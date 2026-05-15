@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime & Manga Info</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🎌 Anime & Manga Info</h1>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Rechercher un anime..." autofocus>
+      <button id="searchBtn">Rechercher</button>
+    </div>
+  </header>
 
+  <main>
+    <section id="topRated">
+      <h2>Top Rated</h2>
+      <div class="grid" id="topGrid"></div>
+    </section>
+
+    <section id="searchResults" class="hidden">
+      <h2>Résultats</h2>
+      <div class="grid" id="resultsGrid"></div>
+    </section>
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="animeDetails"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
