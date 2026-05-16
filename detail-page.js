@@ -1,161 +1,271 @@
-// Récupérer l'ID depuis l'URL
+// Récupérer l'ID et le type depuis l'URL
 const urlParams = new URLSearchParams(window.location.search);
-const animeId = urlParams.get('id');
-const type = urlParams.get('type') || 'anime';
+const contentId = urlParams.get('id');
+const contentType = window.location.pathname.includes('manga-detail') ? 'manga' : 'anime';
+
+// Éléments DOM
+const container = document.getElementById(`${contentType}DetailContainer`);
 
 // Charger les détails
-async function loadAnimeDetails() {
-  const container = document.getElementById('animeDetailContainer');
-  if (!animeId) {
-    container.innerHTML = '<p class="error">ID d\'anime manquant</p>';
+async function loadDetails() {
+  if (!container) return;
+  
+  if (!contentId) {
+    container.innerHTML = '<p class="error">❌ ID manquant</p>';
     return;
   }
   
-  container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
+  container.innerHTML = '<div class="loading">⏳ Chargement des détails...</div>';
   
   try {
-    const response = await fetch(`https://api.jikan.moe/v4/${type}/${animeId}`);
+    const response = await fetch(`https://api.jikan.moe/v4/${contentType}/${contentId}`);
+    if (!response.ok) throw new Error('Erreur réseau');
     const data = await response.json();
     const item = data.data;
     
     // Formatage des dates
-    const airedFrom = item.aired?.from ? new Date(item.aired.from).toLocaleDateString('fr-FR') : 'Inconnue';
-    const airedTo = item.aired?.to ? new Date(item.aired.to).toLocaleDateString('fr-FR') : 'En cours';
+    let publishedFrom = 'Inconnue';
+    let publishedTo = 'En cours';
+    
+    if (contentType === 'manga') {
+      if (item.published?.from) {
+        publishedFrom = new Date(item.published.from).toLocaleDateString('fr-FR', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+      }
+      if (item.published?.to) {
+        publishedTo = new Date(item.published.to).toLocaleDateString('fr-FR', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+      } else if (item.status === 'Finished') {
+        publishedTo = 'Terminé';
+      }
+    }
+    
+    const title = item.title || 'Sans titre';
+    const englishTitle = item.title_english || '';
+    const score = item.score || 'N/A';
+    const rank = item.rank || 'N/A';
+    const favorites = item.favorites?.toLocaleString() || '0';
+    const status = item.status || 'Inconnu';
+    const genres = item.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Aucun';
+    const synopsis = item.synopsis || 'Pas de synopsis disponible.';
+    const imageUrl = item.images?.jpg?.large_image_url || item.images?.jpg?.image_url || 'https://via.placeholder.com/300x450?text=Image+non+disponible';
+    
+    // Données spécifiques
+    let volumes = 'N/A';
+    let chapters = 'N/A';
+    let authors = 'N/A';
+    
+    if (contentType === 'manga') {
+      volumes = item.volumes || '?';
+      chapters = item.chapters || '?';
+      authors = item.authors?.map(a => a.name).join(', ') || 'Inconnu';
+    } else {
+      volumes = item.episodes || '?';
+      chapters = item.duration || 'N/A';
+      authors = item.studios?.map(s => s.name).join(', ') || 'Inconnu';
+    }
     
     container.innerHTML = `
       <div class="detail-hero">
-        <img src="${item.images?.jpg?.large_image_url || ''}" alt="${item.title}">
+        <img src="${imageUrl}" alt="${title}">
         <div class="detail-hero-info">
-          <h1>${item.title}</h1>
-          <h2>${item.title_english || ''}</h2>
+          <h1>${title}</h1>
+          ${englishTitle ? `<h2>${englishTitle}</h2>` : ''}
           <div class="detail-stats">
-            <span class="stat">⭐ ${item.score || 'N/A'}</span>
-            <span class="stat">📊 Rang #${item.rank || 'N/A'}</span>
-            <span class="stat">❤️ Favoris : ${item.favorites?.toLocaleString() || '0'}</span>
+            <span class="stat">⭐ ${score}</span>
+            <span class="stat">📊 Rang #${rank}</span>
+            <span class="stat">❤️ Favoris : ${favorites}</span>
           </div>
         </div>
       </div>
       
       <div class="detail-info-grid">
         <div class="info-card">
-          <h3>📅 Dates de sortie</h3>
-          <p><strong>Japon :</strong> ${airedFrom}</p>
-          <p><strong>France :</strong> À venir (consultez ADN/Crunchyroll)</p>
-          <p><strong>Statut :</strong> ${item.status || 'Inconnu'}</p>
+          <h3>📅 Dates de publication</h3>
+          <p><strong>Japon :</strong> ${publishedFrom}</p>
+          <p><strong>France :</strong> À venir (consultez l'éditeur)</p>
+          <p><strong>Statut :</strong> ${status}</p>
+          ${contentType === 'manga' ? `<p><strong>Volumes :</strong> ${volumes}</p>` : ''}
         </div>
         
         <div class="info-card">
-          <h3>📺 Épisodes</h3>
-          <p><strong>Total :</strong> ${item.episodes || '?'} épisodes</p>
-          <p><strong>Durée :</strong> ${item.duration || 'N/A'}</p>
-          <p><strong>Studio :</strong> ${item.studios?.map(s => s.name).join(', ') || 'N/A'}</p>
+          <h3>${contentType === 'manga' ? '📚 Chapitres' : '📺 Épisodes'}</h3>
+          <p><strong>${contentType === 'manga' ? 'Chapitres :' : 'Total :'}</strong> ${chapters}</p>
+          <p><strong>${contentType === 'manga' ? 'Auteur(s) :' : 'Studio :'}</strong> ${authors}</p>
+          ${contentType !== 'manga' ? `<p><strong>Durée :</strong> ${volumes}</p>` : ''}
         </div>
         
         <div class="info-card">
           <h3>🏷️ Genres</h3>
           <div class="genres-list">
-            ${item.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Aucun'}
+            ${genres}
           </div>
         </div>
       </div>
       
       <div class="synopsis-full">
         <h3>📖 Synopsis</h3>
-        <p>${item.synopsis || 'Pas de synopsis disponible.'}</p>
+        <p>${synopsis}</p>
       </div>
     `;
     
-    // Si utilisateur connecté, charger ses préférences pour cet anime
-    if (currentUser) {
+    // Si utilisateur connecté, charger ses préférences
+    if (currentUser && document.getElementById('userActions')) {
       document.getElementById('userActions').classList.remove('hidden');
-      await loadUserAnimeData(animeId);
+      await loadUserContentData(contentId);
     }
     
   } catch (error) {
-    console.error(error);
-    container.innerHTML = '<p class="error">❌ Erreur lors du chargement</p>';
+    console.error('Erreur:', error);
+    container.innerHTML = '<div class="error">❌ Erreur lors du chargement des détails. Vérifie ta connexion.</div>';
   }
 }
 
-// Charger les données utilisateur pour cet anime
-async function loadUserAnimeData(animeId) {
+// Charger les données utilisateur
+async function loadUserContentData(contentId) {
   if (!currentUser) return;
   
-  const userRef = db.collection('users').doc(currentUser.uid);
-  const userDoc = await userRef.get();
-  const userData = userDoc.exists ? userDoc.data() : { watched: [], likes: [], ratings: {} };
-  
-  // Marquer le bouton "vu" si déjà dans la liste
-  const watchedBtn = document.getElementById('markWatchedBtn');
-  if (userData.watched && userData.watched.includes(animeId)) {
-    watchedBtn.classList.add('active');
-    watchedBtn.textContent = '✅ Vu';
-  }
-  
-  // Marquer le like
-  const likeBtn = document.getElementById('likeBtn');
-  if (userData.likes && userData.likes.includes(animeId)) {
-    likeBtn.classList.add('active');
-    likeBtn.textContent = '❤️ Liké';
-  }
-  
-  // Restaurer la note
-  const ratingSelect = document.getElementById('userRating');
-  if (userData.ratings && userData.ratings[animeId]) {
-    ratingSelect.value = userData.ratings[animeId];
+  try {
+    const userRef = db.collection('users').doc(currentUser.uid);
+    const userDoc = await userRef.get();
+    const userData = userDoc.exists ? userDoc.data() : { 
+      watched: [], 
+      read: [],
+      likes: [], 
+      ratings: {} 
+    };
+    
+    const actionKey = contentType === 'manga' ? 'read' : 'watched';
+    const actionBtn = document.getElementById('markReadBtn') || document.getElementById('markWatchedBtn');
+    
+    if (actionBtn) {
+      if (userData[actionKey] && userData[actionKey].includes(contentId)) {
+        actionBtn.classList.add('active');
+        actionBtn.textContent = contentType === 'manga' ? '✅ Lu' : '✅ Vu';
+      }
+    }
+    
+    const likeBtn = document.getElementById('likeBtn');
+    if (likeBtn && userData.likes && userData.likes.includes(contentId)) {
+      likeBtn.classList.add('active');
+      likeBtn.textContent = '❤️ Liké';
+    }
+    
+    const ratingSelect = document.getElementById('userRating');
+    if (ratingSelect && userData.ratings && userData.ratings[contentId]) {
+      ratingSelect.value = userData.ratings[contentId];
+    }
+  } catch (error) {
+    console.error('Erreur chargement préférences:', error);
   }
 }
 
 // Sauvegarder dans Firestore
-async function saveUserAnimeData(action, animeId) {
+async function saveUserContentData(action, contentId) {
   if (!currentUser) {
-    alert('Connectez-vous pour sauvegarder vos préférences !');
+    alert('🔐 Connectez-vous pour sauvegarder vos préférences !');
     return;
   }
   
-  const userRef = db.collection('users').doc(currentUser.uid);
-  const userDoc = await userRef.get();
-  let userData = userDoc.exists ? userDoc.data() : { watched: [], likes: [], ratings: {} };
-  
-  switch(action) {
-    case 'watched':
-      if (userData.watched && userData.watched.includes(animeId)) {
-        userData.watched = userData.watched.filter(id => id !== animeId);
-        document.getElementById('markWatchedBtn').classList.remove('active');
-        document.getElementById('markWatchedBtn').textContent = '👁️ Marquer comme vu';
-      } else {
-        userData.watched = [...(userData.watched || []), animeId];
-        document.getElementById('markWatchedBtn').classList.add('active');
-        document.getElementById('markWatchedBtn').textContent = '✅ Vu';
-      }
-      break;
-      
-    case 'like':
-      if (userData.likes && userData.likes.includes(animeId)) {
-        userData.likes = userData.likes.filter(id => id !== animeId);
-        document.getElementById('likeBtn').classList.remove('active');
-        document.getElementById('likeBtn').textContent = '❤️ Liker';
-      } else {
-        userData.likes = [...(userData.likes || []), animeId];
-        document.getElementById('likeBtn').classList.add('active');
-        document.getElementById('likeBtn').textContent = '❤️ Liké';
-      }
-      break;
-      
-    case 'rating':
-      const rating = document.getElementById('userRating').value;
-      userData.ratings = { ...userData.ratings, [animeId]: rating };
-      break;
+  try {
+    const userRef = db.collection('users').doc(currentUser.uid);
+    const userDoc = await userRef.get();
+    let userData = userDoc.exists ? userDoc.data() : { 
+      watched: [], 
+      read: [],
+      likes: [], 
+      ratings: {} 
+    };
+    
+    const actionKey = contentType === 'manga' ? 'read' : 'watched';
+    const actionBtn = document.getElementById('markReadBtn') || document.getElementById('markWatchedBtn');
+    const likeBtn = document.getElementById('likeBtn');
+    
+    switch(action) {
+      case 'read':
+      case 'watched':
+        if (userData[actionKey] && userData[actionKey].includes(contentId)) {
+          userData[actionKey] = userData[actionKey].filter(id => id !== contentId);
+          if (actionBtn) {
+            actionBtn.classList.remove('active');
+            actionBtn.textContent = contentType === 'manga' ? '📖 Marquer comme lu' : '👁️ Marquer comme vu';
+          }
+        } else {
+          userData[actionKey] = [...(userData[actionKey] || []), contentId];
+          if (actionBtn) {
+            actionBtn.classList.add('active');
+            actionBtn.textContent = contentType === 'manga' ? '✅ Lu' : '✅ Vu';
+          }
+        }
+        break;
+        
+      case 'like':
+        if (userData.likes && userData.likes.includes(contentId)) {
+          userData.likes = userData.likes.filter(id => id !== contentId);
+          if (likeBtn) {
+            likeBtn.classList.remove('active');
+            likeBtn.textContent = '❤️ Liker';
+          }
+        } else {
+          userData.likes = [...(userData.likes || []), contentId];
+          if (likeBtn) {
+            likeBtn.classList.add('active');
+            likeBtn.textContent = '❤️ Liké';
+          }
+        }
+        break;
+        
+      case 'rating':
+        const rating = document.getElementById('userRating').value;
+        userData.ratings = { ...userData.ratings, [contentId]: rating };
+        break;
+    }
+    
+    await userRef.set(userData);
+    
+    // Afficher un petit message de confirmation
+    showToast('✅ Préférence sauvegardée !');
+    
+  } catch (error) {
+    console.error('Erreur sauvegarde:', error);
+    showToast('❌ Erreur lors de la sauvegarde', 'error');
   }
-  
-  await userRef.set(userData);
+}
+
+// Notification toast
+function showToast(message, type = 'success') {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  loadAnimeDetails();
+  loadDetails();
   
-  document.getElementById('markWatchedBtn')?.addEventListener('click', () => saveUserAnimeData('watched', animeId));
-  document.getElementById('likeBtn')?.addEventListener('click', () => saveUserAnimeData('like', animeId));
-  document.getElementById('userRating')?.addEventListener('change', () => saveUserAnimeData('rating', animeId));
+  const actionBtn = document.getElementById('markReadBtn') || document.getElementById('markWatchedBtn');
+  const likeBtn = document.getElementById('likeBtn');
+  const ratingSelect = document.getElementById('userRating');
+  
+  if (actionBtn) {
+    const action = contentType === 'manga' ? 'read' : 'watched';
+    actionBtn.addEventListener('click', () => saveUserContentData(action, contentId));
+  }
+  
+  if (likeBtn) {
+    likeBtn.addEventListener('click', () => saveUserContentData('like', contentId));
+  }
+  
+  if (ratingSelect) {
+    ratingSelect.addEventListener('change', () => saveUserContentData('rating', contentId));
+  }
 });
