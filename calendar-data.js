@@ -1,11 +1,19 @@
 // ============================================
-// CALENDAR-DATA.JS - GESTION DU CALENDRIER
-// Anime & Manga Info - Planning des sorties
+// CALENDAR.JS - GESTION DU CALENDRIER DES SORTIES
+// Anime & Manga Info - Planning hebdomadaire
 // ============================================
 
 // ============================================
-// STRUCTURE DES DONNÉES
+// CONFIGURATION
 // ============================================
+const ANILIST_API = 'https://graphql.anilist.co';
+
+let currentWeekOffset = 0;
+let currentView = 'anime'; // anime, manga, webtoon
+let calendarData = null;
+let isLoading = false;
+
+// Jours de la semaine en français
 const DAYS_FR = {
   monday: 'Lundi',
   tuesday: 'Mardi',
@@ -17,321 +25,486 @@ const DAYS_FR = {
 };
 
 const DAYS_ORDER = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const DAYS_FR_ORDER = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
-// Noms des mois en français
+// Mois en français
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
 ];
 
 // ============================================
-// DONNÉES DE SORTIES SIMULÉES (FALLBACK)
+// REQUÊTES GRAPHQL
 // ============================================
-const FALLBACK_SCHEDULE = {
-  monday: [
-    { id: 21, title: "One Piece", episode: 1122, time: "09:30", image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg", type: "anime" },
-    { id: 2, title: "Black Clover", episode: 170, time: "10:00", image: "https://cdn.myanimelist.net/images/anime/2/76014.jpg", type: "anime" }
-  ],
-  tuesday: [
-    { id: 7, title: "Jujutsu Kaisen", episode: 47, time: "11:00", image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg", type: "anime" }
-  ],
-  wednesday: [
-    { id: 8, title: "Demon Slayer", episode: 55, time: "10:30", image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg", type: "anime" }
-  ],
-  thursday: [
-    { id: 9, title: "My Hero Academia", episode: 138, time: "09:00", image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg", type: "anime" }
-  ],
-  friday: [
-    { id: 6, title: "Attack on Titan", episode: 87, time: "08:00", image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg", type: "anime" }
-  ],
-  saturday: [
-    { id: 10, title: "Boruto", episode: 293, time: "11:30", image: "https://cdn.myanimelist.net/images/anime/9/78917.jpg", type: "anime" }
-  ],
-  sunday: [
-    { id: 15, title: "Dragon Ball Daima", episode: 12, time: "10:00", image: "https://cdn.myanimelist.net/images/anime/1947/144122.jpg", type: "anime" }
-  ]
-};
 
-// Données des mangas
-const MANGA_SCHEDULE = {
-  monday: [
-    { id: 21, title: "One Piece", chapter: 1125, time: "10:00", image: "https://cdn.myanimelist.net/images/manga/1/10.jpg", type: "manga" }
-  ],
-  wednesday: [
-    { id: 7, title: "Jujutsu Kaisen", chapter: 255, time: "11:00", image: "https://cdn.myanimelist.net/images/manga/3/196750.jpg", type: "manga" }
-  ],
-  friday: [
-    { id: 9, title: "My Hero Academia", chapter: 398, time: "12:00", image: "https://cdn.myanimelist.net/images/manga/3/205975.jpg", type: "manga" }
-  ],
-  sunday: [
-    { id: 10, title: "Boruto", chapter: 80, time: "09:00", image: "https://cdn.myanimelist.net/images/manga/3/192797.jpg", type: "manga" }
-  ]
-};
+// Requête pour les animes diffusés cette semaine
+const WEEK_SCHEDULE_QUERY = `
+  query ($startDate: Int, $endDate: Int) {
+    Page(page: 1, perPage: 100) {
+      media(type: ANIME, startDate_greater: $startDate, startDate_lesser: $endDate, sort: START_DATE) {
+        id
+        title { romaji english }
+        coverImage { medium }
+        startDate { year month day }
+        nextAiringEpisode { episode airingAt }
+        format
+        status
+        episodes
+        averageScore
+      }
+    }
+  }
+`;
 
-// Données des webtoons
-const WEBTOON_SCHEDULE = {
-  thursday: [
-    { id: 301, title: "Tower of God", chapter: 600, time: "14:00", image: "https://cdn.myanimelist.net/images/manga/2/165032.jpg", type: "webtoon" }
-  ],
-  saturday: [
-    { id: 302, title: "Solo Leveling", chapter: 179, time: "15:00", image: "https://cdn.myanimelist.net/images/manga/2/209195.jpg", type: "webtoon" }
-  ]
-};
+// Requête pour les animes tendances
+const TRENDING_QUERY = `
+  query ($page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(type: ANIME, sort: TRENDING_DESC) {
+        id
+        title { romaji english }
+        coverImage { medium }
+        averageScore
+        nextAiringEpisode { episode airingAt }
+      }
+    }
+  }
+`;
+
+// Requête pour les animes populaires
+const POPULAR_QUERY = `
+  query ($page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(type: ANIME, sort: POPULARITY_DESC) {
+        id
+        title { romaji english }
+        coverImage { medium }
+        averageScore
+        favourites
+      }
+    }
+  }
+`;
 
 // ============================================
 // FONCTIONS DE DATE
 // ============================================
 
-function getWeekRange(date = new Date()) {
-  const start = new Date(date);
-  const day = start.getDay();
-  const diff = start.getDate() - day + (day === 0 ? -6 : 1);
-  start.setDate(diff);
+/**
+ * Obtient la semaine actuelle (début et fin)
+ * @param {Date} date - Date de référence
+ * @param {number} offset - Décalage en semaines
+ * @returns {Object} - { start, end, startTimestamp, endTimestamp }
+ */
+function getWeekRange(date = new Date(), offset = 0) {
+  const currentDate = new Date(date);
+  currentDate.setDate(currentDate.getDate() + (offset * 7));
+  
+  const dayOfWeek = currentDate.getDay();
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  
+  const start = new Date(currentDate);
+  start.setDate(currentDate.getDate() - diffToMonday);
   start.setHours(0, 0, 0, 0);
   
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
   end.setHours(23, 59, 59, 999);
   
-  return { start, end };
+  return {
+    start,
+    end,
+    startTimestamp: Math.floor(start.getTime() / 1000),
+    endTimestamp: Math.floor(end.getTime() / 1000)
+  };
 }
 
+/**
+ * Formate une date en français
+ * @param {Date} date - Date à formater
+ * @returns {string} - Date formatée
+ */
 function formatDateFr(date) {
   return `${date.getDate()} ${MONTHS_FR[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function getDayNameFr(dayKey) {
-  return DAYS_FR[dayKey] || dayKey;
+/**
+ * Formate une date pour l'affichage (ex: "15 Janvier 2025")
+ * @param {Object} dateObj - Objet date { year, month, day }
+ * @returns {string}
+ */
+function formatAnilistDate(dateObj) {
+  if (!dateObj || !dateObj.year) return 'Date inconnue';
+  const date = new Date(dateObj.year, (dateObj.month || 1) - 1, dateObj.day || 1);
+  return `${date.getDate()} ${MONTHS_FR[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function isReleasedToday(releaseDate) {
-  const today = new Date();
-  return releaseDate.getDate() === today.getDate() &&
-         releaseDate.getMonth() === today.getMonth() &&
-         releaseDate.getFullYear() === today.getFullYear();
-}
-
-// ============================================
-// FONCTIONS DE RÉCUPÉRATION DES SORTIES
-// ============================================
-
-function getTodayReleases() {
-  const todayIndex = new Date().getDay();
-  const dayMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' };
-  const todayKey = dayMap[todayIndex];
-  
-  const animeReleases = FALLBACK_SCHEDULE[todayKey] || [];
-  const mangaReleases = MANGA_SCHEDULE[todayKey] || [];
-  const webtoonReleases = WEBTOON_SCHEDULE[todayKey] || [];
-  
-  return [...animeReleases, ...mangaReleases, ...webtoonReleases];
-}
-
-function getTodayReleasesByType(type) {
-  const todayIndex = new Date().getDay();
-  const dayMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' };
-  const todayKey = dayMap[todayIndex];
-  
-  switch(type) {
-    case 'anime': return FALLBACK_SCHEDULE[todayKey] || [];
-    case 'manga': return MANGA_SCHEDULE[todayKey] || [];
-    case 'webtoon': return WEBTOON_SCHEDULE[todayKey] || [];
-    default: return [];
-  }
-}
-
-function getWeekReleases(startDate = new Date()) {
-  const weekReleases = {};
-  const weekStart = new Date(startDate);
-  const day = weekStart.getDay();
-  const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-  weekStart.setDate(diff);
-  
-  for (let i = 0; i < 7; i++) {
-    const currentDate = new Date(weekStart);
-    currentDate.setDate(weekStart.getDate() + i);
-    const dayName = DAYS_ORDER[i];
-    
-    weekReleases[dayName] = {
-      anime: FALLBACK_SCHEDULE[dayName] || [],
-      manga: MANGA_SCHEDULE[dayName] || [],
-      webtoon: WEBTOON_SCHEDULE[dayName] || [],
-      date: new Date(currentDate)
-    };
-  }
-  
-  return weekReleases;
-}
-
-function getUpcomingReleases() {
-  const upcoming = [];
-  const today = new Date();
-  const dayMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' };
-  
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    const dayIndex = date.getDay();
-    const dayKey = dayMap[dayIndex];
-    
-    const releases = FALLBACK_SCHEDULE[dayKey] || [];
-    releases.forEach(release => {
-      upcoming.push({
-        ...release,
-        releaseDate: new Date(date),
-        formattedDate: formatDateFr(date),
-        dayName: getDayNameFr(dayKey)
-      });
-    });
-  }
-  
-  return upcoming.sort((a, b) => a.releaseDate - b.releaseDate);
+/**
+ * Obtient le nom du jour en français à partir d'une date
+ * @param {Date} date - Date
+ * @returns {string}
+ */
+function getDayNameFromDate(date) {
+  const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  return days[date.getDay()];
 }
 
 // ============================================
-// RECHERCHE DANS LE CALENDRIER
+// RÉCUPÉRATION DES DONNÉES
 // ============================================
 
-function searchInSchedule(query) {
-  const allReleases = [];
-  const searchTerm = query.toLowerCase();
-  
-  Object.values(FALLBACK_SCHEDULE).forEach(dayReleases => {
-    allReleases.push(...dayReleases.map(r => ({ ...r, category: 'anime' })));
-  });
-  
-  Object.values(MANGA_SCHEDULE).forEach(dayReleases => {
-    allReleases.push(...dayReleases.map(r => ({ ...r, category: 'manga' })));
-  });
-  
-  Object.values(WEBTOON_SCHEDULE).forEach(dayReleases => {
-    allReleases.push(...dayReleases.map(r => ({ ...r, category: 'webtoon' })));
-  });
-  
-  return allReleases.filter(release => 
-    release.title.toLowerCase().includes(searchTerm)
-  );
-}
-
-// ============================================
-// SYNC AVEC API JIKAN
-// ============================================
-
-async function fetchRealSchedule() {
-  const API_BASE = 'https://api.jikan.moe/v4';
-  const CORS_PROXY = 'https://corsproxy.io/?url=';
-  
+/**
+ * Fetche les données depuis l'API AniList
+ * @param {string} query - Requête GraphQL
+ * @param {Object} variables - Variables
+ * @returns {Promise<Object>}
+ */
+async function fetchAnilist(query, variables) {
   try {
-    let response = await fetch(`${API_BASE}/schedules`);
-    if (!response.ok) throw new Error('Erreur réseau');
-    
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables })
+    });
     const data = await response.json();
-    const realSchedule = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+    if (data.errors) {
+      console.error('GraphQL Errors:', data.errors);
+      return null;
+    }
+    return data.data;
+  } catch (error) {
+    console.error('Erreur fetch AniList:', error);
+    return null;
+  }
+}
+
+/**
+ * Récupère les sorties de la semaine
+ * @param {number} weekOffset - Décalage de semaine
+ * @returns {Promise<Object>}
+ */
+async function fetchWeekSchedule(weekOffset = 0) {
+  const { startTimestamp, endTimestamp } = getWeekRange(new Date(), weekOffset);
+  
+  const data = await fetchAnilist(WEEK_SCHEDULE_QUERY, {
+    startDate: startTimestamp,
+    endDate: endTimestamp
+  });
+  
+  if (data?.Page?.media) {
+    return organizeScheduleByDay(data.Page.media);
+  }
+  return {};
+}
+
+/**
+ * Organise les sorties par jour de la semaine
+ * @param {Array} media - Liste des médias
+ * @returns {Object}
+ */
+function organizeScheduleByDay(media) {
+  const schedule = {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: []
+  };
+  
+  media.forEach(anime => {
+    let dayKey = null;
     
-    if (data.data) {
-      data.data.forEach(anime => {
-        const day = anime.broadcast?.day?.toLowerCase();
-        if (day && realSchedule[day]) {
-          realSchedule[day].push({
-            id: anime.mal_id,
-            title: anime.title,
-            episode: anime.episodes || '?',
-            time: anime.broadcast?.time || 'Horaire inconnu',
-            image: anime.images?.jpg?.image_url || '',
-            type: 'anime',
-            score: anime.score
-          });
-        }
+    // Vérifier via nextAiringEpisode
+    if (anime.nextAiringEpisode) {
+      const airingDate = new Date(anime.nextAiringEpisode.airingAt * 1000);
+      const dayName = getDayNameFromDate(airingDate);
+      dayKey = dayName;
+    }
+    // Vérifier via startDate
+    else if (anime.startDate?.year) {
+      const releaseDate = new Date(
+        anime.startDate.year,
+        (anime.startDate.month || 1) - 1,
+        anime.startDate.day || 1
+      );
+      const dayName = getDayNameFromDate(releaseDate);
+      dayKey = dayName;
+    }
+    
+    if (dayKey && schedule[dayKey]) {
+      schedule[dayKey].push({
+        ...anime,
+        releaseInfo: getReleaseInfo(anime)
       });
     }
-    
-    return realSchedule;
-  } catch (error) {
-    console.error('Erreur chargement planning réel:', error);
-    return FALLBACK_SCHEDULE;
+  });
+  
+  // Trier chaque jour par heure de diffusion
+  for (const day in schedule) {
+    schedule[day].sort((a, b) => {
+      const timeA = a.nextAiringEpisode?.airingAt || Infinity;
+      const timeB = b.nextAiringEpisode?.airingAt || Infinity;
+      return timeA - timeB;
+    });
   }
+  
+  return schedule;
 }
 
-async function updateScheduleFromAPI() {
+/**
+ * Obtient les informations de sortie pour un anime
+ * @param {Object} anime - Anime object
+ * @returns {string}
+ */
+function getReleaseInfo(anime) {
+  if (anime.nextAiringEpisode) {
+    const date = new Date(anime.nextAiringEpisode.airingAt * 1000);
+    return `Ép. ${anime.nextAiringEpisode.episode} - ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  if (anime.startDate?.year) {
+    return `Sortie: ${formatAnilistDate(anime.startDate)}`;
+  }
+  return 'Date inconnue';
+}
+
+// ============================================
+// AFFICHAGE DU CALENDRIER
+// ============================================
+
+/**
+ * Rendu du calendrier
+ * @param {Object} schedule - Planning des sorties
+ * @param {number} weekOffset - Décalage de semaine
+ */
+function renderCalendar(schedule, weekOffset = 0) {
+  const calendarGrid = document.getElementById('calendarGrid');
+  const weekDaysContainer = document.getElementById('weekDays');
+  const calendarTitle = document.getElementById('calendarTitle');
+  
+  if (!calendarGrid) return;
+  
+  const { start, end } = getWeekRange(new Date(), weekOffset);
+  const weekDates = [];
+  
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
+    weekDates.push(date);
+  }
+  
+  // Mettre à jour le titre
+  if (calendarTitle) {
+    calendarTitle.innerHTML = `📅 Semaine du ${formatDateFr(start)} au ${formatDateFr(end)}`;
+  }
+  
+  // Afficher les jours de la semaine avec les dates
+  if (weekDaysContainer) {
+    weekDaysContainer.innerHTML = DAYS_FR_ORDER.map((day, index) => `
+      <div class="calendar-day-header">
+        ${day}<br>
+        <small>${weekDates[index].getDate()} ${MONTHS_FR[weekDates[index].getMonth()]}</small>
+      </div>
+    `).join('');
+  }
+  
+  // Remplir la grille
+  calendarGrid.innerHTML = DAYS_ORDER.map(day => {
+    const releases = schedule[day] || [];
+    const dayDate = weekDates[DAYS_ORDER.indexOf(day)];
+    
+    return `
+      <div class="calendar-day">
+        <div class="calendar-day-date">
+          ${DAYS_FR[day]}<br>
+          <small>${dayDate.getDate()} ${MONTHS_FR[dayDate.getMonth()]}</small>
+        </div>
+        <div class="calendar-releases">
+          ${releases.map(anime => `
+            <div class="calendar-episode" data-id="${anime.id}">
+              <strong>${anime.title?.romaji?.substring(0, 25) || '?'}</strong>
+              <small>${anime.releaseInfo}</small>
+              ${anime.averageScore ? `<span class="calendar-score">⭐ ${(anime.averageScore / 10).toFixed(1)}</span>` : ''}
+            </div>
+          `).join('')}
+          ${releases.length === 0 ? '<div class="calendar-empty">Aucune sortie</div>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Ajouter les événements de clic
+  document.querySelectorAll('.calendar-episode').forEach(ep => {
+    ep.addEventListener('click', () => {
+      const id = ep.dataset.id;
+      if (id) window.location.href = `anime-detail.html?id=${id}`;
+    });
+  });
+}
+
+// ============================================
+// CHARGEMENT DU CALENDRIER
+// ============================================
+
+/**
+ * Charge et affiche le calendrier
+ * @param {number} weekOffset - Décalage de semaine
+ */
+async function loadCalendar(weekOffset = 0) {
+  if (isLoading) return;
+  isLoading = true;
+  
+  const calendarGrid = document.getElementById('calendarGrid');
+  if (calendarGrid) {
+    calendarGrid.innerHTML = '<div class="loading">⏳ Chargement du calendrier...</div>';
+  }
+  
   try {
-    const realSchedule = await fetchRealSchedule();
-    Object.assign(FALLBACK_SCHEDULE, realSchedule);
+    const schedule = await fetchWeekSchedule(weekOffset);
+    renderCalendar(schedule, weekOffset);
+    currentWeekOffset = weekOffset;
   } catch (error) {
-    console.warn('Impossible de synchroniser avec l\'API, utilisation des données de fallback');
-  }
-  return FALLBACK_SCHEDULE;
-}
-
-// ============================================
-// NOTIFICATIONS DE SORTIES
-// ============================================
-
-async function checkTodayReleasesAndNotify() {
-  // Vérifier si les notifications sont supportées et autorisées
-  if (!('Notification' in window)) return;
-  if (Notification.permission !== 'granted') return;
-  
-  const todayReleases = getTodayReleases();
-  
-  if (todayReleases.length > 0) {
-    new Notification('📺 Nouvelles sorties aujourd\'hui !', {
-      body: `${todayReleases.length} nouvel${todayReleases.length > 1 ? 's' : ''} épisode${todayReleases.length > 1 ? 's' : ''} disponible${todayReleases.length > 1 ? 's' : ''}.`,
-      icon: '/favicon.ico',
-      tag: 'daily-releases',
-      silent: false
-    });
-  }
-}
-
-// ============================================
-// INITIALISATION (évite les erreurs)
-// ============================================
-if (typeof window !== 'undefined') {
-  // Attendre que la page soit chargée pour initialiser
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      updateScheduleFromAPI().catch(console.warn);
-      
-      const lastCheck = localStorage.getItem('lastReleasesCheck');
-      const today = new Date().toDateString();
-      if (lastCheck !== today) {
-        setTimeout(() => checkTodayReleasesAndNotify(), 5000);
-        localStorage.setItem('lastReleasesCheck', today);
-      }
-    });
-  } else {
-    updateScheduleFromAPI().catch(console.warn);
-    
-    const lastCheck = localStorage.getItem('lastReleasesCheck');
-    const today = new Date().toDateString();
-    if (lastCheck !== today) {
-      setTimeout(() => checkTodayReleasesAndNotify(), 5000);
-      localStorage.setItem('lastReleasesCheck', today);
+    console.error('Erreur chargement calendrier:', error);
+    if (calendarGrid) {
+      calendarGrid.innerHTML = '<div class="error">❌ Erreur de chargement du calendrier</div>';
     }
+  } finally {
+    isLoading = false;
   }
 }
 
 // ============================================
-// EXPORT DES FONCTIONS
+// NAVIGATION
 // ============================================
-window.CalendarData = {
-  getWeekRange,
-  formatDateFr,
-  getDayNameFr,
-  isReleasedToday,
+
+/**
+ * Semaine précédente
+ */
+function prevWeek() {
+  loadCalendar(currentWeekOffset - 1);
+}
+
+/**
+ * Semaine suivante
+ */
+function nextWeek() {
+  loadCalendar(currentWeekOffset + 1);
+}
+
+/**
+ * Semaine actuelle
+ */
+function currentWeek() {
+  loadCalendar(0);
+}
+
+// ============================================
+// CALENDRIER DES SORTIES (ALTERNATIF)
+// ============================================
+
+/**
+ * Récupère les sorties du jour
+ * @returns {Promise<Array>}
+ */
+async function getTodayReleases() {
+  const { startTimestamp, endTimestamp } = getWeekRange(new Date(), 0);
+  const today = new Date();
+  const todayDay = getDayNameFromDate(today);
+  
+  const schedule = await fetchWeekSchedule(0);
+  return schedule[todayDay] || [];
+}
+
+/**
+ * Récupère les prochaines sorties (7 jours)
+ * @returns {Promise<Array>}
+ */
+async function getUpcomingReleases() {
+  const schedule = await fetchWeekSchedule(0);
+  const allReleases = [];
+  
+  for (const day of DAYS_ORDER) {
+    const releases = schedule[day] || [];
+    allReleases.push(...releases);
+  }
+  
+  return allReleases.sort((a, b) => {
+    const timeA = a.nextAiringEpisode?.airingAt || Infinity;
+    const timeB = b.nextAiringEpisode?.airingAt || Infinity;
+    return timeA - timeB;
+  });
+}
+
+// ============================================
+// TENDANCES ET POPULAIRES
+// ============================================
+
+/**
+ * Récupère les animes tendances
+ * @param {number} limit - Nombre d'animes
+ * @returns {Promise<Array>}
+ */
+async function getTrendingAnime(limit = 12) {
+  const data = await fetchAnilist(TRENDING_QUERY, { page: 1, perPage: limit });
+  return data?.Page?.media || [];
+}
+
+/**
+ * Récupère les animes populaires
+ * @param {number} limit - Nombre d'animes
+ * @returns {Promise<Array>}
+ */
+async function getPopularAnime(limit = 12) {
+  const data = await fetchAnilist(POPULAR_QUERY, { page: 1, perPage: limit });
+  return data?.Page?.media || [];
+}
+
+// ============================================
+// INITIALISATION
+// ============================================
+function initCalendar() {
+  // Écouteurs pour les boutons de navigation
+  const prevBtn = document.getElementById('prevWeekBtn');
+  const nextBtn = document.getElementById('nextWeekBtn');
+  const currentBtn = document.getElementById('currentWeekBtn');
+  
+  if (prevBtn) prevBtn.addEventListener('click', () => prevWeek());
+  if (nextBtn) nextBtn.addEventListener('click', () => nextWeek());
+  if (currentBtn) currentBtn.addEventListener('click', () => currentWeek());
+  
+  // Charger le calendrier initial
+  loadCalendar(0);
+}
+
+// Auto-initialisation si la page contient les éléments du calendrier
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('calendarGrid')) {
+      initCalendar();
+    }
+  });
+} else {
+  if (document.getElementById('calendarGrid')) {
+    initCalendar();
+  }
+}
+
+// ============================================
+// EXPORT (pour utilisation dans d'autres scripts)
+// ============================================
+window.Calendar = {
+  loadCalendar,
+  prevWeek,
+  nextWeek,
+  currentWeek,
   getTodayReleases,
-  getTodayReleasesByType,
-  getWeekReleases,
   getUpcomingReleases,
-  searchInSchedule,
-  fetchRealSchedule,
-  updateScheduleFromAPI,
-  checkTodayReleasesAndNotify,
+  getTrendingAnime,
+  getPopularAnime,
+  fetchWeekSchedule,
   DAYS_FR,
-  MONTHS_FR,
-  FALLBACK_SCHEDULE,
-  MANGA_SCHEDULE,
-  WEBTOON_SCHEDULE
+  MONTHS_FR
 };
 
-console.log('✅ calendar-data.js chargé');
+console.log('✅ calendar.js chargé');
