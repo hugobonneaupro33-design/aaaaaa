@@ -9,8 +9,6 @@
 const ANILIST_API = 'https://graphql.anilist.co';
 
 let currentWeekOffset = 0;
-let currentView = 'anime'; // anime, manga, webtoon
-let calendarData = null;
 let isLoading = false;
 
 // Jours de la semaine en français
@@ -56,36 +54,6 @@ const WEEK_SCHEDULE_QUERY = `
   }
 `;
 
-// Requête pour les animes tendances
-const TRENDING_QUERY = `
-  query ($page: Int, $perPage: Int) {
-    Page(page: $page, perPage: $perPage) {
-      media(type: ANIME, sort: TRENDING_DESC) {
-        id
-        title { romaji english }
-        coverImage { medium }
-        averageScore
-        nextAiringEpisode { episode airingAt }
-      }
-    }
-  }
-`;
-
-// Requête pour les animes populaires
-const POPULAR_QUERY = `
-  query ($page: Int, $perPage: Int) {
-    Page(page: $page, perPage: $perPage) {
-      media(type: ANIME, sort: POPULARITY_DESC) {
-        id
-        title { romaji english }
-        coverImage { medium }
-        averageScore
-        favourites
-      }
-    }
-  }
-`;
-
 // ============================================
 // FONCTIONS DE DATE
 // ============================================
@@ -94,7 +62,7 @@ const POPULAR_QUERY = `
  * Obtient la semaine actuelle (début et fin)
  * @param {Date} date - Date de référence
  * @param {number} offset - Décalage en semaines
- * @returns {Object} - { start, end, startTimestamp, endTimestamp }
+ * @returns {Object}
  */
 function getWeekRange(date = new Date(), offset = 0) {
   const currentDate = new Date(date);
@@ -122,20 +90,9 @@ function getWeekRange(date = new Date(), offset = 0) {
 /**
  * Formate une date en français
  * @param {Date} date - Date à formater
- * @returns {string} - Date formatée
- */
-function formatDateFr(date) {
-  return `${date.getDate()} ${MONTHS_FR[date.getMonth()]} ${date.getFullYear()}`;
-}
-
-/**
- * Formate une date pour l'affichage (ex: "15 Janvier 2025")
- * @param {Object} dateObj - Objet date { year, month, day }
  * @returns {string}
  */
-function formatAnilistDate(dateObj) {
-  if (!dateObj || !dateObj.year) return 'Date inconnue';
-  const date = new Date(dateObj.year, (dateObj.month || 1) - 1, dateObj.day || 1);
+function formatDateFr(date) {
   return `${date.getDate()} ${MONTHS_FR[date.getMonth()]} ${date.getFullYear()}`;
 }
 
@@ -149,12 +106,31 @@ function getDayNameFromDate(date) {
   return days[date.getDay()];
 }
 
+/**
+ * Obtient les informations de sortie pour un anime
+ * @param {Object} anime - Anime object
+ * @returns {string}
+ */
+function getReleaseInfo(anime) {
+  if (anime.nextAiringEpisode) {
+    const date = new Date(anime.nextAiringEpisode.airingAt * 1000);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `Ép. ${anime.nextAiringEpisode.episode} - ${hours}:${minutes}`;
+  }
+  if (anime.startDate?.year) {
+    const releaseDate = new Date(anime.startDate.year, (anime.startDate.month || 1) - 1, anime.startDate.day || 1);
+    return `Sortie: ${releaseDate.getDate()} ${MONTHS_FR[releaseDate.getMonth()]}`;
+  }
+  return 'Date inconnue';
+}
+
 // ============================================
 // RÉCUPÉRATION DES DONNÉES
 // ============================================
 
 /**
- * Fetche les données depuis l'API AniList
+ * Fetch les données depuis l'API AniList
  * @param {string} query - Requête GraphQL
  * @param {Object} variables - Variables
  * @returns {Promise<Object>}
@@ -194,16 +170,15 @@ async function fetchWeekSchedule(weekOffset = 0) {
   if (data?.Page?.media) {
     return organizeScheduleByDay(data.Page.media);
   }
-  return {};
+  return createEmptySchedule();
 }
 
 /**
- * Organise les sorties par jour de la semaine
- * @param {Array} media - Liste des médias
+ * Crée un planning vide
  * @returns {Object}
  */
-function organizeScheduleByDay(media) {
-  const schedule = {
+function createEmptySchedule() {
+  return {
     monday: [],
     tuesday: [],
     wednesday: [],
@@ -212,15 +187,25 @@ function organizeScheduleByDay(media) {
     saturday: [],
     sunday: []
   };
+}
+
+/**
+ * Organise les sorties par jour de la semaine
+ * @param {Array} media - Liste des médias
+ * @returns {Object}
+ */
+function organizeScheduleByDay(media) {
+  const schedule = createEmptySchedule();
   
   media.forEach(anime => {
     let dayKey = null;
+    let airingTime = null;
     
     // Vérifier via nextAiringEpisode
     if (anime.nextAiringEpisode) {
       const airingDate = new Date(anime.nextAiringEpisode.airingAt * 1000);
-      const dayName = getDayNameFromDate(airingDate);
-      dayKey = dayName;
+      dayKey = getDayNameFromDate(airingDate);
+      airingTime = anime.nextAiringEpisode.airingAt;
     }
     // Vérifier via startDate
     else if (anime.startDate?.year) {
@@ -229,13 +214,14 @@ function organizeScheduleByDay(media) {
         (anime.startDate.month || 1) - 1,
         anime.startDate.day || 1
       );
-      const dayName = getDayNameFromDate(releaseDate);
-      dayKey = dayName;
+      dayKey = getDayNameFromDate(releaseDate);
+      airingTime = releaseDate.getTime() / 1000;
     }
     
-    if (dayKey && schedule[dayKey]) {
+    if (dayKey && schedule[dayKey] !== undefined) {
       schedule[dayKey].push({
         ...anime,
+        airingTime: airingTime || Infinity,
         releaseInfo: getReleaseInfo(anime)
       });
     }
@@ -243,30 +229,10 @@ function organizeScheduleByDay(media) {
   
   // Trier chaque jour par heure de diffusion
   for (const day in schedule) {
-    schedule[day].sort((a, b) => {
-      const timeA = a.nextAiringEpisode?.airingAt || Infinity;
-      const timeB = b.nextAiringEpisode?.airingAt || Infinity;
-      return timeA - timeB;
-    });
+    schedule[day].sort((a, b) => (a.airingTime || Infinity) - (b.airingTime || Infinity));
   }
   
   return schedule;
-}
-
-/**
- * Obtient les informations de sortie pour un anime
- * @param {Object} anime - Anime object
- * @returns {string}
- */
-function getReleaseInfo(anime) {
-  if (anime.nextAiringEpisode) {
-    const date = new Date(anime.nextAiringEpisode.airingAt * 1000);
-    return `Ép. ${anime.nextAiringEpisode.episode} - ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-  }
-  if (anime.startDate?.year) {
-    return `Sortie: ${formatAnilistDate(anime.startDate)}`;
-  }
-  return 'Date inconnue';
 }
 
 // ============================================
@@ -283,7 +249,10 @@ function renderCalendar(schedule, weekOffset = 0) {
   const weekDaysContainer = document.getElementById('weekDays');
   const calendarTitle = document.getElementById('calendarTitle');
   
-  if (!calendarGrid) return;
+  if (!calendarGrid) {
+    console.warn('CalendarGrid non trouvé');
+    return;
+  }
   
   const { start, end } = getWeekRange(new Date(), weekOffset);
   const weekDates = [];
@@ -310,25 +279,26 @@ function renderCalendar(schedule, weekOffset = 0) {
   }
   
   // Remplir la grille
-  calendarGrid.innerHTML = DAYS_ORDER.map(day => {
+  calendarGrid.innerHTML = DAYS_ORDER.map((day, index) => {
     const releases = schedule[day] || [];
-    const dayDate = weekDates[DAYS_ORDER.indexOf(day)];
+    const dayDate = weekDates[index];
     
     return `
       <div class="calendar-day">
-        <div class="calendar-day-date">
-          ${DAYS_FR[day]}<br>
+        <div class="calendar-day-header">
+          <strong>${DAYS_FR[day]}</strong><br>
           <small>${dayDate.getDate()} ${MONTHS_FR[dayDate.getMonth()]}</small>
         </div>
         <div class="calendar-releases">
-          ${releases.map(anime => `
+          ${releases.length > 0 ? releases.map(anime => `
             <div class="calendar-episode" data-id="${anime.id}">
-              <strong>${anime.title?.romaji?.substring(0, 25) || '?'}</strong>
-              <small>${anime.releaseInfo}</small>
-              ${anime.averageScore ? `<span class="calendar-score">⭐ ${(anime.averageScore / 10).toFixed(1)}</span>` : ''}
+              <div class="calendar-episode-title">${anime.title?.romaji?.substring(0, 22) || '?'}</div>
+              <div class="calendar-episode-info">
+                <small>${anime.releaseInfo}</small>
+                ${anime.averageScore ? `<span class="calendar-score">⭐ ${(anime.averageScore / 10).toFixed(1)}</span>` : ''}
+              </div>
             </div>
-          `).join('')}
-          ${releases.length === 0 ? '<div class="calendar-empty">Aucune sortie</div>' : ''}
+          `).join('') : '<div class="calendar-empty">Aucune sortie</div>'}
         </div>
       </div>
     `;
@@ -400,7 +370,7 @@ function currentWeek() {
 }
 
 // ============================================
-// CALENDRIER DES SORTIES (ALTERNATIF)
+// FONCTIONS UTILES
 // ============================================
 
 /**
@@ -408,11 +378,9 @@ function currentWeek() {
  * @returns {Promise<Array>}
  */
 async function getTodayReleases() {
-  const { startTimestamp, endTimestamp } = getWeekRange(new Date(), 0);
+  const schedule = await fetchWeekSchedule(0);
   const today = new Date();
   const todayDay = getDayNameFromDate(today);
-  
-  const schedule = await fetchWeekSchedule(0);
   return schedule[todayDay] || [];
 }
 
@@ -429,65 +397,50 @@ async function getUpcomingReleases() {
     allReleases.push(...releases);
   }
   
-  return allReleases.sort((a, b) => {
-    const timeA = a.nextAiringEpisode?.airingAt || Infinity;
-    const timeB = b.nextAiringEpisode?.airingAt || Infinity;
-    return timeA - timeB;
-  });
-}
-
-// ============================================
-// TENDANCES ET POPULAIRES
-// ============================================
-
-/**
- * Récupère les animes tendances
- * @param {number} limit - Nombre d'animes
- * @returns {Promise<Array>}
- */
-async function getTrendingAnime(limit = 12) {
-  const data = await fetchAnilist(TRENDING_QUERY, { page: 1, perPage: limit });
-  return data?.Page?.media || [];
-}
-
-/**
- * Récupère les animes populaires
- * @param {number} limit - Nombre d'animes
- * @returns {Promise<Array>}
- */
-async function getPopularAnime(limit = 12) {
-  const data = await fetchAnilist(POPULAR_QUERY, { page: 1, perPage: limit });
-  return data?.Page?.media || [];
+  return allReleases.sort((a, b) => (a.airingTime || Infinity) - (b.airingTime || Infinity));
 }
 
 // ============================================
 // INITIALISATION
 // ============================================
 function initCalendar() {
+  // Vérifier que les éléments existent
+  const calendarGrid = document.getElementById('calendarGrid');
+  if (!calendarGrid) {
+    console.log('Calendar: Éléments non trouvés, initialisation différée');
+    return;
+  }
+  
   // Écouteurs pour les boutons de navigation
   const prevBtn = document.getElementById('prevWeekBtn');
   const nextBtn = document.getElementById('nextWeekBtn');
   const currentBtn = document.getElementById('currentWeekBtn');
   
-  if (prevBtn) prevBtn.addEventListener('click', () => prevWeek());
-  if (nextBtn) nextBtn.addEventListener('click', () => nextWeek());
-  if (currentBtn) currentBtn.addEventListener('click', () => currentWeek());
+  if (prevBtn) {
+    prevBtn.removeEventListener('click', prevWeek);
+    prevBtn.addEventListener('click', () => prevWeek());
+  }
+  if (nextBtn) {
+    nextBtn.removeEventListener('click', nextWeek);
+    nextBtn.addEventListener('click', () => nextWeek());
+  }
+  if (currentBtn) {
+    currentBtn.removeEventListener('click', currentWeek);
+    currentBtn.addEventListener('click', () => currentWeek());
+  }
   
   // Charger le calendrier initial
   loadCalendar(0);
+  console.log('✅ Calendar initialisé');
 }
 
-// Auto-initialisation si la page contient les éléments du calendrier
+// Auto-initialisation
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('calendarGrid')) {
-      initCalendar();
-    }
+    initCalendar();
   });
 } else {
-  if (document.getElementById('calendarGrid')) {
-    initCalendar();
-  }
+  initCalendar();
 }
 
 // ============================================
@@ -500,8 +453,6 @@ window.Calendar = {
   currentWeek,
   getTodayReleases,
   getUpcomingReleases,
-  getTrendingAnime,
-  getPopularAnime,
   fetchWeekSchedule,
   DAYS_FR,
   MONTHS_FR
