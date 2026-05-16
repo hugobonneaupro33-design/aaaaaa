@@ -4,12 +4,13 @@
 
 // REMPLACE PAR TES INFOS FIREBASE
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY",
-  authDomain: "VOTRE_PROJECT.firebaseapp.com",
-  projectId: "VOTRE_PROJECT_ID",
-  storageBucket: "VOTRE_PROJECT.appspot.com",
-  messagingSenderId: "VOTRE_SENDER_ID",
-  appId: "VOTRE_APP_ID"
+  apiKey: "AIzaSyCwDOGPUWQ08WGuAAZ9p6hS6SZytmRoKig",
+  authDomain: "arkya-animemanga.firebaseapp.com",
+  projectId: "arkya-animemanga",
+  storageBucket: "arkya-animemanga.firebasestorage.app",
+  messagingSenderId: "52570519836",
+  appId: "1:52570519836:web:dbf4fcd7aafe01aac762d9",
+  measurementId: "G-04DPK4LP4H"
 };
 
 // ============================================
