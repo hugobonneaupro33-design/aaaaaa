@@ -960,4 +960,242 @@ footer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+  /* Watch Page */
+.watch-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.video-player {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  position: relative;
+}
+
+.video-player iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.8rem;
+  background: #1a1a2e;
+  border-radius: 12px;
+}
+
+.lang-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lang-btn {
+  padding: 0.5rem 1.2rem;
+  background: #252540;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-btn.active {
+  background: #e94560;
+}
+
+.episode-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-ep-btn {
+  padding: 0.4rem 1rem;
+  background: #252540;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-ep-btn:hover {
+  background: #e94560;
+}
+
+#currentEpisodeDisplay {
+  font-weight: bold;
+  color: #e94560;
+}
+
+.anime-info {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.anime-info h2 {
+  color: #e94560;
+  margin-bottom: 0.5rem;
+}
+
+.anime-info p {
+  line-height: 1.5;
+  color: #ccc;
+}
+
+/* Episodes Section */
+.episodes-section {
+  background: #1a1a2e;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 120px);
+  position: sticky;
+  top: 100px;
+}
+
+.episodes-header {
+  padding: 1rem;
+  border-bottom: 1px solid #252540;
+}
+
+.episodes-header h3 {
+  color: #e94560;
+  margin-bottom: 0.8rem;
+}
+
+#episodeSearch {
+  width: 100%;
+  padding: 0.6rem;
+  background: #252540;
+  border: none;
+  border-radius: 8px;
+  color: white;
+}
+
+.episodes-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.episode-card {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.6rem;
+  margin-bottom: 0.5rem;
+  background: #252540;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.episode-card:hover {
+  background: #3a3a5c;
+  transform: translateX(4px);
+}
+
+.episode-card.active {
+  background: #e94560;
+}
+
+.episode-thumb img {
+  width: 100px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.episode-info {
+  flex: 1;
+}
+
+.episode-num {
+  font-size: 0.8rem;
+  color: #e94560;
+  font-weight: bold;
+}
+
+.episode-card.active .episode-num {
+  color: white;
+}
+
+.episode-title {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.watch-episode-btn {
+  padding: 0.3rem 0.8rem;
+  background: #e94560;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.8rem;
+  align-self: center;
+}
+
+/* Manga Reader */
+.manga-reader {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+}
+
+.manga-reader iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .watch-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .episodes-section {
+    position: static;
+    max-height: 500px;
+  }
+  
+  .episode-title {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .video-controls {
+    flex-direction: column;
+  }
+  
+  .episode-thumb img {
+    width: 70px;
+    height: 40px;
+  }
+  
+  .episode-title {
+    max-width: 120px;
+    font-size: 0.75rem;
+  }
+}
 }
