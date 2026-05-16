@@ -2,15 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Anime & Manga Info - Votre source d'actualités pour les animes, mangas et webtoons. Découvrez les tops notes, les dernières news et gérez vos favoris.">
-  <meta name="keywords" content="anime, manga, webtoon, actualités, shonen jump, crunchyroll">
-  <meta name="author" content="Anime & Manga Info">
-  <meta name="theme-color" content="#e94560">
-  <title>Anime & Manga Info - Actualités Anime, Manga & Webtoon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime & Manga Info - Accueil</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎌</text></svg>">
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -22,21 +16,8 @@
         <h1>🎌 Anime & Manga Info</h1>
       </div>
       <div id="authButtons" class="auth-buttons">
-        <button onclick="loginWithGoogle()" class="google-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right: 8px;">
-            <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Google
-        </button>
-        <button onclick="loginWithFacebook()" class="facebook-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right: 8px;">
-            <path fill="white" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.96h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/>
-          </svg>
-          Facebook
-        </button>
+        <button onclick="loginWithGoogle()" class="google-btn">🔵 Google</button>
+        <button onclick="loginWithFacebook()" class="facebook-btn">📘 Facebook</button>
       </div>
       <div id="userMenu" class="user-menu hidden">
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
@@ -45,86 +26,93 @@
         <a href="profile.html" class="profile-link">👤 Mon profil</a>
       </div>
     </div>
-    
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Rechercher un anime ou manga..." autofocus>
-      <button id="searchBtn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        Rechercher
-      </button>
+      <input type="text" id="searchInput" placeholder="Rechercher un anime/manga...">
+      <button id="searchBtn">🔍 Rechercher</button>
     </div>
   </header>
 
   <main>
-    <!-- Onglets principaux -->
-    <div class="main-tabs">
-      <button class="main-tab active" data-tab="news">
-        <span>📰</span> Actualités
-      </button>
-      <button class="main-tab" data-tab="top">
-        <span>⭐</span> Top Rated
-      </button>
+    <!-- Navigation rapide -->
+    <div class="quick-nav">
+      <button class="nav-btn active" data-page="home">🏠 Accueil</button>
+      <button class="nav-btn" data-page="calendar">📅 Calendrier</button>
+      <button class="nav-btn" data-page="top">⭐ Top Rated</button>
+      <button class="nav-btn" data-page="news">📰 Actualités</button>
     </div>
 
-    <!-- SECTION ACTUALITÉS -->
-    <section id="newsSection">
+    <!-- PAGE ACCUEIL -->
+    <div id="homePage" class="page active">
+      <!-- Sorties du jour -->
+      <section class="today-releases">
+        <h2>📅 Sorties du <span id="todayDate"></span></h2>
+        <div id="todayReleases" class="releases-grid">
+          <div class="loading">⏳ Chargement...</div>
+        </div>
+      </section>
+
+      <!-- Tendances -->
+      <section class="trending">
+        <h2>🔥 Tendances de la semaine</h2>
+        <div id="trendingGrid" class="grid"></div>
+      </section>
+
+      <!-- Nouveautés -->
+      <section class="new-releases">
+        <h2>✨ Nouveautés de la semaine</h2>
+        <div id="newReleasesGrid" class="grid"></div>
+      </section>
+    </div>
+
+    <!-- PAGE CALENDRIER -->
+    <div id="calendarPage" class="page hidden">
+      <h2>📅 Calendrier des sorties</h2>
+      <p class="calendar-info">Semaine du <span id="weekStart"></span> au <span id="weekEnd"></span></p>
+      <div class="week-nav">
+        <button id="prevWeekBtn">◀ Semaine précédente</button>
+        <button id="currentWeekBtn">📍 Semaine actuelle</button>
+        <button id="nextWeekBtn">Semaine suivante ▶</button>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+
+    <!-- PAGE TOP RATED -->
+    <div id="topPage" class="page hidden">
+      <div class="categories">
+        <button class="cat-btn active" data-cat="anime">📺 Anime</button>
+        <button class="cat-btn" data-cat="manga">📖 Manga</button>
+      </div>
+      <div class="grid" id="topGrid"></div>
+    </div>
+
+    <!-- PAGE ACTUALITÉS -->
+    <div id="newsPage" class="page hidden">
       <div class="news-filters">
         <button class="news-filter active" data-source="all">🌐 Tous</button>
         <button class="news-filter" data-source="shonenjump">📖 Shonen Jump</button>
-        <button class="news-filter" data-source="animenews">📰 Anime News</button>
         <button class="news-filter" data-source="crunchyroll">🍣 Crunchyroll</button>
-        <button class="news-filter" data-source="webtoon">🎨 Webtoon</button>
       </div>
-      <div id="newsGrid" class="news-grid">
-        <!-- Les actualités seront chargées ici -->
-        <div class="loading">⏳ Chargement des actualités...</div>
-      </div>
-    </section>
+      <div id="newsGrid" class="news-grid"></div>
+    </div>
 
-    <!-- SECTION TOP RATED -->
-    <section id="topRatedSection" class="hidden">
-      <div class="categories">
-        <button class="cat-btn active" data-cat="anime">
-          <span>📺</span> Anime
-        </button>
-        <button class="cat-btn" data-cat="manga">
-          <span>📖</span> Manga
-        </button>
-        <button class="cat-btn" data-cat="webtoon">
-          <span>🎨</span> Webtoon
-        </button>
-      </div>
-      <div class="grid" id="topGrid">
-        <div class="loading">⏳ Chargement du top rated...</div>
-      </div>
-    </section>
-
-    <!-- Section résultats recherche -->
-    <section id="searchResults" class="hidden">
+    <!-- Résultats recherche -->
+    <div id="searchResults" class="search-results hidden">
       <div class="results-header">
-        <h2>🔍 Résultats de recherche</h2>
-        <button id="clearSearchBtn" class="clear-search">✖️ Effacer</button>
+        <h2>🔍 Résultats</h2>
+        <button id="clearSearchBtn">✖️ Effacer</button>
       </div>
       <div class="grid" id="resultsGrid"></div>
-    </section>
+    </div>
   </main>
 
-  <!-- Footer -->
   <footer>
-    <div class="footer-content">
-      <p>© 2025 Anime & Manga Info - Tous droits réservés</p>
-      <p>Données fournies par <a href="https://myanimelist.net/" target="_blank" rel="noopener noreferrer">MyAnimeList</a></p>
-    </div>
+    <p>© 2025 Anime & Manga Info - Données par MyAnimeList</p>
   </footer>
 
-  <!-- Toast notification -->
   <div id="toast" class="toast hidden"></div>
 
   <script src="firebase-config.js"></script>
-  <script src="news-data.js"></script>
+  <script src="calendar-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
