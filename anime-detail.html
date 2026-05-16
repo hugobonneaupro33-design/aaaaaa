@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Détail Anime</title>
+  <title>Détail Anime - Anime & Manga Info</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -15,13 +16,14 @@
       <a href="index.html" class="home-link">🏠 Accueil</a>
       <h1>🎌 Détail de l'anime</h1>
       <div id="authButtons" class="auth-buttons">
-        <button onclick="loginWithGoogle()">🔵 Google</button>
-        <button onclick="loginWithFacebook()">📘 Facebook</button>
+        <button onclick="loginWithGoogle()" class="google-btn">🔵 Connexion Google</button>
+        <button onclick="loginWithFacebook()" class="facebook-btn">📘 Connexion Facebook</button>
       </div>
       <div id="userMenu" class="user-menu hidden">
-        <img id="userAvatar" class="user-avatar">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
         <span id="userName"></span>
-        <button onclick="logout()">Déconnexion</button>
+        <button onclick="logout()" class="logout-btn">Déconnexion</button>
+        <a href="profile.html" class="profile-link">📊 Mon profil</a>
       </div>
     </div>
   </header>
@@ -29,6 +31,7 @@
   <main class="detail-page">
     <div id="animeDetailContainer" class="anime-detail-container">
       <!-- Le contenu sera injecté ici -->
+      <div class="loading">⏳ Chargement des détails...</div>
     </div>
     
     <!-- Section actions utilisateur (connecté uniquement) -->
@@ -36,18 +39,21 @@
       <button id="markWatchedBtn" class="action-btn">👁️ Marquer comme vu</button>
       <button id="likeBtn" class="action-btn">❤️ Liker</button>
       <div class="user-rating">
-        <span>Ma note : </span>
+        <span>⭐ Ma note :</span>
         <select id="userRating">
           <option value="0">Non noté</option>
-          <option value="1">⭐</option>
-          <option value="2">⭐⭐</option>
-          <option value="3">⭐⭐⭐</option>
-          <option value="4">⭐⭐⭐⭐</option>
-          <option value="5">⭐⭐⭐⭐⭐</option>
+          <option value="1">1 - Décevant</option>
+          <option value="2">2 - Moyen</option>
+          <option value="3">3 - Bien</option>
+          <option value="4">4 - Très bien</option>
+          <option value="5">5 - Chef-d'œuvre</option>
         </select>
       </div>
     </div>
   </main>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast hidden"></div>
 
   <script src="firebase-config.js"></script>
   <script src="detail-page.js"></script>
