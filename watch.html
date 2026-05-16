@@ -459,7 +459,7 @@
       10: 293    // Boruto
     };
 
-    // URLs des sources (à remplacer par de vraies sources)
+    // URLs des sources
     const embedSources = {
       voe: {
         vf: (id, ep) => `https://voe.sx/e/${id}-${ep}`,
@@ -588,7 +588,7 @@
         if (loadingDiv) loadingDiv.style.display = 'none';
       }, 3000);
       
-      document.getElementById('currentEpisodeDisplay').textContent = `${contentType === 'anime' ? 'Épisode' : 'Chapitre'} ${episode}`;
+      document.getElementById('currentEpisodeDisplay').textContent = `Épisode ${episode}`;
       
       // Mettre à jour l'URL
       const newUrl = `${window.location.pathname}?id=${animeId}&ep=${episode}`;
@@ -641,12 +641,6 @@
           document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentSpeed = parseFloat(btn.dataset.speed);
-          const videoFrame = document.getElementById('videoFrame');
-          if (videoFrame && videoFrame.contentWindow) {
-            try {
-              videoFrame.contentWindow.postMessage({ type: 'speed', value: currentSpeed }, '*');
-            } catch(e) {}
-          }
           showToast(`Vitesse: ${currentSpeed}x`, 'info');
         });
       });
