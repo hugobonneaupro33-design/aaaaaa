@@ -5,35 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anime & Manga Info - Accueil</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <style>
+    .hero-section {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .hero-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero-section p {
+      color: #aaa;
+      margin-bottom: 1.5rem;
+    }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .season-badge {
+      background: #e94560;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="header-top">
-      <div class="logo-area">
-        <h1>🎌 Anime & Manga Info</h1>
-      </div>
+      <h1>🎌 Anime & Manga Info</h1>
       <div id="authButtons" class="auth-buttons">
         <button onclick="loginWithGoogle()" class="google-btn">🔵 Google</button>
         <button onclick="loginWithFacebook()" class="facebook-btn">📘 Facebook</button>
       </div>
       <div id="userMenu" class="user-menu hidden">
-        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <img id="userAvatar" class="user-avatar">
         <span id="userName"></span>
-        <button onclick="logout()" class="logout-btn">🚪 Déconnexion</button>
-        <a href="profile.html" class="profile-link">👤 Mon profil</a>
+        <button onclick="logout()" class="logout-btn">Déconnexion</button>
+        <a href="profile.html" class="profile-link">Mon profil</a>
       </div>
     </div>
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Rechercher un anime/manga...">
-      <button id="searchBtn">🔍 Rechercher</button>
+      <button id="searchBtn">Rechercher</button>
     </div>
   </header>
 
   <main>
-    <!-- Navigation rapide -->
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <span class="season-badge" id="currentSeason"></span>
+      <h2>📺 Anime de la saison</h2>
+      <p>Découvrez les animes les plus attendus de la saison actuelle</p>
+      <div id="seasonalAnime" class="featured-grid">
+        <div class="loading">Chargement...</div>
+      </div>
+    </div>
+
     <div class="quick-nav">
       <button class="nav-btn active" data-page="home">🏠 Accueil</button>
       <button class="nav-btn" data-page="calendar">📅 Calendrier</button>
@@ -41,42 +75,35 @@
       <button class="nav-btn" data-page="news">📰 Actualités</button>
     </div>
 
-    <!-- PAGE ACCUEIL -->
+    <!-- Page Accueil -->
     <div id="homePage" class="page active">
-      <!-- Sorties du jour -->
-      <section class="today-releases">
-        <h2>📅 Sorties du <span id="todayDate"></span></h2>
+      <div class="today-releases">
+        <h2>📅 Sorties aujourd'hui</h2>
         <div id="todayReleases" class="releases-grid">
-          <div class="loading">⏳ Chargement...</div>
+          <div class="loading">Chargement...</div>
         </div>
-      </section>
+      </div>
 
-      <!-- Tendances -->
-      <section class="trending">
-        <h2>🔥 Tendances de la semaine</h2>
-        <div id="trendingGrid" class="grid"></div>
-      </section>
-
-      <!-- Nouveautés -->
-      <section class="new-releases">
-        <h2>✨ Nouveautés de la semaine</h2>
-        <div id="newReleasesGrid" class="grid"></div>
-      </section>
+      <div class="trending">
+        <h2>🔥 Tendances cette semaine</h2>
+        <div id="trendingGrid" class="grid">
+          <div class="loading">Chargement...</div>
+        </div>
+      </div>
     </div>
 
-    <!-- PAGE CALENDRIER -->
+    <!-- Page Calendrier -->
     <div id="calendarPage" class="page hidden">
       <h2>📅 Calendrier des sorties</h2>
-      <p class="calendar-info">Semaine du <span id="weekStart"></span> au <span id="weekEnd"></span></p>
       <div class="week-nav">
         <button id="prevWeekBtn">◀ Semaine précédente</button>
-        <button id="currentWeekBtn">📍 Semaine actuelle</button>
+        <button id="currentWeekBtn">📍 Aujourd'hui</button>
         <button id="nextWeekBtn">Semaine suivante ▶</button>
       </div>
       <div id="calendarGrid" class="calendar-grid"></div>
     </div>
 
-    <!-- PAGE TOP RATED -->
+    <!-- Page Top Rated -->
     <div id="topPage" class="page hidden">
       <div class="categories">
         <button class="cat-btn active" data-cat="anime">📺 Anime</button>
@@ -85,34 +112,25 @@
       <div class="grid" id="topGrid"></div>
     </div>
 
-    <!-- PAGE ACTUALITÉS -->
+    <!-- Page Actualités -->
     <div id="newsPage" class="page hidden">
-      <div class="news-filters">
-        <button class="news-filter active" data-source="all">🌐 Tous</button>
-        <button class="news-filter" data-source="shonenjump">📖 Shonen Jump</button>
-        <button class="news-filter" data-source="crunchyroll">🍣 Crunchyroll</button>
+      <div id="newsGrid" class="news-grid">
+        <div class="loading">Chargement des actualités...</div>
       </div>
-      <div id="newsGrid" class="news-grid"></div>
     </div>
 
-    <!-- Résultats recherche -->
     <div id="searchResults" class="search-results hidden">
-      <div class="results-header">
-        <h2>🔍 Résultats</h2>
-        <button id="clearSearchBtn">✖️ Effacer</button>
-      </div>
+      <h2>Résultats</h2>
       <div class="grid" id="resultsGrid"></div>
     </div>
   </main>
 
-  <footer>
-    <p>© 2025 Anime & Manga Info - Données par MyAnimeList</p>
-  </footer>
-
   <div id="toast" class="toast hidden"></div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="calendar-data.js"></script>
-  <script src="script.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
