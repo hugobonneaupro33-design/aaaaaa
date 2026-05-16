@@ -1,13 +1,12 @@
 // ============================================
 // WATCH.JS - LECTEUR VIDÉO ANIME & MANGA INFO
-// Gestion de la lecture, épisodes, sources, progression
+// Version corrigée avec AniList API
 // ============================================
 
 // ============================================
 // CONFIGURATION
 // ============================================
-const API_BASE = 'https://api.jikan.moe/v4';
-const CORS_PROXY = 'https://corsproxy.io/?url=';
+const ANILIST_API = 'https://graphql.anilist.co';
 
 // Récupération des paramètres URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +29,7 @@ let autoPlayNext = true;
 // Corrections des épisodes pour les animes longs
 const episodeCorrections = {
   21: 1122,  // One Piece
-  1: 220,    // Naruto
+  1: 1100,   // Detective Conan
   2: 500,    // Naruto Shippuden
   3: 366,    // Bleach
   4: 291,    // Dragon Ball Z
@@ -39,12 +38,7 @@ const episodeCorrections = {
   7: 47,     // Jujutsu Kaisen
   8: 55,     // Demon Slayer
   9: 138,    // My Hero Academia
-  10: 293,   // Boruto
-  11: 25,    // Tokyo Revengers
-  12: 24,    // Spy x Family
-  13: 25,    // Chainsaw Man
-  14: 24,    // Blue Lock
-  15: 12     // Dragon Ball Daima
+  10: 293    // Boruto
 };
 
 // Sources d'embed disponibles
@@ -67,30 +61,48 @@ const embedSources = {
     vostfr: (id, ep) => `https://drive.google.com/file/d/preview`,
     isAvailable: true
   },
-  anime: {
+  animesama: {
     name: 'AnimeSama',
     vf: (id, ep) => `https://animesama.cc/embed/${id}-${ep}`,
     vostfr: (id, ep) => `https://animesama.cc/embed/${id}-${ep}`,
-    isAvailable: true
-  },
-  dark: {
-    name: 'DarkAnime',
-    vf: (id, ep) => `https://darkanime.stream/embed/${id}-${ep}`,
-    vostfr: (id, ep) => `https://darkanime.stream/embed/${id}-${ep}`,
     isAvailable: true
   }
 };
 
 // ============================================
-// FETCH AVEC PROXY CORS
+// REQUÊTE ANILIST
 // ============================================
-async function fetchWithProxy(url) {
+const ANIME_QUERY = `
+  query ($id: Int) {
+    Media(id: $id, type: ANIME) {
+      id
+      title { romaji english }
+      coverImage { large }
+      episodes
+      status
+      averageScore
+      nextAiringEpisode { episode airingAt }
+    }
+  }
+`;
+
+async function fetchAnilist(query, variables) {
   try {
-    const response = await fetch(url);
-    if (response.ok) return response;
-  } catch (e) {}
-  const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-  return fetch(proxyUrl);
+    const response = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables })
+    });
+    const data = await response.json();
+    if (data.errors) {
+      console.error('GraphQL Errors:', data.errors);
+      return null;
+    }
+    return data.data;
+  } catch (error) {
+    console.error('Erreur fetch AniList:', error);
+    return null;
+  }
 }
 
 // ============================================
@@ -104,29 +116,37 @@ async function loadContent() {
   }
 
   try {
-    const response = await fetchWithProxy(`${API_BASE}/${contentType}/${contentId}`);
-    const data = await response.json();
-    contentData = data.data;
+    const data = await fetchAnilist(ANIME_QUERY, { id: parseInt(contentId) });
+    if (!data || !data.Media) throw new Error('Anime non trouvé');
     
-    contentTitle = contentData.title;
-    episodeCount = contentType === 'anime' 
-      ? (episodeCorrections[contentId] || contentData.episodes || 24)
-      : (contentData.chapters || 100);
+    contentData = data.Media;
+    contentTitle = contentData.title?.romaji || contentData.title?.english || 'Anime';
+    
+    // Déterminer le nombre d'épisodes
+    if (episodeCorrections[contentId]) {
+      episodeCount = episodeCorrections[contentId];
+    } else if (contentData.episodes) {
+      episodeCount = contentData.episodes;
+    } else if (contentData.nextAiringEpisode) {
+      episodeCount = contentData.nextAiringEpisode.episode - 1;
+    } else {
+      episodeCount = 24;
+    }
     
     document.getElementById('animeTitle').textContent = contentTitle;
     document.getElementById('currentAnimeTitle').textContent = contentTitle;
     
-    const isAiring = contentData.status === 'Currently Airing';
+    const isAiring = contentData.status === 'RELEASING';
     document.getElementById('animeMeta').innerHTML = `
-      <span>⭐ ${contentData.score || 'N/A'}</span>
-      <span>📺 ${episodeCount} ${contentType === 'anime' ? 'épisodes' : 'chapitres'}</span>
-      <span>${isAiring ? '🟢 En cours' : (contentData.status === 'Finished Airing' ? '✅ Terminé' : '📅 À venir')}</span>
+      <span>⭐ ${(contentData.averageScore / 10).toFixed(1) || 'N/A'}</span>
+      <span>📺 ${episodeCount} épisodes</span>
+      <span>${isAiring ? '🟢 En cours' : (contentData.status === 'FINISHED' ? '✅ Terminé' : '📅 À venir')}</span>
     `;
     
     generateEpisodesList();
     loadEpisode(currentEpisode);
     
-    // Restaurer la progression si existante
+    // Restaurer la progression
     restoreProgress();
     
   } catch (error) {
@@ -143,9 +163,9 @@ function generateEpisodesList() {
     releaseDate.setDate(releaseDate.getDate() - (episodeCount - epNum));
     return {
       number: epNum,
-      title: `${contentType === 'anime' ? 'Épisode' : 'Chapitre'} ${epNum}`,
+      title: `Épisode ${epNum}`,
       releaseDate: releaseDate,
-      thumbnail: contentData?.images?.jpg?.image_url || null
+      thumbnail: contentData?.coverImage?.large || null
     };
   });
   
@@ -158,7 +178,7 @@ function displayEpisodesList() {
 
   container.innerHTML = episodesList.map(ep => `
     <div class="episode-card ${ep.number === currentEpisode ? 'active' : ''}" data-ep="${ep.number}">
-      <div class="episode-number">${contentType === 'anime' ? 'Ép.' : 'Ch.'} ${ep.number}</div>
+      <div class="episode-number">Ép. ${ep.number}</div>
       <div class="episode-title">${ep.title}</div>
       <div class="episode-date">📅 ${ep.releaseDate.toLocaleDateString('fr-FR')}</div>
       <button class="watch-btn" data-ep="${ep.number}">▶</button>
@@ -217,7 +237,7 @@ function loadEpisode(episode) {
   }, 5000);
   
   // Mettre à jour l'affichage
-  document.getElementById('currentEpisodeDisplay').textContent = `${contentType === 'anime' ? 'Épisode' : 'Chapitre'} ${episode}`;
+  document.getElementById('currentEpisodeDisplay').textContent = `Épisode ${episode}`;
   
   // Mettre à jour l'URL sans recharger
   const newUrl = `${window.location.pathname}?id=${contentId}&ep=${episode}`;
@@ -245,17 +265,17 @@ function saveProgress(episode) {
   localStorage.setItem(`lastWatched_${contentType}_${contentId}`, new Date().toISOString());
   
   // Sauvegarde Firestore si disponible
-  if (typeof saveProgressToFirestore !== 'undefined') {
+  if (typeof saveProgressToFirestore !== 'undefined' && window.db) {
     saveProgressToFirestore(contentType, contentId, episode);
   }
   
-  console.log(`✅ Progression sauvegardée: ${contentType} ${contentId} - Épisode ${episode}`);
+  console.log(`✅ Progression sauvegardée: Épisode ${episode}/${episodeCount}`);
 }
 
 function restoreProgress() {
   const savedEpisode = localStorage.getItem(`progress_${contentType}_${contentId}`);
   if (savedEpisode && parseInt(savedEpisode) !== currentEpisode) {
-    const restore = confirm(`Vous vous êtes arrêté à l'épisode ${savedEpisode}. Voulez-vous reprendre ?`);
+    const restore = confirm(`📌 Vous vous êtes arrêté à l'épisode ${savedEpisode}. Voulez-vous reprendre ?`);
     if (restore) {
       currentEpisode = parseInt(savedEpisode);
       loadEpisode(currentEpisode);
@@ -270,7 +290,7 @@ function nextEpisode() {
   if (currentEpisode < episodesList.length) {
     loadEpisode(currentEpisode + 1);
   } else {
-    showToast('C\'est le dernier épisode disponible', 'info');
+    showToast('🎉 C\'est le dernier épisode disponible', 'info');
   }
 }
 
@@ -278,7 +298,7 @@ function prevEpisode() {
   if (currentEpisode > 1) {
     loadEpisode(currentEpisode - 1);
   } else {
-    showToast('C\'est le premier épisode', 'info');
+    showToast('📺 C\'est le premier épisode', 'info');
   }
 }
 
@@ -287,7 +307,6 @@ function prevEpisode() {
 // ============================================
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', (e) => {
-    // Éviter les conflits avec les champs de saisie
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     
     switch(e.key) {
@@ -306,23 +325,15 @@ function setupKeyboardShortcuts() {
         e.preventDefault();
         togglePlayPause();
         break;
-      case 'ArrowUp':
-        increaseVolume();
-        break;
-      case 'ArrowDown':
-        decreaseVolume();
-        break;
     }
   });
 }
 
 function toggleFullscreen() {
-  const videoPlayer = document.querySelector('.video-player');
+  const videoPlayer = document.querySelector('.video-player-wrapper');
   if (videoPlayer) {
     if (!document.fullscreenElement) {
-      videoPlayer.requestFullscreen().catch(err => {
-        console.error(`Erreur plein écran: ${err.message}`);
-      });
+      videoPlayer.requestFullscreen().catch(err => console.error(err));
     } else {
       document.exitFullscreen();
     }
@@ -334,24 +345,6 @@ function togglePlayPause() {
   if (videoFrame && videoFrame.contentWindow) {
     try {
       videoFrame.contentWindow.postMessage({ type: 'playpause' }, '*');
-    } catch(e) {}
-  }
-}
-
-function increaseVolume() {
-  const videoFrame = document.getElementById('videoFrame');
-  if (videoFrame && videoFrame.contentWindow) {
-    try {
-      videoFrame.contentWindow.postMessage({ type: 'volumeup' }, '*');
-    } catch(e) {}
-  }
-}
-
-function decreaseVolume() {
-  const videoFrame = document.getElementById('videoFrame');
-  if (videoFrame && videoFrame.contentWindow) {
-    try {
-      videoFrame.contentWindow.postMessage({ type: 'volumedown' }, '*');
     } catch(e) {}
   }
 }
@@ -388,14 +381,6 @@ function setupEventListeners() {
       document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentSpeed = parseFloat(btn.dataset.speed);
-      
-      // Tenter d'appliquer la vitesse au lecteur
-      const videoFrame = document.getElementById('videoFrame');
-      if (videoFrame && videoFrame.contentWindow) {
-        try {
-          videoFrame.contentWindow.postMessage({ type: 'speed', value: currentSpeed }, '*');
-        } catch(e) {}
-      }
       showToast(`Vitesse: ${currentSpeed}x`, 'info');
     });
   });
@@ -409,8 +394,7 @@ function setupEventListeners() {
     const searchTerm = e.target.value.toLowerCase();
     document.querySelectorAll('.episode-card').forEach(card => {
       const epNum = card.dataset.ep;
-      const title = card.querySelector('.episode-title')?.textContent.toLowerCase() || '';
-      if (epNum.includes(searchTerm) || title.includes(searchTerm)) {
+      if (epNum.includes(searchTerm)) {
         card.style.display = 'flex';
       } else {
         card.style.display = 'none';
@@ -466,4 +450,4 @@ window.nextEpisode = nextEpisode;
 window.prevEpisode = prevEpisode;
 window.showToast = showToast;
 
-console.log('✅ watch.js chargé');
+console.log('✅ watch.js chargé (version AniList)');
