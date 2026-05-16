@@ -10,22 +10,32 @@
   <header>
     <h1>🎌 Anime & Manga Info</h1>
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Rechercher un anime..." autofocus>
+      <input type="text" id="searchInput" placeholder="Rechercher un anime/manga..." autofocus>
       <button id="searchBtn">Rechercher</button>
     </div>
   </header>
 
   <main>
+    <!-- Catégories -->
+    <div class="categories">
+      <button class="cat-btn active" data-cat="anime">📺 Anime</button>
+      <button class="cat-btn" data-cat="manga">📖 Manga</button>
+      <button class="cat-btn" data-cat="webtoon">🎨 Webtoon</button>
+    </div>
+
+    <!-- Section Top Rated -->
     <section id="topRated">
-      <h2>Top Rated</h2>
+      <h2>⭐ Top Rated</h2>
       <div class="grid" id="topGrid"></div>
     </section>
 
+    <!-- Section Résultats de recherche -->
     <section id="searchResults" class="hidden">
-      <h2>Résultats</h2>
+      <h2>🔍 Résultats</h2>
       <div class="grid" id="resultsGrid"></div>
     </section>
 
+    <!-- Modal détails -->
     <div id="modal" class="modal hidden">
       <div class="modal-content">
         <span class="close">&times;</span>
