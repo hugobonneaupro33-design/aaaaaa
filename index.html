@@ -3,12 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anime & Manga Info</title>
+  <title>Anime & Manga Info - Actualités</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <header>
-    <h1>🎌 Anime & Manga Info</h1>
+    <div class="header-top">
+      <h1>🎌 Anime & Manga Info</h1>
+      <div id="authButtons" class="auth-buttons">
+        <button onclick="loginWithGoogle()" class="google-btn">🔵 Connexion Google</button>
+        <button onclick="loginWithFacebook()" class="facebook-btn">📘 Connexion Facebook</button>
+      </div>
+      <div id="userMenu" class="user-menu hidden">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <span id="userName"></span>
+        <button onclick="logout()" class="logout-btn">Déconnexion</button>
+        <a href="profile.html" class="profile-link">📊 Mon profil</a>
+      </div>
+    </div>
+    
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Rechercher un anime/manga..." autofocus>
       <button id="searchBtn">Rechercher</button>
@@ -16,27 +33,43 @@
   </header>
 
   <main>
-    <!-- Catégories -->
-    <div class="categories">
-      <button class="cat-btn active" data-cat="anime">📺 Anime</button>
-      <button class="cat-btn" data-cat="manga">📖 Manga</button>
-      <button class="cat-btn" data-cat="webtoon">🎨 Webtoon</button>
+    <!-- Onglets principaux -->
+    <div class="main-tabs">
+      <button class="main-tab active" data-tab="news">📰 Actualités</button>
+      <button class="main-tab" data-tab="top">⭐ Top Rated</button>
     </div>
 
-    <!-- Section Top Rated -->
-    <section id="topRated">
-      <h2>⭐ Top Rated</h2>
+    <!-- SECTION ACTUALITÉS -->
+    <section id="newsSection" class="active">
+      <div class="news-filters">
+        <button class="news-filter active" data-source="all">Tous</button>
+        <button class="news-filter" data-source="shonenjump">📖 Shonen Jump</button>
+        <button class="news-filter" data-source="animenews">📰 Anime News Network</button>
+        <button class="news-filter" data-source="crunchyroll">🍣 Crunchyroll</button>
+        <button class="news-filter" data-source="webtoon">🎨 Webtoon</button>
+      </div>
+      <div id="newsGrid" class="news-grid"></div>
+    </section>
+
+    <!-- SECTION TOP RATED (existante) -->
+    <section id="topRatedSection" class="hidden">
+      <div class="categories">
+        <button class="cat-btn active" data-cat="anime">📺 Anime</button>
+        <button class="cat-btn" data-cat="manga">📖 Manga</button>
+        <button class="cat-btn" data-cat="webtoon">🎨 Webtoon</button>
+      </div>
       <div class="grid" id="topGrid"></div>
     </section>
 
-    <!-- Section Résultats de recherche -->
+    <!-- Section résultats recherche -->
     <section id="searchResults" class="hidden">
       <h2>🔍 Résultats</h2>
       <div class="grid" id="resultsGrid"></div>
     </section>
-
   </main>
 
+  <script src="firebase-config.js"></script>
+  <script src="news-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
