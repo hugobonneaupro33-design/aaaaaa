@@ -1,1 +1,693 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, view-fit=cover">
+  <meta name="description" content="Découvrez les détails du manga : synopsis, chapitres, informations et lecture en ligne">
+  <meta name="theme-color" content="#e94560">
+  <title>Détail Manga - Anime & Manga Info</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    /* Variables */
+    :root {
+      --primary: #e94560;
+      --primary-dark: #c72e48;
+      --bg-dark: #0a0a0f;
+      --bg-card: #13131f;
+      --bg-hover: #1e1e2e;
+      --text-light: #f0f0f0;
+      --text-muted: #8888aa;
+      --border: #252540;
+      --shadow: 0 8px 20px rgba(0,0,0,0.3);
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .home-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .home-link:hover {
+      color: var(--primary-dark);
+    }
+
+    /* Main */
+    .detail-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Hero section */
+    .detail-hero {
+      display: flex;
+      gap: 2rem;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-hero img {
+      width: 250px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .detail-hero-info {
+      flex: 1;
+    }
+
+    .detail-hero-info h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-hero-info h2 {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .detail-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat {
+      background: var(--bg-hover);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    .next-chapter {
+      background: var(--primary);
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-sm);
+      margin: 1rem 0;
+      display: inline-block;
+    }
+
+    .read-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .read-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.02);
+    }
+
+    /* Info grid */
+    .detail-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      padding: 1rem;
+      border-radius: var(--radius);
+    }
+
+    .info-card h3 {
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .info-card p {
+      margin: 0.5rem 0;
+      line-height: 1.4;
+    }
+
+    .genres-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .genre-tag {
+      background: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    /* Synopsis bilingue */
+    .synopsis-container {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .synopsis-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .synopsis-tab {
+      padding: 0.5rem 1.2rem;
+      background: var(--bg-hover);
+      border: none;
+      border-radius: 30px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .synopsis-tab.active {
+      background: var(--primary);
+    }
+
+    .synopsis-content {
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* Chapitres */
+    .chapters-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .chapters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chapters-header h3 {
+      font-size: 1.3rem;
+    }
+
+    .chapter-search {
+      padding: 0.5rem 1rem;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      color: white;
+      width: 200px;
+    }
+
+    .chapter-search::placeholder {
+      color: var(--text-muted);
+    }
+
+    .chapter-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 0.8rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .chapter-item {
+      background: var(--bg-hover);
+      padding: 0.6rem;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chapter-item:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      padding: 0.4rem 0.8rem;
+      background: var(--bg-hover);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .page-btn.active, .page-btn:hover {
+      background: var(--primary);
+    }
+
+    /* Toast */
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: var(--bg-card);
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      padding: 1rem;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-left: 4px solid var(--primary);
+    }
+    .toast.show {
+      visibility: visible;
+      animation: fadeInOut 3s ease;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+
+    /* Loading & Error */
+    .loading, .error {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+    .error { color: var(--primary); }
+
+    /* Favorite button */
+    .favorite-btn {
+      background: none;
+      border: 2px solid var(--primary);
+      border-radius: 40px;
+      padding: 0.5rem 1rem;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+
+    .favorite-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .detail-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .detail-hero img { width: 200px; }
+      .detail-stats { justify-content: center; }
+      .chapter-list { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+      .detail-container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <a href="index.html" class="home-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/>
+        </svg>
+        Accueil
+      </a>
+      <h1>📖 Détail du Manga</h1>
+      <div></div>
+    </div>
+  </header>
+
+  <main class="detail-container">
+    <div id="mangaDetailContainer">
+      <div class="loading">⏳ Chargement du manga...</div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const mangaId = urlParams.get('id');
+    const API_BASE = 'https://api.jikan.moe/v4';
+    const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+    let currentLang = 'fr';
+    let currentPage = 1;
+    let itemsPerPage = 30;
+    let totalChapters = 0;
+    let mangaData = null;
+    let isFavorite = false;
+
+    // Corrections des chapitres pour les mangas longs
+    const chapterCorrections = {
+      21: 1125,  // One Piece
+      1: 700,    // Naruto
+      2: 700,    // Naruto Shippuden
+      3: 686,    // Bleach
+      7: 255,    // Jujutsu Kaisen
+      8: 204,    // Demon Slayer
+      9: 398,    // My Hero Academia
+      10: 80     // Boruto
+    };
+
+    // ============================================
+    // FETCH AVEC PROXY
+    // ============================================
+    async function fetchWithProxy(url) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) return response;
+      } catch (e) {}
+      const proxyUrl = CORS_PROXY + encodeURIComponent(url);
+      return fetch(proxyUrl);
+    }
+
+    // ============================================
+    // CHARGEMENT DU MANGA
+    // ============================================
+    async function loadMangaDetail() {
+      if (!mangaId) {
+        document.getElementById('mangaDetailContainer').innerHTML = '<div class="error">❌ ID du manga manquant</div>';
+        return;
+      }
+
+      try {
+        const response = await fetchWithProxy(`${API_BASE}/manga/${mangaId}`);
+        const data = await response.json();
+        mangaData = data.data;
+
+        if (!mangaData) throw new Error('Manga non trouvé');
+
+        totalChapters = chapterCorrections[mangaId] || mangaData.chapters || 100;
+        const isOngoing = mangaData.status === 'Publishing';
+        const publishedDate = mangaData.published?.from 
+          ? new Date(mangaData.published.from).toLocaleDateString('fr-FR')
+          : 'Date inconnue';
+
+        // Vérifier si dans les favoris
+        if (typeof isFavoriteManga !== 'undefined') {
+          isFavorite = await isFavoriteManga(mangaId);
+        }
+
+        renderMangaDetail(mangaData, totalChapters, isOngoing, publishedDate, isFavorite);
+        renderChaptersList(totalChapters);
+        setupEventListeners();
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('mangaDetailContainer').innerHTML = `
+          <div class="error">
+            ❌ Erreur de chargement<br>
+            <small>${error.message}</small>
+            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary); border: none; border-radius: 8px; color: white; cursor: pointer;">🔄 Réessayer</button>
+          </div>
+        `;
+        showToast('Erreur de chargement du manga', 'error');
+      }
+    }
+
+    function renderMangaDetail(manga, chapters, isOngoing, publishedDate, isFav) {
+      const container = document.getElementById('mangaDetailContainer');
+      
+      container.innerHTML = `
+        <!-- Hero Section -->
+        <div class="detail-hero">
+          <img src="${manga.images.jpg.large_image_url || manga.images.jpg.image_url}" alt="${manga.title}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
+          <div class="detail-hero-info">
+            <h1>${escapeHtml(manga.title)}</h1>
+            <h2>${escapeHtml(manga.title_english || manga.title_japanese || '')}</h2>
+            <div class="detail-stats">
+              <span class="stat">⭐ ${manga.score || 'N/A'}</span>
+              <span class="stat">📊 Rang #${manga.rank || 'N/A'}</span>
+              <span class="stat">❤️ ${manga.favorites?.toLocaleString() || '0'} favoris</span>
+              <span class="stat">📚 ${chapters} chapitres</span>
+            </div>
+            ${isOngoing ? '<div class="next-chapter">📖 En cours de parution - Nouveau chapitre bientôt</div>' : '<div class="next-chapter">✅ Manga terminé</div>'}
+            <button id="favoriteBtn" class="favorite-btn ${isFav ? 'active' : ''}">
+              ${isFav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
+            </button>
+            <a href="#" id="readFirstBtn" class="read-btn" style="margin-left: 1rem;">📖 Lire le chapitre 1</a>
+          </div>
+        </div>
+
+        <!-- Informations détaillées -->
+        <div class="detail-info-grid">
+          <div class="info-card">
+            <h3>📅 Informations</h3>
+            <p><strong>Statut:</strong> ${isOngoing ? '🟢 En cours' : '✅ Terminé'}</p>
+            <p><strong>Chapitres:</strong> ${chapters}</p>
+            <p><strong>Volumes:</strong> ${manga.volumes || 'N/A'}</p>
+            <p><strong>Auteur(s):</strong> ${manga.authors?.map(a => a.name).join(', ') || 'N/A'}</p>
+            <p><strong>Date début:</strong> ${publishedDate}</p>
+          </div>
+          <div class="info-card">
+            <h3>🏷️ Genres</h3>
+            <div class="genres-list">
+              ${manga.genres?.map(g => `<span class="genre-tag">${escapeHtml(g.name)}</span>`).join('') || 'Aucun genre'}
+            </div>
+            ${manga.themes?.length > 0 ? `
+              <h3 style="margin-top: 1rem;">🎭 Thèmes</h3>
+              <div class="genres-list">
+                ${manga.themes.map(t => `<span class="genre-tag">${escapeHtml(t.name)}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+          <div class="info-card">
+            <h3>📺 Publication</h3>
+            <p><strong>Magazine:</strong> ${manga.serializations?.map(s => s.name).join(', ') || 'N/A'}</p>
+            <p><strong>Type:</strong> ${manga.type || 'Manga'}</p>
+            <p><strong>Score:</strong> ${manga.score || 'N/A'} (${manga.scored_by?.toLocaleString() || '0'} votes)</p>
+          </div>
+        </div>
+
+        <!-- Synopsis bilingue -->
+        <div class="synopsis-container">
+          <div class="synopsis-tabs">
+            <button class="synopsis-tab ${currentLang === 'fr' ? 'active' : ''}" data-lang="fr">🇫🇷 Français</button>
+            <button class="synopsis-tab ${currentLang === 'en' ? 'active' : ''}" data-lang="en">🇬🇧 English</button>
+          </div>
+          <div id="synopsisContent" class="synopsis-content">
+            ${manga.synopsis || 'Synopsis non disponible.'}
+          </div>
+        </div>
+
+        <!-- Liste des chapitres -->
+        <div class="chapters-section">
+          <div class="chapters-header">
+            <h3>📚 Liste des chapitres (${chapters})</h3>
+            <input type="text" id="chapterSearch" class="chapter-search" placeholder="🔍 Rechercher un chapitre...">
+          </div>
+          <div id="chapterList" class="chapter-list"></div>
+          <div id="chapterPagination" class="pagination"></div>
+        </div>
+      `;
+    }
+
+    function renderChaptersList(total) {
+      const chapters = Array.from({ length: Math.min(total, 500) }, (_, i) => i + 1);
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const displayChapters = chapters.slice(start, end);
+      
+      const container = document.getElementById('chapterList');
+      if (container) {
+        container.innerHTML = displayChapters.map(ch => `
+          <div class="chapter-item" data-chapter="${ch}">
+            Ch. ${ch}
+          </div>
+        `).join('');
+        
+        document.querySelectorAll('.chapter-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const chapter = item.dataset.chapter;
+            window.location.href = `manga-reader.html?id=${mangaId}&chapter=${chapter}`;
+          });
+        });
+      }
+      
+      renderPagination(total);
+    }
+
+    function renderPagination(total) {
+      const totalPages = Math.ceil(total / itemsPerPage);
+      const paginationDiv = document.getElementById('chapterPagination');
+      if (!paginationDiv) return;
+      
+      let pages = [];
+      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        pages.push(i);
+      }
+      
+      paginationDiv.innerHTML = `
+        <button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>◀ Précédent</button>
+        ${pages.map(p => `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`).join('')}
+        <button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Suivant ▶</button>
+      `;
+      
+      document.querySelectorAll('#chapterPagination .page-btn').forEach(btn => {
+        if (!btn.disabled) {
+          btn.addEventListener('click', () => {
+            const newPage = parseInt(btn.dataset.page);
+            if (!isNaN(newPage) && newPage !== currentPage) {
+              currentPage = newPage;
+              renderChaptersList(totalChapters);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          });
+        }
+      });
+    }
+
+    // ============================================
+    // ÉVÉNEMENTS
+    // ============================================
+    function setupEventListeners() {
+      // Synopsis bilingue
+      document.querySelectorAll('.synopsis-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          currentLang = tab.dataset.lang;
+          document.querySelectorAll('.synopsis-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          const synopsisDiv = document.getElementById('synopsisContent');
+          if (synopsisDiv && mangaData) {
+            if (currentLang === 'en') {
+              synopsisDiv.textContent = mangaData.synopsis || 'Synopsis not available.';
+            } else {
+              synopsisDiv.textContent = mangaData.synopsis || 'Synopsis non disponible.';
+            }
+          }
+        });
+      });
+      
+      // Premier chapitre
+      const readFirstBtn = document.getElementById('readFirstBtn');
+      if (readFirstBtn) {
+        readFirstBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = `manga-reader.html?id=${mangaId}&chapter=1`;
+        });
+      }
+      
+      // Favoris
+      const favBtn = document.getElementById('favoriteBtn');
+      if (favBtn && typeof toggleMangaFavorite !== 'undefined') {
+        favBtn.addEventListener('click', async () => {
+          isFavorite = await toggleMangaFavorite(mangaId, mangaData.title, mangaData.score, mangaData.images.jpg.image_url);
+          favBtn.textContent = isFavorite ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris';
+          favBtn.classList.toggle('active', isFavorite);
+          showToast(isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris');
+        });
+      }
+      
+      // Recherche de chapitres
+      const searchInput = document.getElementById('chapterSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          document.querySelectorAll('.chapter-item').forEach(item => {
+            const chapterNum = item.dataset.chapter;
+            if (chapterNum.includes(searchTerm)) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      }
+    }
+
+    // ============================================
+    // UTILITAIRES
+    // ============================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type = 'success') {
+      let toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // INITIALISATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMangaDetail();
+    });
+  </script>
+</body>
+</html>
