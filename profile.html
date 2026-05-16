@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil - Anime & Manga Info</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <a href="index.html" class="home-link">🏠 Accueil</a>
+      <h1>📊 Mon Profil</h1>
+      <div id="authButtons" class="auth-buttons">
+        <button onclick="loginWithGoogle()" class="google-btn">🔵 Connexion Google</button>
+        <button onclick="loginWithFacebook()" class="facebook-btn">📘 Connexion Facebook</button>
+      </div>
+      <div id="userMenu" class="user-menu hidden">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <span id="userName"></span>
+        <button onclick="logout()" class="logout-btn">Déconnexion</button>
+        <a href="profile.html" class="profile-link">📊 Mon profil</a>
+      </div>
+    </div>
+  </header>
 
+  <main class="profile-container">
+    <div id="profileContent">
+      <div class="loading">⏳ Chargement de votre profil...</div>
+    </div>
+  </main>
+
+  <script src="firebase-config.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>
