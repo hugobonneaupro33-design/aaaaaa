@@ -680,7 +680,7 @@
 
     const SEARCH_QUERY = `
       query ($search: String) {
-        Page(page: 1, perPage: 10) {
+        Page(page: 1, perPage: 30) {
           media(type: ANIME, search: $search) {
             id
             title { romaji english }
@@ -982,7 +982,7 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // ============================================
+       // ============================================
     // INITIALISATION
     // ============================================
     document.addEventListener('DOMContentLoaded', () => {
@@ -1033,91 +1033,94 @@
       });
     });
 
-// ============================================
-// CONFIGURATION FIREBASE (À METTRE AVEC VOS CLÉS)
-// ============================================
-const firebaseConfig = {
-  apiKey: "AIzaSyCwDOGPUWQ08WGuAAZ9p6hS6SZytmRoKig",
-  authDomain: "arkya-animemanga.firebaseapp.com",
-  projectId: "arkya-animemanga",
-  storageBucket: "arkya-animemanga.firebasestorage.app",
-  messagingSenderId: "52570519836",
-  appId: "1:52570519836:web:dbf4fcd7aafe01aac762d9",
-  measurementId: "G-04DPK4LP4H"
-};
+    // ============================================
+    // CONFIGURATION FIREBASE
+    // ============================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwDOGPUWQ08WGuAAZ9p6hS6SZytmRoKig",
+      authDomain: "arkya-animemanga.firebaseapp.com",
+      projectId: "arkya-animemanga",
+      storageBucket: "arkya-animemanga.firebasestorage.app",
+      messagingSenderId: "52570519836",
+      appId: "1:52570519836:web:dbf4fcd7aafe01aac762d9",
+      measurementId: "G-04DPK4LP4H"
+    };
 
-// Initialiser Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-// Fournisseurs
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-const facebookProvider = new firebase.auth.FacebookAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
-facebookProvider.setCustomParameters({ display: 'popup' });
-
-let currentUser = null;
-
-// Écouter les changements d'état
-auth.onAuthStateChanged((user) => {
-  currentUser = user;
-  const authDiv = document.getElementById('authButtons');
-  const userDiv = document.getElementById('userMenu');
-  
-  if (authDiv && userDiv) {
-    if (user) {
-      authDiv.style.display = 'none';
-      userDiv.style.display = 'flex';
-      document.getElementById('userName').textContent = user.displayName || user.email;
-      if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
-      showToast(`👋 Bonjour ${user.displayName || user.email}`);
-    } else {
-      authDiv.style.display = 'flex';
-      userDiv.style.display = 'none';
+    // Initialiser Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-  }
-});
 
-// Fonctions d'authentification réelles
-window.loginWithGoogle = async () => {
-  try {
-    const result = await auth.signInWithPopup(googleProvider);
-    console.log('Utilisateur:', result.user);
-    showToast(`✨ Bienvenue ${result.user.displayName || result.user.email}`);
-  } catch (error) {
-    console.error('Erreur:', error);
-    if (error.code === 'auth/popup-blocked') {
-      showToast('❌ Popup bloqué. Autorisez les popups pour ce site.', 'error');
-    } else {
-      showToast(`❌ ${error.message}`, 'error');
-    }
-  }
-};
+    const auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-window.loginWithFacebook = async () => {
-  try {
-    const result = await auth.signInWithPopup(facebookProvider);
-    console.log('Utilisateur:', result.user);
-    showToast(`✨ Bienvenue ${result.user.displayName || result.user.email}`);
-  } catch (error) {
-    console.error('Erreur:', error);
-    if (error.code === 'auth/popup-blocked') {
-      showToast('❌ Popup bloqué. Autorisez les popups pour ce site.', 'error');
-    } else {
-      showToast(`❌ ${error.message}`, 'error');
-    }
-  }
-};
+    // Fournisseurs
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+    facebookProvider.setCustomParameters({ display: 'popup' });
 
-window.logout = async () => {
-  try {
-    await auth.signOut();
-    showToast('🔓 Déconnecté avec succès');
-  } catch (error) {
-    showToast(`❌ ${error.message}`, 'error');
-  }
-};
+    let currentUser = null;
+
+    // Écouter les changements d'état
+    auth.onAuthStateChanged((user) => {
+      currentUser = user;
+      const authDiv = document.getElementById('authButtons');
+      const userDiv = document.getElementById('userMenu');
+      
+      if (authDiv && userDiv) {
+        if (user) {
+          authDiv.style.display = 'none';
+          userDiv.style.display = 'flex';
+          document.getElementById('userName').textContent = user.displayName || user.email;
+          if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
+          showToast(`👋 Bonjour ${user.displayName || user.email}`);
+        } else {
+          authDiv.style.display = 'flex';
+          userDiv.style.display = 'none';
+        }
+      }
+    });
+
+    // Fonctions d'authentification réelles
+    window.loginWithGoogle = async () => {
+      try {
+        const result = await auth.signInWithPopup(googleProvider);
+        console.log('Utilisateur:', result.user);
+        showToast(`✨ Bienvenue ${result.user.displayName || result.user.email}`);
+      } catch (error) {
+        console.error('Erreur:', error);
+        if (error.code === 'auth/popup-blocked') {
+          showToast('❌ Popup bloqué. Autorisez les popups pour ce site.', 'error');
+        } else {
+          showToast(`❌ ${error.message}`, 'error');
+        }
+      }
+    };
+
+    window.loginWithFacebook = async () => {
+      try {
+        const result = await auth.signInWithPopup(facebookProvider);
+        console.log('Utilisateur:', result.user);
+        showToast(`✨ Bienvenue ${result.user.displayName || result.user.email}`);
+      } catch (error) {
+        console.error('Erreur:', error);
+        if (error.code === 'auth/popup-blocked') {
+          showToast('❌ Popup bloqué. Autorisez les popups pour ce site.', 'error');
+        } else {
+          showToast(`❌ ${error.message}`, 'error');
+        }
+      }
+    };
+
+    window.logout = async () => {
+      try {
+        await auth.signOut();
+        showToast('🔓 Déconnecté avec succès');
+      } catch (error) {
+        showToast(`❌ ${error.message}`, 'error');
+      }
+    };
+  </script>
+</body>
+</html>
