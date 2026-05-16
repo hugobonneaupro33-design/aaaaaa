@@ -16,13 +16,16 @@ const API_BASE = 'https://api.jikan.moe/v4';
 
 // Attendre que le DOM soit chargé
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM chargé, chargement du contenu...');
   loadContent();
   setupEventListeners();
 });
 
 async function loadContent() {
+  console.log('loadContent appelé, contentType:', contentType, 'contentId:', contentId);
+  
   if (!contentId || !contentType) {
-    showError('Aucun contenu spécifié');
+    showError('Aucun contenu spécifié. Vérifie le lien.');
     return;
   }
 
@@ -34,11 +37,17 @@ async function loadContent() {
     if (!response.ok) throw new Error('Erreur de chargement');
     const data = await response.json();
     contentData = data.data;
+    
+    console.log('Contenu chargé:', contentData.title);
 
     // Mettre à jour les titres
-    document.getElementById('animeTitle').textContent = contentData.title;
-    document.getElementById('currentAnimeTitle').textContent = contentData.title;
-    document.getElementById('animeSynopsis').textContent = contentData.synopsis || 'Synopsis non disponible.';
+    const animeTitleEl = document.getElementById('animeTitle');
+    const currentAnimeTitleEl = document.getElementById('currentAnimeTitle');
+    const animeSynopsisEl = document.getElementById('animeSynopsis');
+    
+    if (animeTitleEl) animeTitleEl.textContent = contentData.title;
+    if (currentAnimeTitleEl) currentAnimeTitleEl.textContent = contentData.title;
+    if (animeSynopsisEl) animeSynopsisEl.textContent = contentData.synopsis || 'Synopsis non disponible.';
 
     // Générer la liste des épisodes/chapitres
     generateEpisodesList();
@@ -57,21 +66,23 @@ async function loadContent() {
 }
 
 function generateEpisodesList() {
+  console.log('generateEpisodesList, contentType:', contentType);
+  
   if (contentType === 'anime') {
     const episodeCount = contentData.episodes || 24;
-    episodesList = Array.from({ length: episodeCount }, (_, i) => ({
+    episodesList = Array.from({ length: Math.min(episodeCount, 500) }, (_, i) => ({
       number: i + 1,
-      title: `Épisode ${i + 1}${contentData.title ? ' - ' + contentData.title : ''}`,
-      thumbnail: contentData.images?.jpg?.image_url || '',
+      title: `Épisode ${i + 1}`,
+      thumbnail: contentData.images?.jpg?.image_url || 'https://via.placeholder.com/120x68?text=Episode',
       vfUrl: getEmbedUrl(contentId, i + 1, 'vf'),
       vostfrUrl: getEmbedUrl(contentId, i + 1, 'vostfr')
     }));
   } else if (contentType === 'manga') {
     const chapterCount = contentData.chapters || 100;
-    episodesList = Array.from({ length: chapterCount }, (_, i) => ({
+    episodesList = Array.from({ length: Math.min(chapterCount, 300) }, (_, i) => ({
       number: i + 1,
       title: `Chapitre ${i + 1}`,
-      thumbnail: contentData.images?.jpg?.image_url || '',
+      thumbnail: contentData.images?.jpg?.image_url || 'https://via.placeholder.com/120x68?text=Chapitre',
       vfUrl: getMangaReaderUrl(contentId, i + 1),
       vostfrUrl: getMangaReaderUrl(contentId, i + 1)
     }));
@@ -79,35 +90,45 @@ function generateEpisodesList() {
     episodesList = Array.from({ length: 50 }, (_, i) => ({
       number: i + 1,
       title: `Chapitre ${i + 1}`,
-      thumbnail: contentData.images?.jpg?.image_url || '',
+      thumbnail: contentData.images?.jpg?.image_url || 'https://via.placeholder.com/120x68?text=Chapitre',
       vfUrl: getWebtoonUrl(contentId, i + 1),
       vostfrUrl: getWebtoonUrl(contentId, i + 1)
     }));
   }
 
+  console.log('Épisodes générés:', episodesList.length);
   loadEpisodesList();
 }
 
 function getEmbedUrl(animeId, episode, lang) {
   // Sources d'embed gratuites (à remplacer par tes sources)
   const embedSources = {
-    'vf': `https://voe.sx/embed/${animeId}-${episode}`,
+    'vf': `https://voe.sx/e/${animeId}-${episode}`,
     'vostfr': `https://send.cm/embed/${animeId}-${episode}`
   };
   return embedSources[lang];
 }
 
 function getMangaReaderUrl(mangaId, chapter) {
-  return `https://manga-scantrad.net/manga/${mangaId}/${chapter}`;
+  // Sites de lecture de manga
+  return `https://mangadex.org/title/${mangaId}/chapter/${chapter}`;
 }
 
 function getWebtoonUrl(webtoonId, chapter) {
-  return `https://www.webtoons.com/${webtoonId}/episode-${chapter}`;
+  return `https://www.webtoons.com/fr/${webtoonId}/episode-${chapter}/viewer`;
 }
 
 function loadEpisodesList() {
   const container = document.getElementById('episodesList');
-  if (!container) return;
+  if (!container) {
+    console.error('Container episodesList non trouvé');
+    return;
+  }
+
+  if (episodesList.length === 0) {
+    container.innerHTML = '<div class="error">Aucun épisode disponible</div>';
+    return;
+  }
 
   container.innerHTML = episodesList.map(ep => `
     <div class="episode-card ${ep.number === currentEpisode ? 'active' : ''}" data-ep="${ep.number}">
@@ -127,7 +148,7 @@ function loadEpisodesList() {
     card.addEventListener('click', (e) => {
       if (e.target.classList.contains('watch-episode-btn')) return;
       const epNum = parseInt(card.dataset.ep);
-      loadEpisode(epNum);
+      if (!isNaN(epNum)) loadEpisode(epNum);
     });
   });
 
@@ -135,21 +156,34 @@ function loadEpisodesList() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const epNum = parseInt(btn.dataset.ep);
-      loadEpisode(epNum);
+      if (!isNaN(epNum)) loadEpisode(epNum);
     });
   });
+  
+  // Mettre à jour l'affichage de l'épisode courant
+  const currentDisplay = document.getElementById('currentEpisodeDisplay');
+  if (currentDisplay) {
+    currentDisplay.textContent = `${contentType === 'anime' ? 'Épisode' : 'Chapitre'} ${currentEpisode}`;
+  }
 }
 
 function loadEpisode(episodeNumber) {
+  console.log('loadEpisode:', episodeNumber);
   currentEpisode = episodeNumber;
   const episode = episodesList.find(ep => ep.number === episodeNumber);
-  if (!episode) return;
+  if (!episode) {
+    console.error('Épisode non trouvé:', episodeNumber);
+    return;
+  }
 
   const videoUrl = currentLang === 'vf' ? episode.vfUrl : episode.vostfrUrl;
   const videoFrame = document.getElementById('videoFrame');
   const embedContainer = document.getElementById('embedContainer');
 
-  if (!videoFrame) return;
+  if (!videoFrame) {
+    console.error('videoFrame non trouvé');
+    return;
+  }
 
   // Afficher le chargement
   showVideoLoading();
@@ -159,16 +193,16 @@ function loadEpisode(episodeNumber) {
     videoFrame.style.display = 'block';
     if (embedContainer) embedContainer.style.display = 'none';
     videoFrame.src = videoUrl;
-    videoFrame.onload = () => hideVideoLoading();
+    setTimeout(() => hideVideoLoading(), 1000);
   } 
-  // Pour les mangas/webtoons (affichage d'images)
+  // Pour les mangas/webtoons
   else {
     videoFrame.style.display = 'none';
     if (embedContainer) {
       embedContainer.style.display = 'block';
       embedContainer.innerHTML = `
         <div class="manga-reader">
-          <iframe src="${videoUrl}" frameborder="0"></iframe>
+          <iframe src="${videoUrl}" frameborder="0" allowfullscreen></iframe>
         </div>
       `;
       hideVideoLoading();
@@ -182,6 +216,12 @@ function loadEpisode(episodeNumber) {
       card.classList.add('active');
     }
   });
+
+  // Mettre à jour l'affichage
+  const currentDisplay = document.getElementById('currentEpisodeDisplay');
+  if (currentDisplay) {
+    currentDisplay.textContent = `${contentType === 'anime' ? 'Épisode' : 'Chapitre'} ${episodeNumber}`;
+  }
 
   // Scroller jusqu'à l'épisode actif
   const activeCard = document.querySelector('.episode-card.active');
@@ -208,26 +248,31 @@ function hideVideoLoading() {
 }
 
 function saveProgress(episode) {
-  if (!currentUser) return;
-  
-  try {
-    const userRef = db.collection('users').doc(currentUser.uid);
-    userRef.set({
-      [`progress.${contentType}.${contentId}`]: episode,
-      lastWatched: new Date().toISOString()
-    }, { merge: true });
-  } catch (error) {
-    console.error('Erreur sauvegarde progression:', error);
+  if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      userRef.set({
+        [`progress.${contentType}.${contentId}`]: episode,
+        lastWatched: new Date().toISOString()
+      }, { merge: true });
+      console.log('Progression sauvegardée:', episode);
+    } catch (error) {
+      console.error('Erreur sauvegarde progression:', error);
+    }
   }
 }
 
 function setupEventListeners() {
   // Changement de langue
-  document.querySelectorAll('.lang-btn').forEach(btn => {
+  const langBtns = document.querySelectorAll('.lang-btn');
+  console.log('Boutons de langue trouvés:', langBtns.length);
+  
+  langBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentLang = btn.dataset.lang;
+      console.log('Langue changée:', currentLang);
       
       // Recharger l'épisode actuel
       loadEpisode(currentEpisode);
@@ -253,16 +298,40 @@ function setupEventListeners() {
       }
     });
   }
+  
+  // Recherche d'épisodes
+  const episodeSearch = document.getElementById('episodeSearch');
+  if (episodeSearch) {
+    episodeSearch.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll('.episode-card');
+      cards.forEach(card => {
+        const title = card.querySelector('.episode-title')?.textContent.toLowerCase() || '';
+        const episodeNum = card.dataset.ep;
+        if (title.includes(searchTerm) || episodeNum?.includes(searchTerm)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
 }
 
 function showLoading() {
   const container = document.getElementById('episodesList');
   if (container) {
-    container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
+    container.innerHTML = '<div class="loading">⏳ Chargement des épisodes...</div>';
+  }
+  
+  const videoFrame = document.getElementById('videoFrame');
+  if (videoFrame) {
+    videoFrame.src = '';
   }
 }
 
 function showError(message) {
+  console.error('Erreur:', message);
   const container = document.getElementById('episodesList');
   if (container) {
     container.innerHTML = `<div class="error">❌ ${message}</div>`;
@@ -270,6 +339,12 @@ function showError(message) {
   const videoFrame = document.getElementById('videoFrame');
   if (videoFrame) {
     videoFrame.src = '';
+  }
+  
+  // Afficher également dans le conteneur principal si besoin
+  const animeDetailContainer = document.getElementById('animeDetailContainer');
+  if (animeDetailContainer && !contentData) {
+    animeDetailContainer.innerHTML = `<div class="error">❌ ${message}</div>`;
   }
 }
 
@@ -283,3 +358,6 @@ document.addEventListener('keydown', (e) => {
     if (currentEpisode < episodesList.length) loadEpisode(currentEpisode + 1);
   }
 });
+
+// Export pour débogage
+console.log('detail-page.js chargé');
