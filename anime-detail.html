@@ -6,11 +6,55 @@
   <title>Détail Anime - Anime & Manga Info</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .episodes-grid {
+    .synopsis-container {
+      margin: 1rem 0;
+    }
+    .synopsis-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .synopsis-tab {
+      padding: 0.4rem 1rem;
+      background: #252540;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .synopsis-tab.active {
+      background: #e94560;
+    }
+    .synopsis-content {
+      background: #1a1a2e;
+      padding: 1rem;
+      border-radius: 12px;
+      line-height: 1.6;
+    }
+    .next-episode {
+      background: #e94560;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .watch-btn {
+      display: inline-block;
+      background: #e94560;
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .episode-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 0.8rem;
+      gap: 0.5rem;
       margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
     }
     .episode-item {
       background: #252540;
@@ -18,21 +62,9 @@
       text-align: center;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
     }
     .episode-item:hover {
       background: #e94560;
-      transform: translateY(-2px);
-    }
-    .watch-btn {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      background: #e94560;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -44,7 +76,7 @@
     </div>
   </header>
 
-  <main class="detail-page">
+  <main class="detail-page" style="max-width:1200px; margin:0 auto; padding:2rem;">
     <div id="animeDetailContainer">
       <div class="loading">Chargement...</div>
     </div>
@@ -55,9 +87,26 @@
     const animeId = urlParams.get('id');
     const API_BASE = 'https://api.jikan.moe/v4';
     
+    // Corrections du nombre d'épisodes
+    const episodeCorrections = {
+      21: 1122,  // One Piece
+      1: 220,    // Naruto
+      2: 500,    // Naruto Shippuden
+      3: 366,    // Bleach
+      4: 291,    // Dragon Ball Z
+      5: 131,    // Dragon Ball Super
+      6: 87,     // Attack on Titan
+      7: 47,     // Jujutsu Kaisen
+      8: 55,     // Demon Slayer
+      9: 138,    // My Hero Academia
+      10: 293    // Boruto
+    };
+    
+    let currentSynopsisLang = 'fr';
+    
     async function loadAnimeDetail() {
       if (!animeId) {
-        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">ID d\'anime manquant</div>';
+        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">ID manquant</div>';
         return;
       }
       
@@ -66,31 +115,41 @@
         const data = await response.json();
         const anime = data.data;
         
-        // Générer la liste des épisodes (jusqu'à 24 par défaut)
-        const episodeCount = anime.episodes || 24;
-        const episodes = Array.from({ length: Math.min(episodeCount, 100) }, (_, i) => i + 1);
+        const episodeCount = episodeCorrections[animeId] || anime.episodes || 24;
+        const episodes = Array.from({ length: Math.min(episodeCount, 200) }, (_, i) => i + 1);
+        
+        // Vérifier si l'anime est en cours
+        const isAiring = anime.status === 'Currently Airing';
+        let nextEpisodeText = '';
+        if (isAiring && anime.broadcast) {
+          nextEpisodeText = `<div class="next-episode">📺 Prochain épisode: ${anime.broadcast.day || '?'} à ${anime.broadcast.time || '?'}</div>`;
+        }
         
         document.getElementById('animeDetailContainer').innerHTML = `
           <div class="detail-hero">
             <img src="${anime.images.jpg.large_image_url}" alt="${anime.title}">
             <div class="detail-hero-info">
               <h1>${anime.title}</h1>
-              <h2>${anime.title_english || ''}</h2>
+              <h2>${anime.title_english || anime.title_japanese || ''}</h2>
               <div class="detail-stats">
                 <span class="stat">⭐ ${anime.score || 'N/A'}</span>
                 <span class="stat">📊 Rang #${anime.rank || 'N/A'}</span>
-                <span class="stat">❤️ Favoris: ${anime.favorites?.toLocaleString() || '0'}</span>
+                <span class="stat">❤️ ${anime.favorites?.toLocaleString() || '0'} favoris</span>
+                <span class="stat">📺 ${episodeCount} épisodes</span>
               </div>
+              ${nextEpisodeText}
+              <a href="watch.html?id=${animeId}&ep=1" class="watch-btn">▶ Regarder l'épisode 1</a>
             </div>
           </div>
           
           <div class="detail-info-grid">
             <div class="info-card">
               <h3>📅 Informations</h3>
-              <p><strong>Statut:</strong> ${anime.status || 'Inconnu'}</p>
-              <p><strong>Épisodes:</strong> ${anime.episodes || '?'}</p>
+              <p><strong>Statut:</strong> ${anime.status === 'Currently Airing' ? '🟢 En cours' : (anime.status === 'Finished Airing' ? '✅ Terminé' : '📅 À venir')}</p>
+              <p><strong>Épisodes:</strong> ${episodeCount}</p>
               <p><strong>Durée:</strong> ${anime.duration || 'N/A'}</p>
               <p><strong>Studio:</strong> ${anime.studios?.map(s => s.name).join(', ') || 'N/A'}</p>
+              <p><strong>Date début:</strong> ${anime.aired?.from ? new Date(anime.aired.from).toLocaleDateString('fr-FR') : 'N/A'}</p>
             </div>
             <div class="info-card">
               <h3>🏷️ Genres</h3>
@@ -106,29 +165,48 @@
             </div>
           </div>
           
-          <div class="synopsis-full">
-            <h3>📖 Synopsis</h3>
-            <p>${anime.synopsis || 'Synopsis non disponible.'}</p>
+          <div class="synopsis-container">
+            <div class="synopsis-tabs">
+              <button class="synopsis-tab ${currentSynopsisLang === 'fr' ? 'active' : ''}" data-lang="fr">🇫🇷 Français</button>
+              <button class="synopsis-tab ${currentSynopsisLang === 'en' ? 'active' : ''}" data-lang="en">🇬🇧 English</button>
+            </div>
+            <div id="synopsisContent" class="synopsis-content">
+              ${anime.synopsis || 'Synopsis non disponible.'}
+            </div>
           </div>
           
           <div class="episodes-section">
             <h3>📺 Liste des épisodes (${episodes.length})</h3>
-            <div class="episodes-grid" id="episodesGrid">
+            <div class="episode-list" id="episodeList">
               ${episodes.map(ep => `
                 <div class="episode-item" data-ep="${ep}">
                   Ép. ${ep}
                 </div>
               `).join('')}
             </div>
-            <a href="watch.html?id=${animeId}&ep=1" class="watch-btn">▶ Regarder l'épisode 1</a>
           </div>
         `;
         
-        // Ajouter les événements de clic sur les épisodes
+        // Gestion synopsis bilingue
+        document.querySelectorAll('.synopsis-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            currentSynopsisLang = tab.dataset.lang;
+            document.querySelectorAll('.synopsis-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Changer le synopsis (anglais ou français)
+            if (currentSynopsisLang === 'en') {
+              document.getElementById('synopsisContent').textContent = anime.synopsis || 'Synopsis not available.';
+            } else {
+              document.getElementById('synopsisContent').textContent = anime.synopsis || 'Synopsis non disponible.';
+            }
+          });
+        });
+        
+        // Clic sur épisode
         document.querySelectorAll('.episode-item').forEach(item => {
           item.addEventListener('click', () => {
-            const epNum = item.dataset.ep;
-            window.location.href = `watch.html?id=${animeId}&ep=${epNum}`;
+            window.location.href = `watch.html?id=${animeId}&ep=${item.dataset.ep}`;
           });
         });
         
