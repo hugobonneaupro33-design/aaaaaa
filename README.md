@@ -73,71 +73,25 @@ anime-info/
 ├── watch.html # Lecteur vidéo
 ├── profile.html # Profil utilisateur
 ├── webtoon.html # Page webtoons
+├── manga-detail.html # Détail d'un manga
 ├── style.css # Styles globaux
 ├── firebase-config.js # Configuration Firebase
 ├── calendar.js # Calendrier des sorties
+├── calendar-data.js # Données du calendrier
+├── detail-page.js # Script page détail
+├── watch.js # Script lecteur vidéo
+├── profile.js # Script profil utilisateur
+├── script.js # Script principal
+├── main.js # Script d'initialisation
+├── news-data.js # Données des actualités
 ├── sw.js # Service Worker (offline)
-└── assets/ # Images et icônes
+├── offline.html # Page hors-ligne
+├── favicon.svg # Icône du site
+└── README.md # Documentation
 
-text
-
----
-
-## 🔧 Installation
-
-### Prérequis
-- Un compte [Firebase](https://firebase.google.com/)
-- Un éditeur de code (VS Code recommandé)
-
-### Étapes
-
-1. **Cloner le dépôt**
-```bash
-git clone https://github.com/hugobonneaupro33-design/aaaaaa.git
-cd aaaaaa
-Configurer Firebase
-
-Créez un projet sur Firebase Console
-
-Activez Authentication (Google + Facebook)
-
-Activez Firestore Database
-
-Copiez vos clés dans firebase-config.js
-
-Lancer en local
-
-bash
-npx live-server
-Déployer sur GitHub Pages
-
-bash
-git add .
-git commit -m "Deploy site"
-git push origin main
-📡 APIs Utilisées
-API	Utilisation
-AniList GraphQL	Récupération des animes, détails, épisodes
-Firebase Auth	Connexion Google/Facebook
-Firestore	Stockage des favoris et progression
-RSS2JSON	Conversion des flux RSS actualités
-🤝 Contributions
-Les contributions sont les bienvenues !
-
-Forkez le projet
-
-Créez votre branche (git checkout -b feature/amazing)
-
-Committez (git commit -m 'Add amazing feature')
-
-Pushez (git push origin feature/amazing)
-
-Ouvrez une Pull Request
 
 📝 Licence
 Ce projet est sous licence MIT
-
-👨‍💻 Auteur
 Hugo Bonneau - GitHub
 
 <div align="center">
