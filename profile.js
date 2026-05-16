@@ -110,4 +110,27 @@ async function loadProfile() {
         <p><strong>Animes vus :</strong> ${watchedList.length}</p>
         <p><strong>Mangas lus :</strong> ${readList.length}</p>
         <p><strong>Total favoris :</strong> ${likesList.length}</p>
-        <p><strong>Note moyenne donnée :</strong>
+        <p><strong>Note moyenne donnée :</strong> ${calculateAverageRating(ratings)}/5 ⭐</p>
+      </div>
+    `;
+    
+  } catch (error) {
+    console.error('Erreur chargement profil:', error);
+    profileContent.innerHTML = '<div class="error">❌ Erreur lors du chargement du profil</div>';
+  }
+}
+
+// Calculer la note moyenne
+function calculateAverageRating(ratings) {
+  const validRatings = Object.values(ratings).filter(r => r > 0);
+  if (validRatings.length === 0) return 'N/A';
+  const sum = validRatings.reduce((a, b) => a + parseInt(b), 0);
+  return (sum / validRatings.length).toFixed(1);
+}
+
+// Observer l'état d'authentification
+auth.onAuthStateChanged((user) => {
+  currentUser = user;
+  updateUIBasedOnAuth();
+  loadProfile();
+});
