@@ -3,18 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Mon profil - Anime & Manga Info : statistiques, favoris, historique de visionnage">
+  <meta name="description" content="Mon profil Anime & Manga Info - Gérez vos favoris, votre historique et vos préférences">
   <meta name="theme-color" content="#e94560">
   <title>Mon Profil - Anime & Manga Info</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Styles supplémentaires spécifiques au profil */
-    .profile-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
+    /* ============================================
+       STYLES PROFIL UTILISATEUR
+    ============================================ */
+    :root {
+      --primary: #e94560;
+      --primary-dark: #c72e48;
+      --bg-dark: #0a0a0f;
+      --bg-card: #13131f;
+      --bg-hover: #1e1e2e;
+      --text-light: #f0f0f0;
+      --text-muted: #8888aa;
+      --border: #252540;
+      --shadow: 0 8px 20px rgba(0,0,0,0.3);
+      --radius: 16px;
+      --radius-sm: 8px;
     }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .home-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .home-link:hover { color: var(--primary-dark); }
+
+    /* Auth */
+    .auth-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .google-btn, .facebook-btn, .logout-btn {
+      padding: 0.5rem 1.2rem;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .google-btn { background: #4285f4; color: white; }
+    .facebook-btn { background: #1877f2; color: white; }
+    .logout-btn { background: var(--primary); color: white; }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg-hover);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+    }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .profile-link { color: var(--primary); text-decoration: none; }
+
+    /* Main */
+    .profile-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    /* Profile Header */
     .profile-header {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       border-radius: 24px;
@@ -23,7 +98,6 @@
       margin-bottom: 2rem;
       border: 1px solid var(--border);
     }
-
     .profile-avatar-large {
       width: 120px;
       height: 120px;
@@ -32,17 +106,44 @@
       border: 4px solid var(--primary);
       margin-bottom: 1rem;
     }
+    .profile-header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .profile-header p { color: var(--text-muted); margin-bottom: 1rem; }
 
-    .profile-header h2 {
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
+    /* Privacy Toggle */
+    .privacy-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem 0;
     }
-
-    .profile-header p {
-      color: var(--text-muted);
-      margin-bottom: 1rem;
+    .privacy-toggle label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
     }
+    .privacy-toggle input { width: 18px; height: 18px; cursor: pointer; }
 
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-number { font-size: 2rem; font-weight: bold; color: var(--primary); }
+    .stat-label { color: var(--text-muted); margin-top: 0.5rem; }
+
+    /* Profile Actions */
     .profile-actions {
       display: flex;
       gap: 1rem;
@@ -50,7 +151,6 @@
       flex-wrap: wrap;
       margin-top: 1rem;
     }
-
     .action-btn {
       padding: 0.5rem 1.2rem;
       background: var(--bg-hover);
@@ -60,49 +160,34 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .action-btn:hover { background: var(--primary); transform: translateY(-2px); }
 
-    .action-btn:hover {
-      background: var(--primary);
-      transform: translateY(-2px);
+    /* Tabs */
+    .profile-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      border-bottom: 2px solid var(--border);
     }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: all 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .stat-label {
+    .profile-tab {
+      padding: 0.7rem 1.5rem;
+      background: none;
+      border: none;
       color: var(--text-muted);
-      margin-top: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
     }
+    .profile-tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
 
+    /* Sections */
     .profile-section {
       background: var(--bg-card);
-      border-radius: 16px;
+      border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
-
     .section-header {
       display: flex;
       justify-content: space-between;
@@ -113,14 +198,7 @@
       padding-bottom: 0.5rem;
       border-bottom: 2px solid var(--border);
     }
-
-    .section-header h3 {
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
+    .section-header h3 { color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
     .badge-count {
       background: var(--primary);
       padding: 0.2rem 0.6rem;
@@ -128,12 +206,12 @@
       font-size: 0.7rem;
     }
 
+    /* Favorites Grid */
     .favorites-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 1rem;
     }
-
     .favorite-item {
       background: var(--bg-hover);
       border-radius: 12px;
@@ -141,38 +219,13 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
-    .favorite-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(233,69,96,0.2);
-    }
-
-    .favorite-item img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .favorite-info {
-      padding: 0.8rem;
-      text-align: center;
-    }
-
-    .favorite-info h4 {
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .favorite-score {
-      font-size: 0.75rem;
-      color: #ffd700;
-      margin-top: 0.3rem;
-    }
-
+    .favorite-item:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(233,69,96,0.2); }
+    .favorite-item img { width: 100%; height: 200px; object-fit: cover; }
+    .favorite-info { padding: 0.8rem; text-align: center; }
+    .favorite-info h4 { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .favorite-score { font-size: 0.75rem; color: #ffd700; margin-top: 0.3rem; }
     .remove-fav-btn {
-      background: var(--error);
+      background: #d63031;
       border: none;
       border-radius: 20px;
       padding: 0.2rem 0.6rem;
@@ -182,12 +235,8 @@
       margin-top: 0.3rem;
     }
 
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
+    /* History List */
+    .history-list { display: flex; flex-direction: column; gap: 0.8rem; }
     .history-item {
       display: flex;
       justify-content: space-between;
@@ -198,26 +247,10 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
-    .history-item:hover {
-      background: #2a2a3a;
-      transform: translateX(5px);
-    }
-
-    .history-info {
-      flex: 1;
-    }
-
-    .history-title {
-      font-weight: bold;
-      margin-bottom: 0.2rem;
-    }
-
-    .history-meta {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
+    .history-item:hover { background: #2a2a3a; transform: translateX(5px); }
+    .history-info { flex: 1; }
+    .history-title { font-weight: bold; margin-bottom: 0.2rem; }
+    .history-meta { font-size: 0.7rem; color: var(--text-muted); }
     .history-episode {
       background: var(--primary);
       padding: 0.3rem 0.8rem;
@@ -225,12 +258,8 @@
       font-size: 0.7rem;
     }
 
-    .stats-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
+    /* Stats Details */
+    .stats-details { display: flex; flex-direction: column; gap: 0.8rem; }
     .stat-row {
       display: flex;
       justify-content: space-between;
@@ -238,71 +267,52 @@
       padding: 0.5rem;
       border-bottom: 1px solid var(--border);
     }
+    .stat-value { color: var(--primary); font-weight: bold; }
 
-    .stat-value {
-      color: var(--primary);
-      font-weight: bold;
-    }
+    /* Empty State */
+    .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
 
-    .profile-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      border-bottom: 2px solid var(--border);
-    }
-
-    .profile-tab {
-      padding: 0.7rem 1.5rem;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-    }
-
-    .profile-tab.active {
-      color: var(--primary);
-      border-bottom: 2px solid var(--primary);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .empty-state {
+    /* Toast */
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: var(--bg-card);
+      color: white;
       text-align: center;
-      padding: 3rem;
-      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 1rem;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-left: 4px solid var(--primary);
+    }
+    .toast.show { visibility: visible; animation: fadeInOut 3s ease; }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     }
 
-    .clear-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.8rem;
+    /* Responsive */
+    @media (max-width: 768px) {
+      .profile-container { padding: 1rem; }
+      .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-header h2 { font-size: 1.3rem; }
     }
-
-    .clear-btn:hover {
-      color: var(--error);
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-top">
-      <a href="index.html" class="home-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/>
-        </svg>
-        Accueil
-      </a>
+      <a href="index.html" class="home-link">🏠 Accueil</a>
       <h1>👤 Mon Profil</h1>
       <div id="authButtons" class="auth-buttons">
         <button onclick="loginWithGoogle()" class="google-btn">🔵 Google</button>
@@ -328,340 +338,233 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js"></script>
   <script>
     // ============================================
-    // PROFIL UTILISATEUR
+    // CONFIGURATION FIREBASE
     // ============================================
-    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwDOGPUWQ08WGuAAZ9p6hS6SZytmRoKig",
+      authDomain: "arkya-animemanga.firebaseapp.com",
+      projectId: "arkya-animemanga",
+      storageBucket: "arkya-animemanga.firebasestorage.app",
+      messagingSenderId: "52570519836",
+      appId: "1:52570519836:web:dbf4fcd7aafe01aac762d9",
+      measurementId: "G-04DPK4LP4H"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Fournisseurs
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+    facebookProvider.setCustomParameters({ display: 'popup' });
+
+    let currentUser = null;
     let userData = {
       favorites: [],
       history: [],
+      settings: {
+        profilePublic: false,
+        notifications: true
+      },
       stats: {
         animesWatched: 0,
         episodesWatched: 0,
         totalHours: 0,
-        memberSince: null
+        memberSince: new Date().toISOString()
       }
     };
     let currentTab = 'favorites';
 
     // ============================================
-    // CHARGEMENT DU PROFIL
+    // AUTHENTIFICATION AVEC PERSISTANCE
     // ============================================
-    function loadProfile() {
-      const container = document.getElementById('profileContent');
-      
-      if (!currentUser) {
-        container.innerHTML = `
-          <div class="profile-header">
-            <div class="empty-state">
-              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-              <h3>🔐 Vous n'êtes pas connecté</h3>
-              <p>Connectez-vous pour accéder à votre profil et sauvegarder vos animes.</p>
-              <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <button onclick="loginWithGoogle()" class="google-btn" style="padding: 0.8rem 1.5rem;">🔵 Se connecter avec Google</button>
-                <button onclick="loginWithFacebook()" class="facebook-btn" style="padding: 0.8rem 1.5rem;">📘 Se connecter avec Facebook</button>
-              </div>
-            </div>
-          </div>
-        `;
-        return;
-      }
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-      loadUserData();
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      updateUIBasedOnAuth();
+      
+      if (user) {
+        await loadUserDataFromFirestore();
+        renderProfileUI();
+      } else {
+        renderNotLoggedIn();
+      }
+    });
+
+    function updateUIBasedOnAuth() {
+      const authDiv = document.getElementById('authButtons');
+      const userDiv = document.getElementById('userMenu');
+      
+      if (authDiv && userDiv) {
+        if (currentUser) {
+          authDiv.style.display = 'none';
+          userDiv.style.display = 'flex';
+          document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
+          if (currentUser.photoURL) document.getElementById('userAvatar').src = currentUser.photoURL;
+        } else {
+          authDiv.style.display = 'flex';
+          userDiv.style.display = 'none';
+        }
+      }
     }
 
     // ============================================
-    // CHARGEMENT DES DONNÉES DEPUIS LE STOCKAGE LOCAL
+    // FIRESTORE - LECTURE/ÉCRITURE
     // ============================================
-    function loadUserData() {
-      // Charger les favoris depuis localStorage
-      const savedFavorites = localStorage.getItem('user_favorites');
-      if (savedFavorites) {
-        userData.favorites = JSON.parse(savedFavorites);
+    async function loadUserDataFromFirestore() {
+      if (!currentUser) return;
+      
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          userData.favorites = data.favorites || [];
+          userData.history = data.history || [];
+          userData.settings = data.settings || { profilePublic: false, notifications: true };
+          userData.stats = data.stats || {
+            animesWatched: userData.favorites.length,
+            episodesWatched: 0,
+            totalHours: 0,
+            memberSince: new Date().toISOString()
+          };
+        }
+      } catch (error) {
+        console.error('Erreur chargement:', error);
+      }
+    }
+
+    async function saveUserDataToFirestore() {
+      if (!currentUser) return;
+      
+      try {
+        await db.collection('users').doc(currentUser.uid).set({
+          favorites: userData.favorites,
+          history: userData.history,
+          settings: userData.settings,
+          stats: userData.stats,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (error) {
+        console.error('Erreur sauvegarde:', error);
+      }
+    }
+
+    // ============================================
+    // FONCTIONS D'AUTHENTIFICATION
+    // ============================================
+    async function loginWithGoogle() {
+      try {
+        const result = await auth.signInWithPopup(googleProvider);
+        showToast(`✨ Bienvenue ${result.user.displayName || result.user.email || 'utilisateur'} !`);
+        await loadUserDataFromFirestore();
+        renderProfileUI();
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast(`❌ ${error.message}`, 'error');
+      }
+    }
+
+    async function loginWithFacebook() {
+      try {
+        const result = await auth.signInWithPopup(facebookProvider);
+        showToast(`✨ Bienvenue ${result.user.displayName || result.user.email || 'utilisateur'} !`);
+        await loadUserDataFromFirestore();
+        renderProfileUI();
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast(`❌ ${error.message}`, 'error');
+      }
+    }
+
+    async function logout() {
+      try {
+        await auth.signOut();
+        showToast('🔓 Déconnecté avec succès');
+        renderNotLoggedIn();
+      } catch (error) {
+        showToast('❌ Erreur lors de la déconnexion', 'error');
+      }
+    }
+
+    // ============================================
+    // GESTION FAVORIS
+    // ============================================
+    function addToFavorites(animeId, animeTitle, animeScore, animeImage) {
+      const exists = userData.favorites.some(f => f.id == animeId);
+      if (exists) {
+        showToast('Cet anime est déjà dans vos favoris');
+        return false;
       }
       
-      // Charger l'historique
-      const savedHistory = localStorage.getItem('user_history');
-      if (savedHistory) {
-        userData.history = JSON.parse(savedHistory);
-      }
-      
-      // Charger les stats
-      const savedStats = localStorage.getItem('user_stats');
-      if (savedStats) {
-        userData.stats = JSON.parse(savedStats);
-      } else {
-        userData.stats = {
-          animesWatched: userData.favorites.length,
-          episodesWatched: Math.floor(Math.random() * 500) + 50,
-          totalHours: Math.floor(Math.random() * 200) + 20,
-          memberSince: new Date().toISOString()
-        };
-      }
-      
+      userData.favorites.push({
+        id: animeId,
+        title: animeTitle,
+        score: animeScore,
+        image: animeImage,
+        dateAdded: new Date().toISOString()
+      });
+      userData.stats.animesWatched = userData.favorites.length;
+      saveUserDataToFirestore();
+      showToast(`❤️ ${animeTitle} ajouté aux favoris`);
+      renderProfileUI();
+      return true;
+    }
+
+    function removeFromFavorites(animeId) {
+      userData.favorites = userData.favorites.filter(f => f.id != animeId);
+      userData.stats.animesWatched = userData.favorites.length;
+      saveUserDataToFirestore();
+      showToast('Favori retiré');
       renderProfileUI();
     }
 
     // ============================================
-    // SAUVEGARDE DES DONNÉES
+    // GESTION HISTORIQUE
     // ============================================
-    function saveUserData() {
-      localStorage.setItem('user_favorites', JSON.stringify(userData.favorites));
-      localStorage.setItem('user_history', JSON.stringify(userData.history));
-      localStorage.setItem('user_stats', JSON.stringify(userData.stats));
+    function addToHistory(animeId, animeTitle, episode) {
+      const existingIndex = userData.history.findIndex(item => item.id == animeId);
+      const historyItem = {
+        id: animeId,
+        title: animeTitle,
+        episode: episode,
+        date: new Date().toISOString()
+      };
+      
+      if (existingIndex !== -1) {
+        userData.history[existingIndex] = historyItem;
+      } else {
+        userData.history.unshift(historyItem);
+      }
+      
+      if (userData.history.length > 50) userData.history = userData.history.slice(0, 50);
+      userData.stats.episodesWatched += 1;
+      userData.stats.totalHours = Math.floor(userData.stats.episodesWatched * 24 / 60);
+      saveUserDataToFirestore();
+    }
+
+    function clearHistory() {
+      userData.history = [];
+      saveUserDataToFirestore();
+      showToast('Historique effacé');
+      renderProfileUI();
     }
 
     // ============================================
-    // RENDU DE L'INTERFACE
+    // PARAMÈTRES
     // ============================================
-    function renderProfileUI() {
-      const container = document.getElementById('profileContent');
-      
-      const animesWatched = userData.stats.animesWatched || userData.favorites.length;
-      const episodesWatched = userData.stats.episodesWatched || 0;
-      const totalHours = userData.stats.totalHours || 0;
-      const memberDate = userData.stats.memberSince ? new Date(userData.stats.memberSince).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
-      
-      container.innerHTML = `
-        <!-- Profile Header -->
-        <div class="profile-header">
-          <img id="profileAvatar" class="profile-avatar-large" src="${currentUser.photoURL || 'https://via.placeholder.com/120x120?text=Avatar'}" alt="Avatar">
-          <h2 id="profileName">${escapeHtml(currentUser.displayName) || escapeHtml(currentUser.email)}</h2>
-          <p id="profileEmail">${escapeHtml(currentUser.email)}</p>
-          <div class="profile-actions">
-            <button id="refreshDataBtn" class="action-btn">🔄 Actualiser</button>
-            <button id="exportDataBtn" class="action-btn">📥 Exporter mes données</button>
-            <button id="clearAllBtn" class="action-btn">🗑️ Tout effacer</button>
-          </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number" id="statAnimes">${animesWatched}</div>
-            <div class="stat-label">Animes suivis</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="statFavorites">${userData.favorites.length}</div>
-            <div class="stat-label">Favoris</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="statEpisodes">${episodesWatched}</div>
-            <div class="stat-label">Épisodes regardés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="statHours">${totalHours}</div>
-            <div class="stat-label">Heures visionnées</div>
-          </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="profile-tabs">
-          <button class="profile-tab ${currentTab === 'favorites' ? 'active' : ''}" data-tab="favorites">❤️ Favoris</button>
-          <button class="profile-tab ${currentTab === 'history' ? 'active' : ''}" data-tab="history">📜 Historique</button>
-          <button class="profile-tab ${currentTab === 'stats' ? 'active' : ''}" data-tab="stats">📊 Statistiques</button>
-        </div>
-
-        <!-- Tab: Favoris -->
-        <div id="tabFavorites" class="tab-content ${currentTab === 'favorites' ? 'active' : ''}">
-          <div class="profile-section">
-            <div class="section-header">
-              <h3>❤️ Mes animes favoris</h3>
-              <span class="badge-count">${userData.favorites.length}</span>
-            </div>
-            <div id="favoritesList" class="favorites-grid">
-              ${renderFavoritesList()}
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab: Historique -->
-        <div id="tabHistory" class="tab-content ${currentTab === 'history' ? 'active' : ''}">
-          <div class="profile-section">
-            <div class="section-header">
-              <h3>📜 Historique de visionnage</h3>
-              <button id="clearHistoryBtn" class="clear-btn">🗑️ Tout effacer</button>
-            </div>
-            <div id="historyList" class="history-list">
-              ${renderHistoryList()}
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab: Statistiques -->
-        <div id="tabStats" class="tab-content ${currentTab === 'stats' ? 'active' : ''}">
-          <div class="profile-section">
-            <div class="section-header">
-              <h3>📊 Statistiques détaillées</h3>
-            </div>
-            <div id="statsDetails" class="stats-details">
-              ${renderStatsDetails()}
-            </div>
-          </div>
-        </div>
-      `;
-      
-      attachEventListeners();
-    }
-
-    function renderFavoritesList() {
-      if (userData.favorites.length === 0) {
-        return `<div class="empty-state">❤️ Aucun favori pour le moment</div>`;
-      }
-      
-      return userData.favorites.map(anime => `
-        <div class="favorite-item" data-id="${anime.id}">
-          <img src="${anime.image || 'https://via.placeholder.com/160x200?text=No+Image'}" alt="${escapeHtml(anime.title)}" loading="lazy" onerror="this.src='https://via.placeholder.com/160x200?text=No+Image'">
-          <div class="favorite-info">
-            <h4>${escapeHtml(anime.title)}</h4>
-            <div class="favorite-score">⭐ ${anime.score || 'N/A'}</div>
-            <button class="remove-fav-btn" data-id="${anime.id}">🗑️ Retirer</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderHistoryList() {
-      if (userData.history.length === 0) {
-        return `<div class="empty-state">📜 Aucun historique pour le moment</div>`;
-      }
-      
-      return userData.history.map(item => `
-        <div class="history-item" data-id="${item.id}" data-ep="${item.episode}">
-          <div class="history-info">
-            <div class="history-title">${escapeHtml(item.title)}</div>
-            <div class="history-meta">
-              📅 ${new Date(item.date).toLocaleDateString('fr-FR')}
-              ${item.episode ? `<span style="margin-left: 0.5rem;">🎬 Épisode ${item.episode}</span>` : ''}
-            </div>
-          </div>
-          <div class="history-episode">Ép. ${item.episode || 1}</div>
-        </div>
-      `).join('');
-    }
-
-    function renderStatsDetails() {
-      const avgScore = userData.favorites.length > 0 
-        ? (userData.favorites.reduce((acc, f) => acc + parseFloat(f.score || 0), 0) / userData.favorites.length).toFixed(1)
-        : 'N/A';
-      
-      return `
-        <div class="stat-row">
-          <span>📺 Total animes suivis</span>
-          <span class="stat-value">${userData.favorites.length}</span>
-        </div>
-        <div class="stat-row">
-          <span>❤️ Nombre de favoris</span>
-          <span class="stat-value">${userData.favorites.length}</span>
-        </div>
-        <div class="stat-row">
-          <span>🎬 Épisodes regardés estimés</span>
-          <span class="stat-value">${userData.stats.episodesWatched || 0}</span>
-        </div>
-        <div class="stat-row">
-          <span>⏱️ Heures visionnées estimées</span>
-          <span class="stat-value">${userData.stats.totalHours || 0}</span>
-        </div>
-        <div class="stat-row">
-          <span>⭐ Note moyenne des favoris</span>
-          <span class="stat-value">${avgScore}/5</span>
-        </div>
-        <div class="stat-row">
-          <span>📅 Membre depuis</span>
-          <span class="stat-value">${userData.stats.memberSince ? new Date(userData.stats.memberSince).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')}</span>
-        </div>
-      `;
-    }
-
-    // ============================================
-    // ÉVÉNEMENTS
-    // ============================================
-    function attachEventListeners() {
-      // Changement d'onglet
-      document.querySelectorAll('.profile-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          currentTab = tab.dataset.tab;
-          renderProfileUI();
-        });
-      });
-      
-      // Clic sur les favoris
-      document.querySelectorAll('.favorite-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-          if (e.target.classList.contains('remove-fav-btn')) return;
-          const id = item.dataset.id;
-          if (id) window.location.href = `anime-detail.html?id=${id}`;
-        });
-      });
-      
-      // Bouton retirer des favoris
-      document.querySelectorAll('.remove-fav-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          const id = btn.dataset.id;
-          userData.favorites = userData.favorites.filter(fav => fav.id != id);
-          saveUserData();
-          renderProfileUI();
-          showToast('Favori retiré');
-        });
-      });
-      
-      // Clic sur l'historique
-      document.querySelectorAll('.history-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const id = item.dataset.id;
-          const ep = item.dataset.ep;
-          window.location.href = `watch.html?id=${id}&ep=${ep}`;
-        });
-      });
-      
-      // Effacer l'historique
-      const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-      if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', () => {
-          if (confirm('Voulez-vous vraiment effacer tout votre historique ?')) {
-            userData.history = [];
-            saveUserData();
-            renderProfileUI();
-            showToast('Historique effacé');
-          }
-        });
-      }
-      
-      // Actualiser
-      const refreshBtn = document.getElementById('refreshDataBtn');
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-          loadUserData();
-          renderProfileUI();
-          showToast('Données actualisées');
-        });
-      }
-      
-      // Exporter
-      const exportBtn = document.getElementById('exportDataBtn');
-      if (exportBtn) {
-        exportBtn.addEventListener('click', exportUserData);
-      }
-      
-      // Tout effacer
-      const clearAllBtn = document.getElementById('clearAllBtn');
-      if (clearAllBtn) {
-        clearAllBtn.addEventListener('click', () => {
-          if (confirm('⚠️ Attention : Cette action supprimera tous vos favoris et votre historique. Êtes-vous sûr ?')) {
-            userData.favorites = [];
-            userData.history = [];
-            saveUserData();
-            renderProfileUI();
-            showToast('Toutes vos données ont été effacées');
-          }
-        });
-      }
+    function toggleProfileVisibility() {
+      userData.settings.profilePublic = !userData.settings.profilePublic;
+      saveUserDataToFirestore();
+      showToast(userData.settings.profilePublic ? '🌍 Profil public' : '🔒 Profil privé');
+      renderProfileUI();
     }
 
     // ============================================
@@ -677,6 +580,7 @@
         favorites: userData.favorites,
         history: userData.history,
         stats: userData.stats,
+        settings: userData.settings,
         exportDate: new Date().toISOString()
       };
       
@@ -690,94 +594,223 @@
       showToast('📥 Données exportées avec succès');
     }
 
+    function importUserData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (imported.favorites) userData.favorites = imported.favorites;
+            if (imported.history) userData.history = imported.history;
+            if (imported.settings) userData.settings = imported.settings;
+            userData.stats.animesWatched = userData.favorites.length;
+            await saveUserDataToFirestore();
+            renderProfileUI();
+            showToast('📥 Données importées avec succès');
+          } catch (error) {
+            showToast('❌ Fichier invalide', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
     // ============================================
-    // UTILITAIRES
+    // AFFICHAGE
     // ============================================
+    function renderNotLoggedIn() {
+      const container = document.getElementById('profileContent');
+      container.innerHTML = `
+        <div class="profile-header">
+          <div class="empty-state">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h3>🔐 Vous n'êtes pas connecté</h3>
+            <p>Connectez-vous pour accéder à votre profil et sauvegarder vos animes.</p>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+              <button onclick="loginWithGoogle()" class="google-btn" style="padding: 0.8rem 1.5rem;">🔵 Se connecter avec Google</button>
+              <button onclick="loginWithFacebook()" class="facebook-btn" style="padding: 0.8rem 1.5rem;">📘 Se connecter avec Facebook</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProfileUI() {
+      const container = document.getElementById('profileContent');
+      
+      const avgScore = userData.favorites.length > 0 
+        ? (userData.favorites.reduce((acc, f) => acc + parseFloat(f.score || 0), 0) / userData.favorites.length).toFixed(1)
+        : 'N/A';
+      
+      container.innerHTML = `
+        <div class="profile-header">
+          <img class="profile-avatar-large" src="${currentUser?.photoURL || 'https://via.placeholder.com/120x120?text=Avatar'}" alt="Avatar">
+          <h2>${escapeHtml(currentUser?.displayName) || escapeHtml(currentUser?.email)}</h2>
+          <p>${escapeHtml(currentUser?.email)}</p>
+          
+          <div class="privacy-toggle">
+            <label>
+              <input type="checkbox" id="privacyToggle" ${userData.settings.profilePublic ? 'checked' : ''}>
+              <span>🌍 Profil public</span>
+            </label>
+            <label>
+              <input type="checkbox" id="notifToggle" ${userData.settings.notifications ? 'checked' : ''}>
+              <span>🔔 Notifications</span>
+            </label>
+          </div>
+          
+          <div class="profile-actions">
+            <button id="refreshBtn" class="action-btn">🔄 Actualiser</button>
+            <button id="exportBtn" class="action-btn">📥 Exporter</button>
+            <button id="importBtn" class="action-btn">📤 Importer</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-number">${userData.favorites.length}</div><div class="stat-label">Favoris</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.history.length}</div><div class="stat-label">Animes vus</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.stats.episodesWatched || 0}</div><div class="stat-label">Épisodes</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.stats.totalHours || 0}</div><div class="stat-label">Heures</div></div>
+        </div>
+
+        <div class="profile-tabs">
+          <button class="profile-tab ${currentTab === 'favorites' ? 'active' : ''}" data-tab="favorites">❤️ Favoris</button>
+          <button class="profile-tab ${currentTab === 'history' ? 'active' : ''}" data-tab="history">📜 Historique</button>
+          <button class="profile-tab ${currentTab === 'stats' ? 'active' : ''}" data-tab="stats">📊 Statistiques</button>
+        </div>
+
+        <div id="tabFavorites" class="tab-content ${currentTab === 'favorites' ? 'active' : ''}" style="display: ${currentTab === 'favorites' ? 'block' : 'none'}">
+          <div class="profile-section">
+            <div class="section-header"><h3>❤️ Mes favoris</h3><span class="badge-count">${userData.favorites.length}</span></div>
+            <div id="favoritesList" class="favorites-grid">${renderFavoritesList()}</div>
+          </div>
+        </div>
+
+        <div id="tabHistory" class="tab-content ${currentTab === 'history' ? 'active' : ''}" style="display: ${currentTab === 'history' ? 'block' : 'none'}">
+          <div class="profile-section">
+            <div class="section-header"><h3>📜 Historique</h3><button id="clearHistoryBtn" class="clear-btn" style="background:none; border:none; color:#888; cursor:pointer;">🗑️ Tout effacer</button></div>
+            <div id="historyList" class="history-list">${renderHistoryList()}</div>
+          </div>
+        </div>
+
+        <div id="tabStats" class="tab-content ${currentTab === 'stats' ? 'active' : ''}" style="display: ${currentTab === 'stats' ? 'block' : 'none'}">
+          <div class="profile-section">
+            <div class="section-header"><h3>📊 Statistiques détaillées</h3></div>
+            <div class="stats-details">
+              <div class="stat-row"><span>❤️ Favoris</span><span class="stat-value">${userData.favorites.length}</span></div>
+              <div class="stat-row"><span>📜 Historique</span><span class="stat-value">${userData.history.length}</span></div>
+              <div class="stat-row"><span>🎬 Épisodes regardés</span><span class="stat-value">${userData.stats.episodesWatched || 0}</span></div>
+              <div class="stat-row"><span>⏱️ Heures visionnées</span><span class="stat-value">${userData.stats.totalHours || 0}</span></div>
+              <div class="stat-row"><span>⭐ Note moyenne</span><span class="stat-value">${avgScore}/5</span></div>
+              <div class="stat-row"><span>📅 Membre depuis</span><span class="stat-value">${new Date(userData.stats.memberSince).toLocaleDateString('fr-FR')}</span></div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      attachEventListeners();
+    }
+
+    function renderFavoritesList() {
+      if (userData.favorites.length === 0) {
+        return '<div class="empty-state">❤️ Aucun favori pour le moment</div>';
+      }
+      return userData.favorites.map(anime => `
+        <div class="favorite-item" data-id="${anime.id}">
+          <img src="${anime.image || 'https://via.placeholder.com/160x200?text=No+Image'}" alt="${escapeHtml(anime.title)}" loading="lazy">
+          <div class="favorite-info">
+            <h4>${escapeHtml(anime.title)}</h4>
+            <div class="favorite-score">⭐ ${anime.score || 'N/A'}</div>
+            <button class="remove-fav-btn" data-id="${anime.id}">🗑️ Retirer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderHistoryList() {
+      if (userData.history.length === 0) {
+        return '<div class="empty-state">📜 Aucun historique</div>';
+      }
+      return userData.history.map(item => `
+        <div class="history-item" data-id="${item.id}" data-ep="${item.episode}">
+          <div class="history-info">
+            <div class="history-title">${escapeHtml(item.title)}</div>
+            <div class="history-meta">📅 ${new Date(item.date).toLocaleDateString('fr-FR')}</div>
+          </div>
+          <div class="history-episode">Ép. ${item.episode || 1}</div>
+        </div>
+      `).join('');
+    }
+
+    function attachEventListeners() {
+      document.querySelectorAll('.profile-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          currentTab = tab.dataset.tab;
+          renderProfileUI();
+        });
+      });
+      
+      document.querySelectorAll('.favorite-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.classList.contains('remove-fav-btn')) return;
+          window.location.href = `anime-detail.html?id=${item.dataset.id}`;
+        });
+      });
+      
+      document.querySelectorAll('.remove-fav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeFromFavorites(btn.dataset.id);
+        });
+      });
+      
+      document.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', () => {
+          window.location.href = `watch.html?id=${item.dataset.id}&ep=${item.dataset.ep}`;
+        });
+      });
+      
+      const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+      if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', () => { if(confirm('Effacer tout l\'historique ?')) clearHistory(); });
+      
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.addEventListener('click', () => { loadUserDataFromFirestore(); renderProfileUI(); showToast('Données actualisées'); });
+      
+      const exportBtn = document.getElementById('exportBtn');
+      if (exportBtn) exportBtn.addEventListener('click', exportUserData);
+      
+      const importBtn = document.getElementById('importBtn');
+      if (importBtn) importBtn.addEventListener('click', importUserData);
+      
+      const privacyToggle = document.getElementById('privacyToggle');
+      if (privacyToggle) privacyToggle.addEventListener('change', toggleProfileVisibility);
+    }
+
     function escapeHtml(str) {
       if (!str) return '';
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     function showToast(message) {
-      let toast = document.getElementById('toast');
-      if (!toast) return;
+      const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Fonctions pour ajouter des favoris depuis d'autres pages
-    window.addToFavorites = function(animeId, animeTitle, animeScore, animeImage) {
-      if (!currentUser) {
-        showToast('Connectez-vous pour ajouter aux favoris');
-        return false;
-      }
-      
-      const exists = userData.favorites.some(f => f.id == animeId);
-      if (exists) {
-        showToast('Cet anime est déjà dans vos favoris');
-        return false;
-      }
-      
-      userData.favorites.push({
-        id: animeId,
-        title: animeTitle,
-        score: animeScore,
-        image: animeImage,
-        dateAdded: new Date().toISOString()
-      });
-      saveUserData();
-      showToast(`❤️ ${animeTitle} ajouté aux favoris`);
-      return true;
-    };
-
-    window.removeFromFavorites = function(animeId) {
-      userData.favorites = userData.favorites.filter(f => f.id != animeId);
-      saveUserData();
-      showToast('Favori retiré');
-    };
-
-    window.addToHistory = function(animeId, animeTitle, episode) {
-      if (!currentUser) return;
-      
-      const existingIndex = userData.history.findIndex(item => item.id == animeId);
-      const historyItem = {
-        id: animeId,
-        title: animeTitle,
-        episode: episode,
-        date: new Date().toISOString()
-      };
-      
-      if (existingIndex !== -1) {
-        userData.history[existingIndex] = historyItem;
-      } else {
-        userData.history.unshift(historyItem);
-      }
-      
-      if (userData.history.length > 50) {
-        userData.history = userData.history.slice(0, 50);
-      }
-      
-      saveUserData();
-    };
-
-    // ============================================
-    // INITIALISATION
-    // ============================================
-    function waitForAuth() {
-      if (typeof currentUser !== 'undefined') {
-        loadProfile();
-      } else {
-        setTimeout(waitForAuth, 100);
-      }
-    }
-
-    waitForAuth();
+    window.loginWithGoogle = loginWithGoogle;
+    window.loginWithFacebook = loginWithFacebook;
+    window.logout = logout;
+    window.addToFavorites = addToFavorites;
+    window.addToHistory = addToHistory;
   </script>
 </body>
 </html>
