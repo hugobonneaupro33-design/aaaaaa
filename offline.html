@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hors-ligne - Anime & Manga Info</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .offline-container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 500px;
+    }
+    
+    .offline-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #e94560;
+    }
+    
+    p {
+      color: #8888aa;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    
+    button {
+      padding: 0.8rem 1.5rem;
+      background: #e94560;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #c72e48;
+      transform: translateY(-2px);
+    }
+    
+    .retry-btn {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">📡</div>
+    <h1>Vous êtes hors-ligne</h1>
+    <p>
+      Votre connexion internet semble interrompue.<br>
+      Les pages que vous avez déjà visitées sont disponibles en cache.
+    </p>
+    <button onclick="location.reload()" class="retry-btn">🔄 Réessayer</button>
+    <button onclick="window.location.href='/'" style="margin-left: 0.5rem;">🏠 Retour à l'accueil</button>
+  </div>
+</body>
+</html>
