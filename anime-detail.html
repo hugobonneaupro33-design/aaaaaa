@@ -2,14 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, view-fit=cover">
-  <meta name="description" content="Découvrez les détails de l'anime : synopsis, épisodes, dates de sortie, et regardez en VF/VOSTFR">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Découvrez tous les détails de l'anime : synopsis, épisodes, dates de sortie, studios et bien plus">
   <meta name="theme-color" content="#e94560">
   <title>Détail Anime - Anime & Manga Info</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
-    /* Styles spécifiques à la page détail */
+    /* ============================================
+       STYLES SPÉCIFIQUES À LA PAGE DÉTAIL
+    ============================================ */
     :root {
       --primary: #e94560;
       --primary-dark: #c72e48;
@@ -20,6 +21,8 @@
       --text-muted: #8888aa;
       --border: #252540;
       --shadow: 0 8px 20px rgba(0,0,0,0.3);
+      --radius: 16px;
+      --radius-sm: 8px;
     }
 
     * {
@@ -78,14 +81,14 @@
       display: flex;
       gap: 2rem;
       background: var(--bg-card);
-      border-radius: 20px;
+      border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
 
     .detail-hero img {
       width: 250px;
-      border-radius: 16px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
 
@@ -121,7 +124,7 @@
     .next-episode {
       background: var(--primary);
       padding: 0.8rem 1rem;
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       margin: 1rem 0;
       display: inline-block;
     }
@@ -134,7 +137,6 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: bold;
-      margin-top: 1rem;
       transition: all 0.2s;
     }
 
@@ -154,7 +156,7 @@
     .info-card {
       background: var(--bg-card);
       padding: 1rem;
-      border-radius: 16px;
+      border-radius: var(--radius);
     }
 
     .info-card h3 {
@@ -183,7 +185,7 @@
     /* Synopsis bilingue */
     .synopsis-container {
       background: var(--bg-card);
-      border-radius: 16px;
+      border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
@@ -216,7 +218,7 @@
     /* Épisodes */
     .episodes-section {
       background: var(--bg-card);
-      border-radius: 16px;
+      border-radius: var(--radius);
       padding: 1.5rem;
     }
 
@@ -268,6 +270,46 @@
       transform: translateY(-2px);
     }
 
+    /* Pagination épisodes */
+    .episode-pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .ep-page-btn {
+      padding: 0.3rem 0.8rem;
+      background: var(--bg-hover);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      cursor: pointer;
+    }
+
+    .ep-page-btn.active {
+      background: var(--primary);
+    }
+
+    /* Favoris */
+    .favorite-btn {
+      background: none;
+      border: 2px solid var(--primary);
+      border-radius: 40px;
+      padding: 0.5rem 1rem;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+
+    .favorite-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
     /* Loading & Error */
     .loading, .error {
       text-align: center;
@@ -313,6 +355,7 @@
       .detail-hero img { width: 200px; }
       .detail-stats { justify-content: center; }
       .episode-list { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+      .detail-container { padding: 1rem; }
     }
   </style>
 </head>
@@ -338,203 +381,375 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script>
     // ============================================
     // RÉCUPÉRATION DE L'ID
     // ============================================
     const urlParams = new URLSearchParams(window.location.search);
     const animeId = urlParams.get('id');
-    const API_BASE = 'https://api.jikan.moe/v4';
-    const CORS_PROXY = 'https://corsproxy.io/?url=';
+    const ANILIST_API = 'https://graphql.anilist.co';
+    
+    let currentLang = 'fr';
+    let currentPage = 1;
+    let itemsPerPage = 30;
+    let totalEpisodes = 0;
+    let animeData = null;
+    let isFav = false;
 
     // ============================================
-    // CORRECTIONS DES ÉPISODES
+    // REQUÊTE GRAPHQL POUR LES DÉTAILS
     // ============================================
-    const episodeCorrections = {
-      21: 1122,  // One Piece
-      1: 220,    // Naruto
-      2: 500,    // Naruto Shippuden
-      3: 366,    // Bleach
-      4: 291,    // Dragon Ball Z
-      5: 131,    // Dragon Ball Super
-      6: 87,     // Attack on Titan
-      7: 47,     // Jujutsu Kaisen
-      8: 55,     // Demon Slayer
-      9: 138,    // My Hero Academia
-      10: 293    // Boruto
-    };
-
-    let currentSynopsisLang = 'fr';
-
-    // ============================================
-    // FONCTION FETCH AVEC PROXY
-    // ============================================
-    async function fetchWithProxy(url) {
-      try {
-        const response = await fetch(url);
-        if (response.ok) return response;
-      } catch (e) {
-        console.log('Directe échouée, utilisation du proxy');
+    const DETAIL_QUERY = `
+      query ($id: Int) {
+        Media(id: $id, type: ANIME) {
+          id
+          title { romaji english native }
+          coverImage { extraLarge large medium }
+          bannerImage
+          description
+          averageScore
+          meanScore
+          popularity
+          favourites
+          status
+          episodes
+          duration
+          format
+          source
+          season
+          seasonYear
+          startDate { year month day }
+          endDate { year month day }
+          studios { nodes { name } }
+          genres
+          tags { name }
+          nextAiringEpisode { episode airingAt }
+          relations { edges { node { id title { romaji } } } }
+          characters { edges { node { name { full } } } }
+        }
       }
-      const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-      return fetch(proxyUrl);
+    `;
+
+    async function fetchAnimeDetail(id) {
+      try {
+        const response = await fetch(ANILIST_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: DETAIL_QUERY, variables: { id } })
+        });
+        const data = await response.json();
+        if (data.errors) {
+          console.error('GraphQL Errors:', data.errors);
+          return null;
+        }
+        return data.data.Media;
+      } catch (error) {
+        console.error('Erreur:', error);
+        return null;
+      }
     }
 
     // ============================================
-    // CHARGEMENT DES DÉTAILS
+    // AFFICHAGE DU DÉTAIL
     // ============================================
-    async function loadAnimeDetail() {
-      if (!animeId) {
-        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ ID d\'anime manquant</div>';
-        return;
+    function formatDate(year, month, day) {
+      if (!year) return 'Inconnue';
+      return new Date(year, month - 1, day || 1).toLocaleDateString('fr-FR', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+    }
+
+    function getStatusText(status) {
+      const statusMap = {
+        FINISHED: '✅ Terminé',
+        RELEASING: '🟢 En cours',
+        NOT_YET_RELEASED: '📅 À venir',
+        CANCELLED: '❌ Annulé'
+      };
+      return statusMap[status] || status;
+    }
+
+    function getFormatText(format) {
+      const formatMap = {
+        TV: 'Série TV',
+        TV_SHORT: 'Série TV courte',
+        MOVIE: 'Film',
+        SPECIAL: 'Spécial',
+        OVA: 'OVA',
+        ONA: 'ONA',
+        MUSIC: 'Music Video'
+      };
+      return formatMap[format] || format;
+    }
+
+    function cleanHtmlDescription(html) {
+      if (!html) return 'Synopsis non disponible.';
+      return html
+        .replace(/<br>/g, '\n')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&');
+    }
+
+    function displayAnimeDetail(anime) {
+      const container = document.getElementById('animeDetailContainer');
+      const episodeCount = anime.episodes || '?';
+      const isAiring = anime.status === 'RELEASING';
+      const releaseDate = formatDate(anime.startDate?.year, anime.startDate?.month, anime.startDate?.day);
+      const endDate = formatDate(anime.endDate?.year, anime.endDate?.month, anime.endDate?.day);
+      
+      let nextEpisodeText = '';
+      if (isAiring && anime.nextAiringEpisode) {
+        const nextDate = new Date(anime.nextAiringEpisode.airingAt * 1000);
+        nextEpisodeText = `<div class="next-episode">📺 Prochain épisode: Épisode ${anime.nextAiringEpisode.episode} - ${nextDate.toLocaleDateString('fr-FR')}</div>`;
       }
 
-      try {
-        const response = await fetchWithProxy(`${API_BASE}/anime/${animeId}`);
-        const data = await response.json();
-        const anime = data.data;
-
-        if (!anime) {
-          throw new Error('Anime non trouvé');
-        }
-
-        const episodeCount = episodeCorrections[animeId] || anime.episodes || 24;
-        const episodes = Array.from({ length: Math.min(episodeCount, 300) }, (_, i) => i + 1);
-        const isAiring = anime.status === 'Currently Airing';
-        const releaseDate = anime.aired?.from ? new Date(anime.aired.from).toLocaleDateString('fr-FR') : 'Date inconnue';
-        
-        let nextEpisodeText = '';
-        if (isAiring && anime.broadcast?.day) {
-          nextEpisodeText = `<div class="next-episode">📺 Prochain épisode: ${anime.broadcast.day || '?'} à ${anime.broadcast.time || '?'}</div>`;
-        }
-
-        document.getElementById('animeDetailContainer').innerHTML = `
-          <!-- Hero Section -->
-          <div class="detail-hero">
-            <img src="${anime.images.jpg.large_image_url}" alt="${anime.title}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
-            <div class="detail-hero-info">
-              <h1>${anime.title}</h1>
-              <h2>${anime.title_english || anime.title_japanese || ''}</h2>
-              <div class="detail-stats">
-                <span class="stat">⭐ ${anime.score || 'N/A'}</span>
-                <span class="stat">📊 Rang #${anime.rank || 'N/A'}</span>
-                <span class="stat">❤️ ${anime.favorites?.toLocaleString() || '0'} favoris</span>
-                <span class="stat">📺 ${episodeCount} épisodes</span>
-              </div>
-              ${nextEpisodeText}
-              <a href="watch.html?id=${animeId}&ep=1" class="watch-btn">▶ Regarder l'épisode 1</a>
+      const descriptionFr = cleanHtmlDescription(anime.description);
+      
+      container.innerHTML = `
+        <!-- Hero Section -->
+        <div class="detail-hero">
+          <img src="${anime.coverImage?.extraLarge || anime.coverImage?.large || anime.coverImage?.medium}" alt="${anime.title?.romaji}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
+          <div class="detail-hero-info">
+            <h1>${anime.title?.romaji || anime.title?.english || 'Sans titre'}</h1>
+            <h2>${anime.title?.english || anime.title?.native || ''}</h2>
+            <div class="detail-stats">
+              <span class="stat">⭐ ${(anime.averageScore / 10).toFixed(1) || 'N/A'}</span>
+              <span class="stat">📊 Popularité #${anime.popularity?.toLocaleString() || 'N/A'}</span>
+              <span class="stat">❤️ ${anime.favourites?.toLocaleString() || '0'} favoris</span>
+              <span class="stat">📺 ${episodeCount} épisodes</span>
             </div>
+            ${nextEpisodeText}
+            <button id="favoriteBtn" class="favorite-btn ${isFav ? 'active' : ''}">
+              ${isFav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
+            </button>
+            <a href="watch.html?id=${anime.id}&ep=1" class="watch-btn" style="margin-left: 1rem;">▶ Regarder l'épisode 1</a>
           </div>
+        </div>
 
-          <!-- Informations détaillées -->
-          <div class="detail-info-grid">
-            <div class="info-card">
-              <h3>📅 Informations</h3>
-              <p><strong>Statut:</strong> ${isAiring ? '🟢 En cours' : (anime.status === 'Finished Airing' ? '✅ Terminé' : '📅 À venir')}</p>
-              <p><strong>Épisodes:</strong> ${episodeCount}</p>
-              <p><strong>Durée:</strong> ${anime.duration || 'N/A'}</p>
-              <p><strong>Studio:</strong> ${anime.studios?.map(s => s.name).join(', ') || 'N/A'}</p>
-              <p><strong>Date début:</strong> ${releaseDate}</p>
+        <!-- Informations détaillées -->
+        <div class="detail-info-grid">
+          <div class="info-card">
+            <h3>📅 Informations</h3>
+            <p><strong>Statut:</strong> ${getStatusText(anime.status)}</p>
+            <p><strong>Épisodes:</strong> ${episodeCount}</p>
+            <p><strong>Durée:</strong> ${anime.duration || '?'} min/ép</p>
+            <p><strong>Format:</strong> ${getFormatText(anime.format)}</p>
+            <p><strong>Source:</strong> ${anime.source || 'N/A'}</p>
+            <p><strong>Saison:</strong> ${anime.season || '?'} ${anime.seasonYear || ''}</p>
+          </div>
+          <div class="info-card">
+            <h3>🏷️ Genres</h3>
+            <div class="genres-list">
+              ${anime.genres?.map(g => `<span class="genre-tag">${g}</span>`).join('') || 'Aucun genre'}
             </div>
-            <div class="info-card">
-              <h3>🏷️ Genres</h3>
+            ${anime.tags?.length > 0 ? `
+              <h3 style="margin-top: 1rem;">🏷️ Tags</h3>
               <div class="genres-list">
-                ${anime.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Aucun genre'}
+                ${anime.tags.slice(0, 8).map(t => `<span class="genre-tag">${t.name}</span>`).join('')}
               </div>
-            </div>
-            <div class="info-card">
-              <h3>📺 Diffusion</h3>
-              <p><strong>Jour:</strong> ${anime.broadcast?.day || 'Inconnu'}</p>
-              <p><strong>Horaire:</strong> ${anime.broadcast?.time || 'Inconnu'}</p>
-              <p><strong>Diffuseur:</strong> ${anime.broadcast?.string || 'N/A'}</p>
-            </div>
+            ` : ''}
           </div>
-
-          <!-- Synopsis bilingue -->
-          <div class="synopsis-container">
-            <div class="synopsis-tabs">
-              <button class="synopsis-tab ${currentSynopsisLang === 'fr' ? 'active' : ''}" data-lang="fr">🇫🇷 Français</button>
-              <button class="synopsis-tab ${currentSynopsisLang === 'en' ? 'active' : ''}" data-lang="en">🇬🇧 English</button>
-            </div>
-            <div id="synopsisContent" class="synopsis-content">
-              ${anime.synopsis || 'Synopsis non disponible.'}
-            </div>
+          <div class="info-card">
+            <h3>📺 Production</h3>
+            <p><strong>Studio:</strong> ${anime.studios?.nodes?.map(s => s.name).join(', ') || 'N/A'}</p>
+            <p><strong>Date début:</strong> ${releaseDate}</p>
+            <p><strong>Date fin:</strong> ${endDate}</p>
+            ${anime.relations?.edges?.length > 0 ? `
+              <p><strong>Liens:</strong> ${anime.relations.edges.slice(0, 3).map(r => r.node.title?.romaji).join(', ')}</p>
+            ` : ''}
           </div>
+        </div>
 
-          <!-- Liste des épisodes -->
-          <div class="episodes-section">
-            <div class="episodes-header">
-              <h3>📺 Liste des épisodes (${episodes.length})</h3>
-              <input type="text" id="episodeSearch" class="episode-search" placeholder="🔍 Rechercher un épisode...">
-            </div>
-            <div id="episodeList" class="episode-list">
-              ${episodes.map(ep => `<div class="episode-item" data-ep="${ep}">Ép. ${ep}</div>`).join('')}
-            </div>
+        <!-- Synopsis bilingue -->
+        <div class="synopsis-container">
+          <div class="synopsis-tabs">
+            <button class="synopsis-tab ${currentLang === 'fr' ? 'active' : ''}" data-lang="fr">🇫🇷 Français</button>
+            <button class="synopsis-tab ${currentLang === 'en' ? 'active' : ''}" data-lang="en">🇬🇧 English</button>
           </div>
-        `;
+          <div id="synopsisContent" class="synopsis-content">
+            ${descriptionFr}
+          </div>
+        </div>
 
-        // Gestion synopsis bilingue
-        document.querySelectorAll('.synopsis-tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            currentSynopsisLang = tab.dataset.lang;
-            document.querySelectorAll('.synopsis-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            if (currentSynopsisLang === 'en') {
-              document.getElementById('synopsisContent').textContent = anime.synopsis || 'Synopsis not available.';
+        <!-- Liste des épisodes -->
+        <div class="episodes-section">
+          <div class="episodes-header">
+            <h3>📺 Liste des épisodes (${episodeCount === '?' ? '?' : episodeCount})</h3>
+            <input type="text" id="episodeSearch" class="episode-search" placeholder="🔍 Rechercher un épisode...">
+          </div>
+          <div id="episodeList" class="episode-list"></div>
+          <div id="episodePagination" class="episode-pagination"></div>
+        </div>
+      `;
+
+      // Gestion synopsis bilingue
+      document.querySelectorAll('.synopsis-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          currentLang = tab.dataset.lang;
+          document.querySelectorAll('.synopsis-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          const synopsisDiv = document.getElementById('synopsisContent');
+          if (synopsisDiv) {
+            if (currentLang === 'en') {
+              synopsisDiv.textContent = cleanHtmlDescription(anime.description) || 'Synopsis not available.';
             } else {
-              document.getElementById('synopsisContent').textContent = anime.synopsis || 'Synopsis non disponible.';
+              synopsisDiv.textContent = descriptionFr;
             }
-          });
+          }
         });
+      });
 
-        // Clic sur épisode
-        document.querySelectorAll('.episode-item').forEach(item => {
-          item.addEventListener('click', () => {
-            const epNum = item.dataset.ep;
-            window.location.href = `watch.html?id=${animeId}&ep=${epNum}`;
-          });
+      // Initialiser la liste des épisodes
+      if (episodeCount !== '?' && episodeCount > 0) {
+        totalEpisodes = Math.min(episodeCount, 500);
+        setupEpisodePagination(totalEpisodes);
+      } else {
+        document.getElementById('episodeList').innerHTML = '<div class="loading">Nombre d\'épisodes non disponible</div>';
+      }
+
+      // Gestion favoris
+      const favBtn = document.getElementById('favoriteBtn');
+      if (favBtn) {
+        favBtn.addEventListener('click', async () => {
+          if (!currentUser) {
+            showToast('🔐 Connectez-vous pour ajouter aux favoris', 'error');
+            return;
+          }
+          if (isFav) {
+            await removeFromFavorites(anime.id);
+            isFav = false;
+            favBtn.textContent = '🤍 Ajouter aux favoris';
+            favBtn.classList.remove('active');
+          } else {
+            await addToFavorites('anime', anime.id, anime.title?.romaji, anime.coverImage?.medium, (anime.averageScore / 10).toFixed(1));
+            isFav = true;
+            favBtn.textContent = '❤️ Dans mes favoris';
+            favBtn.classList.add('active');
+          }
         });
+      }
+    }
 
-        // Recherche d'épisodes
-        const searchInput = document.getElementById('episodeSearch');
-        if (searchInput) {
-          searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            document.querySelectorAll('.episode-item').forEach(item => {
+    // ============================================
+    // PAGINATION DES ÉPISODES
+    // ============================================
+    function renderEpisodeList(episodes, start, end) {
+      const displayEpisodes = episodes.slice(start, end);
+      return displayEpisodes.map(ep => `
+        <div class="episode-item" data-ep="${ep}">
+          Ép. ${ep}
+        </div>
+      `).join('');
+    }
+
+    function setupEpisodePagination(total) {
+      const totalPages = Math.ceil(total / itemsPerPage);
+      let currentEpPage = 1;
+      
+      function renderPage(page) {
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const episodes = Array.from({ length: total }, (_, i) => i + 1);
+        const episodeList = document.getElementById('episodeList');
+        if (episodeList) {
+          episodeList.innerHTML = renderEpisodeList(episodes, start, end);
+          
+          document.querySelectorAll('.episode-item').forEach(item => {
+            item.addEventListener('click', () => {
               const epNum = item.dataset.ep;
-              if (epNum.includes(searchTerm)) {
-                item.style.display = 'block';
-              } else {
-                item.style.display = 'none';
-              }
+              window.location.href = `watch.html?id=${animeId}&ep=${epNum}`;
             });
           });
         }
+        updatePaginationButtons(page, totalPages);
+      }
 
-      } catch (error) {
-        console.error('Erreur:', error);
-        document.getElementById('animeDetailContainer').innerHTML = `
-          <div class="error">
-            ❌ Erreur de chargement<br>
-            <small>${error.message}</small>
-          </div>
+      function updatePaginationButtons(currentPage, total) {
+        const paginationDiv = document.getElementById('episodePagination');
+        if (!paginationDiv) return;
+        
+        let pages = [];
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(total, currentPage + 2); i++) {
+          pages.push(i);
+        }
+        
+        paginationDiv.innerHTML = `
+          <button class="ep-page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>◀</button>
+          ${pages.map(p => `<button class="ep-page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`).join('')}
+          <button class="ep-page-btn" data-page="${currentPage + 1}" ${currentPage === total ? 'disabled' : ''}>▶</button>
         `;
-        showToast('Erreur de chargement de l\'anime', 'error');
+        
+        document.querySelectorAll('.ep-page-btn').forEach(btn => {
+          if (!btn.disabled) {
+            btn.addEventListener('click', () => {
+              const newPage = parseInt(btn.dataset.page);
+              if (!isNaN(newPage) && newPage !== currentPage) {
+                currentEpPage = newPage;
+                renderPage(currentEpPage);
+              }
+            });
+          }
+        });
+      }
+
+      renderPage(1);
+    }
+
+    // ============================================
+    // RECHERCHE ÉPISODES
+    // ============================================
+    function setupEpisodeSearch() {
+      const searchInput = document.getElementById('episodeSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          document.querySelectorAll('.episode-item').forEach(item => {
+            const epNum = item.dataset.ep;
+            if (epNum.includes(searchTerm)) {
+              item.style.display = 'flex';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
       }
     }
 
-    function showToast(message, type = 'success') {
-      let toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = message;
-      toast.className = `toast ${type}`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+    // ============================================
+    // CHARGEMENT PRINCIPAL
+    // ============================================
+    async function loadAnimeDetail() {
+      if (!animeId) {
+        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ ID de l\'anime manquant</div>';
+        return;
+      }
+
+      const anime = await fetchAnimeDetail(parseInt(animeId));
+      if (anime) {
+        // Vérifier si dans les favoris
+        if (typeof isFavorite !== 'undefined' && currentUser) {
+          isFav = await isFavorite(animeId);
+        }
+        displayAnimeDetail(anime);
+        setupEpisodeSearch();
+      } else {
+        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ Erreur de chargement de l\'anime</div>';
+      }
     }
 
-    // Chargement
-    loadAnimeDetail();
+    // ============================================
+    // INITIALISATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAnimeDetail();
+    });
   </script>
 </body>
 </html>
