@@ -114,6 +114,11 @@ header h1 {
   color: #888;
 }
 
+#searchInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #e94560;
+}
+
 #searchBtn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -165,6 +170,7 @@ main {
   justify-content: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .cat-btn {
@@ -463,6 +469,11 @@ section h2 {
   cursor: pointer;
 }
 
+#userRating:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #e94560;
+}
+
 /* Profile Page */
 .profile-container {
   max-width: 1000px;
@@ -551,6 +562,10 @@ section h2 {
   color: #888;
 }
 
+.loading {
+  color: #e94560;
+}
+
 .error {
   color: #e94560;
 }
@@ -571,6 +586,7 @@ section h2 {
   z-index: 1000;
   font-size: 0.9rem;
   border-left: 4px solid #e94560;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 #toast.show {
@@ -587,6 +603,25 @@ section h2 {
   10% { opacity: 1; bottom: 30px; }
   90% { opacity: 1; bottom: 30px; }
   100% { opacity: 0; bottom: 0; }
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e94560;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff6b6b;
 }
 
 /* Responsive */
@@ -625,5 +660,48 @@ section h2 {
   
   .categories {
     flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .search-container {
+    max-width: 100%;
+  }
+  
+  .user-actions {
+    justify-content: center;
+  }
+  
+  .profile-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+  
+  main {
+    padding: 1rem;
+  }
+  
+  .detail-hero {
+    padding: 1rem;
+  }
+  
+  .detail-hero img {
+    width: 150px;
+  }
+  
+  .detail-hero-info h1 {
+    font-size: 1.3rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .likes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
