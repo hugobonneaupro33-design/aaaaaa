@@ -2,10 +2,345 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anime & Manga Info - Accueil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Anime & Manga Info - Découvrez les derniers animes par date de sortie, recherchez vos séries préférées">
+  <meta name="theme-color" content="#e94560">
+  <title>Anime & Manga Info - Dernières sorties</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* Variables et reset */
+    :root {
+      --primary: #e94560;
+      --primary-dark: #c72e48;
+      --primary-light: #ff6b8b;
+      --bg-dark: #0a0a0f;
+      --bg-card: #13131f;
+      --bg-hover: #1e1e2e;
+      --text-light: #f0f0f0;
+      --text-muted: #8888aa;
+      --border: #252540;
+      --shadow: 0 8px 20px rgba(0,0,0,0.3);
+      --shadow-hover: 0 12px 30px rgba(233,69,96,0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logo p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Auth */
+    .auth-buttons {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .google-btn, .facebook-btn, .logout-btn {
+      padding: 0.5rem 1.2rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .google-btn { background: #4285f4; color: white; }
+    .facebook-btn { background: #1877f2; color: white; }
+    .logout-btn { background: var(--primary); color: white; }
+
+    .google-btn:hover, .facebook-btn:hover, .logout-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg-hover);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Barre de recherche style voiranime */
+    .search-container {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-wrapper {
+      display: flex;
+      background: var(--bg-hover);
+      border-radius: 50px;
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .search-wrapper:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
+    }
+
+    #searchInput {
+      flex: 1;
+      padding: 0.9rem 1.5rem;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      color: white;
+      outline: none;
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-muted);
+    }
+
+    #searchBtn {
+      padding: 0 1.8rem;
+      background: var(--primary);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #searchBtn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.02);
+    }
+
+    /* Résultats de recherche dropdown */
+    .search-results-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-radius: 16px;
+      margin-top: 0.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 200;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .search-results-dropdown.active {
+      display: block;
+    }
+
+    .search-result-item {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-result-item:hover {
+      background: var(--bg-hover);
+      transform: translateX(5px);
+    }
+
+    .search-result-img {
+      width: 50px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .search-result-info h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .search-result-info p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Navigation */
+    .quick-nav {
+      display: flex;
+      gap: 0.5rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-btn {
+      padding: 0.7rem 1.5rem;
+      background: var(--bg-hover);
+      border: none;
+      border-radius: 40px;
+      color: var(--text-light);
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: var(--primary);
+    }
+
+    /* Filtres */
+    .filters-section {
+      margin-bottom: 2rem;
+    }
+
+    .filter-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .genre-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .genre-filter {
+      padding: 0.4rem 1rem;
+      background: var(--bg-hover);
+      border: none;
+      border-radius: 30px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .genre-filter:hover, .genre-filter.active {
+      background: var(--primary);
+    }
+
+    /* Grille des animes */
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .anime-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .anime-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .anime-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .anime-info {
+      padding: 1rem;
+    }
+
+    .anime-info h3 {
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .anime-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .score {
+      color: #ffd700;
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--primary);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
     /* Pagination */
     .pagination {
       display: flex;
@@ -14,73 +349,190 @@
       margin-top: 2rem;
       flex-wrap: wrap;
     }
+
     .page-btn {
       padding: 0.5rem 1rem;
-      background: #252540;
+      background: var(--bg-hover);
       border: none;
       border-radius: 8px;
       color: white;
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .page-btn.active, .page-btn:hover {
-      background: #e94560;
+      background: var(--primary);
     }
-    .load-more {
-      text-align: center;
-      margin: 2rem 0;
-    }
-    .load-more-btn {
-      padding: 0.8rem 2rem;
-      background: #e94560;
-      border: none;
-      border-radius: 30px;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .genre-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+
+    /* Autres sections */
+    .section-title {
+      font-size: 1.5rem;
       margin-bottom: 1.5rem;
-      justify-content: center;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .genre-filter {
-      padding: 0.3rem 0.8rem;
-      background: #252540;
-      border: none;
-      border-radius: 20px;
-      color: #e0e0e0;
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    /* Calendrier */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1rem;
+      overflow-x: auto;
+    }
+
+    .calendar-day {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 1rem;
+      min-width: 130px;
+    }
+
+    .calendar-day h4 {
+      color: var(--primary);
+      text-align: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .calendar-episode {
+      background: var(--bg-hover);
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
       cursor: pointer;
+      font-size: 0.7rem;
     }
-    .genre-filter.active {
-      background: #e94560;
+
+    .calendar-episode:hover {
+      background: var(--primary);
+    }
+
+    /* Actualités */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .news-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .news-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .news-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .news-content {
+      padding: 1rem;
+    }
+
+    .news-source {
+      background: var(--primary);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .news-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Utilitaires */
+    .hidden { display: none !important; }
+    .loading, .error { text-align: center; padding: 2rem; color: var(--text-muted); }
+    .error { color: var(--primary); }
+
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: var(--bg-card);
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      padding: 1rem;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-left: 4px solid var(--primary);
+    }
+
+    .toast.show {
+      visibility: visible;
+      animation: fadeInOut 3s ease;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+
+    @media (max-width: 768px) {
+      .header-top { flex-direction: column; text-align: center; }
+      .anime-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+      .anime-card img { height: 220px; }
+      .calendar-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-top">
-      <h1>🎌 Anime & Manga Info</h1>
+      <div class="logo">
+        <h1>🎌 Anime & Manga Info</h1>
+        <p>Votre source d'actualités manga & anime</p>
+      </div>
       <div id="authButtons" class="auth-buttons">
         <button onclick="loginWithGoogle()" class="google-btn">🔵 Google</button>
         <button onclick="loginWithFacebook()" class="facebook-btn">📘 Facebook</button>
       </div>
       <div id="userMenu" class="user-menu hidden">
-        <img id="userAvatar" class="user-avatar">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
         <span id="userName"></span>
-        <button onclick="logout()" class="logout-btn">Déconnexion</button>
-        <a href="profile.html" class="profile-link">Mon profil</a>
+        <button onclick="logout()" class="logout-btn">🚪 Déconnexion</button>
+        <a href="profile.html" class="profile-link">👤 Mon profil</a>
       </div>
     </div>
+    
+    <!-- Barre de recherche style voiranime -->
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Rechercher un anime/manga...">
-      <button id="searchBtn">Rechercher</button>
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Rechercher un anime... (ex: One Piece, Naruto, Demon Slayer)" autocomplete="off">
+        <button id="searchBtn">🔍 Rechercher</button>
+      </div>
+      <div id="searchDropdown" class="search-results-dropdown"></div>
     </div>
   </header>
 
-  <main>
+  <main style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+    <!-- Navigation rapide -->
     <div class="quick-nav">
       <button class="nav-btn active" data-page="home">🏠 Accueil</button>
       <button class="nav-btn" data-page="calendar">📅 Calendrier</button>
@@ -89,47 +541,61 @@
     </div>
 
     <!-- Page Accueil -->
-    <div id="homePage" class="page active">
-      <div class="hero-section">
-        <h2>📺 Animes populaires</h2>
-        <div class="genre-filters" id="genreFilters">
-          <button class="genre-filter active" data-genre="">Tous</button>
-          <button class="genre-filter" data-genre="action">Action</button>
-          <button class="genre-filter" data-genre="adventure">Aventure</button>
-          <button class="genre-filter" data-genre="comedy">Comédie</button>
-          <button class="genre-filter" data-genre="drama">Drame</button>
-          <button class="genre-filter" data-genre="fantasy">Fantasy</button>
-          <button class="genre-filter" data-genre="romance">Romance</button>
-          <button class="genre-filter" data-genre="sci-fi">Sci-Fi</button>
+    <div id="homePage" class="page">
+      <!-- Filtres -->
+      <div class="filters-section">
+        <div class="filter-title">
+          <span>🎯</span> <span>Filtrer par genre</span>
         </div>
-        <div id="animeGrid" class="grid"></div>
-        <div class="pagination" id="pagination"></div>
+        <div class="genre-filters" id="genreFilters">
+          <button class="genre-filter active" data-genre="">🌟 Tous</button>
+          <button class="genre-filter" data-genre="action">⚔️ Action</button>
+          <button class="genre-filter" data-genre="adventure">🗺️ Aventure</button>
+          <button class="genre-filter" data-genre="comedy">😄 Comédie</button>
+          <button class="genre-filter" data-genre="drama">🎭 Drame</button>
+          <button class="genre-filter" data-genre="fantasy">✨ Fantasy</button>
+          <button class="genre-filter" data-genre="romance">💕 Romance</button>
+          <button class="genre-filter" data-genre="sci-fi">🤖 Sci-Fi</button>
+          <button class="genre-filter" data-genre="horror">👻 Horreur</button>
+          <button class="genre-filter" data-genre="sports">⚽ Sports</button>
+        </div>
       </div>
+
+      <!-- Grille des animes -->
+      <div class="section-title">
+        <span>📺</span> <span>Dernières sorties</span>
+        <span style="font-size:0.8rem; color:#888;">(classé du plus récent au plus ancien)</span>
+      </div>
+      <div id="animeGrid" class="anime-grid">
+        <div class="loading">⏳ Chargement des animes...</div>
+      </div>
+      
+      <!-- Pagination -->
+      <div id="pagination" class="pagination"></div>
     </div>
 
     <!-- Page Calendrier -->
     <div id="calendarPage" class="page hidden">
-      <h2>📅 Calendrier des sorties</h2>
-      <div id="calendarGrid" class="calendar-grid"></div>
+      <div class="section-title">📅 Calendrier des sorties</div>
+      <div id="calendarGrid" class="calendar-grid">
+        <div class="loading">⏳ Chargement...</div>
+      </div>
     </div>
 
     <!-- Page Top Rated -->
     <div id="topPage" class="page hidden">
-      <div class="categories">
-        <button class="cat-btn active" data-cat="anime">📺 Anime</button>
-        <button class="cat-btn" data-cat="manga">📖 Manga</button>
+      <div class="section-title">⭐ Top Rated Anime</div>
+      <div id="topGrid" class="anime-grid">
+        <div class="loading">⏳ Chargement...</div>
       </div>
-      <div id="topGrid" class="grid"></div>
     </div>
 
     <!-- Page Actualités -->
     <div id="newsPage" class="page hidden">
-      <div id="newsGrid" class="news-grid"></div>
-    </div>
-
-    <div id="searchResults" class="search-results hidden">
-      <h2>Résultats</h2>
-      <div id="resultsGrid" class="grid"></div>
+      <div class="section-title">📰 Actualités Anime</div>
+      <div id="newsGrid" class="news-grid">
+        <div class="loading">⏳ Chargement...</div>
+      </div>
     </div>
   </main>
 
@@ -147,53 +613,145 @@
     let currentGenre = '';
     let totalPages = 0;
     let isLoading = false;
+    let searchTimeout = null;
+
+    // Corrections des épisodes pour les animes longs
+    const episodeCorrections = {
+      21: 1122,  // One Piece
+      1: 220,    // Naruto
+      2: 500,    // Naruto Shippuden
+      3: 366,    // Bleach
+      4: 291,    // Dragon Ball Z
+      5: 131,    // Dragon Ball Super
+      6: 87,     // Attack on Titan
+      7: 47,     // Jujutsu Kaisen
+      8: 55,     // Demon Slayer
+      9: 138,    // My Hero Academia
+      10: 293    // Boruto
+    };
 
     // ============================================
-    // CHARGEMENT DES ANIMES AVEC PAGINATION
+    // RECHERCHE EN TEMPS RÉEL (style voiranime)
+    // ============================================
+    const searchInput = document.getElementById('searchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+    const searchBtn = document.getElementById('searchBtn');
+
+    async function performSearch(query) {
+      if (!query.trim()) {
+        searchDropdown.classList.remove('active');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=8`);
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+          searchDropdown.innerHTML = data.data.map(anime => `
+            <div class="search-result-item" data-id="${anime.mal_id}">
+              <img class="search-result-img" src="${anime.images.jpg.image_url}" alt="${anime.title}" onerror="this.src='https://via.placeholder.com/50x70?text=No+Image'">
+              <div class="search-result-info">
+                <h4>${anime.title}</h4>
+                <p>⭐ ${anime.score || 'N/A'} | 📺 ${episodeCorrections[anime.mal_id] || anime.episodes || '?'} épisodes</p>
+                <p>${anime.year || 'Date inconnue'} - ${anime.status === 'Currently Airing' ? '🟢 En cours' : (anime.status === 'Finished Airing' ? '✅ Terminé' : '📅 À venir')}</p>
+              </div>
+            </div>
+          `).join('');
+          
+          searchDropdown.classList.add('active');
+          
+          // Ajouter les événements de clic
+          document.querySelectorAll('.search-result-item').forEach(item => {
+            item.addEventListener('click', () => {
+              const id = item.dataset.id;
+              window.location.href = `anime-detail.html?id=${id}`;
+            });
+          });
+        } else {
+          searchDropdown.innerHTML = '<div class="search-result-item" style="justify-content:center;">Aucun résultat trouvé</div>';
+          searchDropdown.classList.add('active');
+        }
+      } catch (error) {
+        console.error('Erreur recherche:', error);
+      }
+    }
+
+    // Recherche en temps réel
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => performSearch(e.target.value), 300);
+    });
+
+    // Fermer le dropdown en cliquant ailleurs
+    document.addEventListener('click', (e) => {
+      if (!searchContainer.contains(e.target)) {
+        searchDropdown.classList.remove('active');
+      }
+    });
+
+    // Recherche complète
+    async function fullSearch(query) {
+      if (!query.trim()) return;
+      
+      const grid = document.getElementById('animeGrid');
+      grid.innerHTML = '<div class="loading">🔍 Recherche en cours...</div>';
+      searchDropdown.classList.remove('active');
+      
+      try {
+        const response = await fetch(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=30`);
+        const data = await response.json();
+        
+        if (data.data) {
+          displayAnimes(data.data);
+          document.getElementById('pagination').innerHTML = '';
+          document.querySelector('.section-title').innerHTML = `<span>🔍</span> <span>Résultats pour "${query}"</span>`;
+        } else {
+          grid.innerHTML = '<div class="error">❌ Aucun résultat trouvé</div>';
+        }
+      } catch (error) {
+        grid.innerHTML = '<div class="error">❌ Erreur de recherche</div>';
+      }
+    }
+
+    searchBtn.addEventListener('click', () => fullSearch(searchInput.value));
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') fullSearch(searchInput.value);
+    });
+
+    // ============================================
+    // CHARGEMENT DES ANIMES PAR DATE (récent → ancien)
     // ============================================
     async function loadAnimes(page = 1, genre = '') {
       if (isLoading) return;
       isLoading = true;
       
       const grid = document.getElementById('animeGrid');
-      grid.innerHTML = '<div class="loading">⏳ Chargement...</div>';
+      grid.innerHTML = '<div class="loading">⏳ Chargement des animes...</div>';
       
       try {
-        let url = `${API_BASE}/top/anime?page=${page}&limit=24`;
+        let url = `${API_BASE}/seasons/now?page=${page}&limit=24`;
         if (genre) {
-          url = `${API_BASE}/anime?genres=${genre}&page=${page}&limit=24&order_by=score&sort=desc`;
+          url = `${API_BASE}/anime?genres=${genre}&page=${page}&limit=24&order_by=start_date&sort=desc`;
+        } else {
+          url = `${API_BASE}/seasons/now?page=${page}&limit=24`;
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
         if (data.data) {
-          // Correction du nombre d'épisodes pour les animes longs
-          const animesCorriges = data.data.map(anime => {
-            // Correction manuelle pour les animes avec épisodes incorrects
-            const corrections = {
-              21: 1122,    // One Piece
-              1: 1000,     // Naruto
-              2: 500,      // Naruto Shippuden
-              3: 366,      // Bleach
-              4: 153,      // Dragon Ball Z
-              5: 64,       // Dragon Ball Super
-              6: 25,       // Attack on Titan
-              7: 47,       // Jujutsu Kaisen
-              8: 55,       // Demon Slayer
-              9: 138,      // My Hero Academia
-              10: 293      // Boruto
-            };
-            
-            if (corrections[anime.mal_id]) {
-              anime.episodes = corrections[anime.mal_id];
-            }
-            return anime;
+          // Trier par date de début (plus récent d'abord)
+          const sortedAnimes = [...data.data].sort((a, b) => {
+            const dateA = a.aired?.from ? new Date(a.aired.from) : new Date(0);
+            const dateB = b.aired?.from ? new Date(b.aired.from) : new Date(0);
+            return dateB - dateA;
           });
           
           totalPages = data.pagination?.last_visible_page || 1;
-          displayAnimes(animesCorriges);
+          displayAnimes(sortedAnimes);
           displayPagination(page, totalPages);
+          document.querySelector('.section-title').innerHTML = `<span>📺</span> <span>Dernières sorties ${genre ? `- ${genre}` : ''}</span>`;
         }
       } catch (error) {
         console.error('Erreur:', error);
@@ -205,19 +763,31 @@
 
     function displayAnimes(animes) {
       const grid = document.getElementById('animeGrid');
-      grid.innerHTML = animes.map(anime => `
-        <div class="card" data-id="${anime.mal_id}" data-type="anime">
-          <img src="${anime.images.jpg.image_url}" alt="${anime.title}" loading="lazy">
-          <div class="card-info">
-            <h3>${anime.title.length > 30 ? anime.title.substring(0,27)+'...' : anime.title}</h3>
-            <div class="score">⭐ ${anime.score || 'N/A'}</div>
-            <div class="episodes-info">📺 ${anime.episodes || '?'} épisodes</div>
-            <div class="status">${anime.status === 'Currently Airing' ? '🟢 En cours' : (anime.status === 'Finished Airing' ? '✅ Terminé' : '📅 À venir')}</div>
+      grid.innerHTML = animes.map(anime => {
+        const episodeCount = episodeCorrections[anime.mal_id] || anime.episodes || '?';
+        const isAiring = anime.status === 'Currently Airing';
+        const releaseDate = anime.aired?.from ? new Date(anime.aired.from).toLocaleDateString('fr-FR') : 'Date inconnue';
+        
+        return `
+          <div class="anime-card" data-id="${anime.mal_id}">
+            <span class="badge">${isAiring ? '🟢 En cours' : (anime.status === 'Finished Airing' ? '✅ Terminé' : '📅 Nouveau')}</span>
+            <img src="${anime.images.jpg.image_url}" alt="${anime.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x280?text=No+Image'">
+            <div class="anime-info">
+              <h3>${anime.title.length > 35 ? anime.title.substring(0,32)+'...' : anime.title}</h3>
+              <div class="anime-meta">
+                <span class="score">⭐ ${anime.score || 'N/A'}</span>
+                <span>📺 ${episodeCount} ép</span>
+              </div>
+              <div class="anime-meta">
+                <span>📅 ${releaseDate}</span>
+                <span>❤️ ${anime.favorites?.toLocaleString() || '0'}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
       
-      document.querySelectorAll('#animeGrid .card').forEach(card => {
+      document.querySelectorAll('.anime-card').forEach(card => {
         card.addEventListener('click', () => {
           window.location.href = `anime-detail.html?id=${card.dataset.id}`;
         });
@@ -254,7 +824,7 @@
     }
 
     // ============================================
-    // CALENDRIER AVEC DATES CORRECTES
+    // CALENDRIER
     // ============================================
     async function loadCalendar() {
       const calendarGrid = document.getElementById('calendarGrid');
@@ -276,10 +846,7 @@
                 'thursday': 'Jeudi', 'friday': 'Vendredi', 'saturday': 'Samedi', 'sunday': 'Dimanche'
               }[day.toLowerCase()];
               if (dayFr && scheduleByDay[dayFr]) {
-                scheduleByDay[dayFr].push({
-                  ...anime,
-                  nextEpisode: anime.broadcast?.time ? `${anime.broadcast.day} ${anime.broadcast.time}` : 'Date inconnue'
-                });
+                scheduleByDay[dayFr].push(anime);
               }
             }
           });
@@ -290,9 +857,8 @@
             <h4>${day}</h4>
             ${scheduleByDay[day].map(anime => `
               <div class="calendar-episode" data-id="${anime.mal_id}">
-                <strong>${anime.title.substring(0, 25)}</strong>
-                <small>⏰ ${anime.broadcast?.time || 'Horaire inconnu'}</small>
-                <small>📺 Prochain épisode: ${anime.nextEpisode || 'N/A'}</small>
+                <strong>${anime.title.substring(0, 20)}</strong>
+                <small>⏰ ${anime.broadcast?.time || '?'}</small>
               </div>
             `).join('')}
             ${scheduleByDay[day].length === 0 ? '<small>Aucune sortie</small>' : ''}
@@ -306,45 +872,44 @@
         });
         
       } catch (error) {
-        console.error('Erreur:', error);
-        calendarGrid.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
+        calendarGrid.innerHTML = '<div class="error">❌ Erreur</div>';
       }
     }
 
     // ============================================
-    // TOP RATED CORRIGÉ
+    // TOP RATED
     // ============================================
-    async function loadTopRated(category = 'anime') {
+    async function loadTopRated() {
       const container = document.getElementById('topGrid');
-      if (!container) return;
-      
       container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
       
       try {
-        const response = await fetch(`${API_BASE}/top/${category}?limit=30`);
+        const response = await fetch(`${API_BASE}/top/anime?limit=30`);
         const data = await response.json();
         
         if (data.data) {
-          container.innerHTML = data.data.map(item => `
-            <div class="card" data-id="${item.mal_id}" data-type="${category}">
-              <img src="${item.images.jpg.image_url}" alt="${item.title}" loading="lazy">
-              <div class="card-info">
-                <h3>${item.title.length > 30 ? item.title.substring(0,27)+'...' : item.title}</h3>
-                <div class="score">⭐ ${item.score || 'N/A'}</div>
-                <div class="rank">🏆 Rang #${item.rank || 'N/A'}</div>
+          container.innerHTML = data.data.map(anime => `
+            <div class="anime-card" data-id="${anime.mal_id}">
+              <span class="badge">🏆 Top ${anime.rank || 'N/A'}</span>
+              <img src="${anime.images.jpg.image_url}" alt="${anime.title}" loading="lazy">
+              <div class="anime-info">
+                <h3>${anime.title.length > 35 ? anime.title.substring(0,32)+'...' : anime.title}</h3>
+                <div class="anime-meta">
+                  <span class="score">⭐ ${anime.score || 'N/A'}</span>
+                  <span>❤️ ${anime.favorites?.toLocaleString() || '0'}</span>
+                </div>
               </div>
             </div>
           `).join('');
           
-          document.querySelectorAll('#topGrid .card').forEach(card => {
+          document.querySelectorAll('#topGrid .anime-card').forEach(card => {
             card.addEventListener('click', () => {
-              window.location.href = `${card.dataset.type}-detail.html?id=${card.dataset.id}`;
+              window.location.href = `anime-detail.html?id=${card.dataset.id}`;
             });
           });
         }
       } catch (error) {
-        console.error('Erreur:', error);
-        container.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
+        container.innerHTML = '<div class="error">❌ Erreur</div>';
       }
     }
 
@@ -353,8 +918,6 @@
     // ============================================
     async function loadNews() {
       const container = document.getElementById('newsGrid');
-      if (!container) return;
-      
       container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
       
       try {
@@ -362,22 +925,19 @@
         const data = await response.json();
         
         if (data.items) {
-          container.innerHTML = data.items.slice(0, 15).map(item => `
+          container.innerHTML = data.items.slice(0, 12).map(item => `
             <div class="news-card" onclick="window.open('${item.link}', '_blank')">
               <img src="${item.enclosure?.link || 'https://via.placeholder.com/300x180?text=Anime+News'}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300x180?text=News'">
               <div class="news-content">
                 <span class="news-source">📰 Anime News Network</span>
                 <h3>${item.title.substring(0, 100)}${item.title.length > 100 ? '...' : ''}</h3>
                 <p>${(item.description?.replace(/<[^>]*>/g, '') || '').substring(0, 120)}...</p>
-                <div class="news-meta">
-                  <span>📅 ${new Date(item.pubDate).toLocaleDateString('fr-FR')}</span>
-                </div>
+                <div class="news-meta">📅 ${new Date(item.pubDate).toLocaleDateString('fr-FR')}</div>
               </div>
             </div>
           `).join('');
         }
       } catch (error) {
-        console.error('Erreur:', error);
         container.innerHTML = '<div class="error">❌ Erreur</div>';
       }
     }
@@ -395,7 +955,7 @@
       document.getElementById(page).classList.remove('hidden');
       
       if (page === 'calendarPage') loadCalendar();
-      else if (page === 'topPage') loadTopRated('anime');
+      else if (page === 'topPage') loadTopRated();
       else if (page === 'newsPage') loadNews();
     }
 
@@ -413,14 +973,6 @@
         });
       });
       
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          loadTopRated(btn.dataset.cat);
-        });
-      });
-      
       document.querySelectorAll('.genre-filter').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.genre-filter').forEach(b => b.classList.remove('active'));
@@ -430,45 +982,46 @@
           loadAnimes(currentPage, currentGenre);
         });
       });
-      
-      // Recherche
-      const searchBtn = document.getElementById('searchBtn');
-      const searchInput = document.getElementById('searchInput');
-      if (searchBtn) {
-        searchBtn.addEventListener('click', async () => {
-          const query = searchInput.value;
-          if (!query.trim()) return;
-          
-          const resultsGrid = document.getElementById('resultsGrid');
-          const searchSection = document.getElementById('searchResults');
-          document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-          searchSection.classList.remove('hidden');
-          resultsGrid.innerHTML = '<div class="loading">Recherche...</div>';
-          
-          try {
-            const response = await fetch(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=30`);
-            const data = await response.json();
-            resultsGrid.innerHTML = data.data.map(anime => `
-              <div class="card" data-id="${anime.mal_id}">
-                <img src="${anime.images.jpg.image_url}" alt="${anime.title}">
-                <div class="card-info">
-                  <h3>${anime.title.length > 30 ? anime.title.substring(0,27)+'...' : anime.title}</h3>
-                  <div class="score">⭐ ${anime.score || 'N/A'}</div>
-                </div>
-              </div>
-            `).join('');
-            
-            document.querySelectorAll('#resultsGrid .card').forEach(card => {
-              card.addEventListener('click', () => {
-                window.location.href = `anime-detail.html?id=${card.dataset.id}`;
-              });
-            });
-          } catch (error) {
-            resultsGrid.innerHTML = '<div class="error">Erreur de recherche</div>';
-          }
-        });
-      }
     });
+
+    // ============================================
+    // AUTHENTIFICATION
+    // ============================================
+    const firebaseConfig = {
+      apiKey: "VOTRE_API_KEY",
+      authDomain: "VOTRE_PROJECT.firebaseapp.com",
+      projectId: "VOTRE_PROJECT_ID",
+      storageBucket: "VOTRE_PROJECT.appspot.com",
+      messagingSenderId: "VOTRE_SENDER_ID",
+      appId: "VOTRE_APP_ID"
+    };
+
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
+
+    if (auth) {
+      auth.onAuthStateChanged((user) => {
+        const authDiv = document.getElementById('authButtons');
+        const userDiv = document.getElementById('userMenu');
+        if (authDiv && userDiv) {
+          if (user) {
+            authDiv.style.display = 'none';
+            userDiv.style.display = 'flex';
+            document.getElementById('userName').textContent = user.displayName || user.email;
+            if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
+          } else {
+            authDiv.style.display = 'flex';
+            userDiv.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    window.loginWithGoogle = () => auth?.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    window.loginWithFacebook = () => auth?.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    window.logout = () => auth?.signOut();
   </script>
 </body>
 </html>
