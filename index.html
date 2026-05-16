@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Anime & Manga Info - Découvrez les derniers animes par date de sortie, recherchez vos séries préférées">
   <meta name="theme-color" content="#e94560">
+  <meta property="og:title" content="Anime & Manga Info">
+  <meta property="og:description" content="Votre source d'actualités manga & anime">
+  <meta property="og:type" content="website">
   <title>Anime & Manga Info - Dernières sorties</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
     /* Variables et reset */
     :root {
@@ -111,7 +115,7 @@
       object-fit: cover;
     }
 
-    /* Barre de recherche style voiranime */
+    /* Barre de recherche */
     .search-container {
       max-width: 600px;
       margin: 0 auto;
@@ -161,7 +165,7 @@
       transform: scale(1.02);
     }
 
-    /* Résultats de recherche dropdown */
+    /* Résultats recherche dropdown */
     .search-results-dropdown {
       position: absolute;
       top: 100%;
@@ -339,6 +343,7 @@
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: bold;
+      z-index: 5;
     }
 
     /* Pagination */
@@ -362,23 +367,6 @@
 
     .page-btn.active, .page-btn:hover {
       background: var(--primary);
-    }
-
-    /* Autres sections */
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .section-title::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: var(--primary);
-      border-radius: 4px;
     }
 
     /* Calendrier */
@@ -461,6 +449,23 @@
       margin-top: 0.5rem;
     }
 
+    /* Section titre */
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
     /* Utilitaires */
     .hidden { display: none !important; }
     .loading, .error { text-align: center; padding: 2rem; color: var(--text-muted); }
@@ -494,11 +499,23 @@
       100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     }
 
+    /* Responsive */
     @media (max-width: 768px) {
       .header-top { flex-direction: column; text-align: center; }
       .anime-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
       .anime-card img { height: 220px; }
       .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+      .search-wrapper { flex-direction: column; border-radius: 16px; }
+      #searchBtn { padding: 0.8rem; border-radius: 0 0 16px 16px; }
+      #searchInput { padding: 0.8rem 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      main { padding: 1rem; }
+      .anime-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .anime-card img { height: 200px; }
+      .quick-nav { gap: 0.3rem; }
+      .nav-btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -517,12 +534,12 @@
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
         <span id="userName"></span>
         <button onclick="logout()" class="logout-btn">🚪 Déconnexion</button>
-        <a href="profile.html" class="profile-link">👤 Mon profil</a>
+        <a href="profile.html" class="profile-link" style="color:#e94560; text-decoration:none;">👤 Mon profil</a>
       </div>
     </div>
     
-    <!-- Barre de recherche style voiranime -->
-    <div class="search-container">
+    <!-- Barre de recherche -->
+    <div class="search-container" id="searchContainer">
       <div class="search-wrapper">
         <input type="text" id="searchInput" placeholder="Rechercher un anime... (ex: One Piece, Naruto, Demon Slayer)" autocomplete="off">
         <button id="searchBtn">🔍 Rechercher</button>
@@ -604,11 +621,15 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script>
     // ============================================
     // CONFIGURATION
     // ============================================
+    // Proxy CORS pour éviter les blocages
+    const CORS_PROXY = 'https://corsproxy.io/?url=';
     const API_BASE = 'https://api.jikan.moe/v4';
+    
     let currentPage = 1;
     let currentGenre = '';
     let totalPages = 0;
@@ -630,8 +651,22 @@
       10: 293    // Boruto
     };
 
+    // Fonction pour faire des requêtes avec proxy CORS
+    async function fetchWithProxy(url) {
+      try {
+        // Tentative directe d'abord
+        const response = await fetch(url);
+        if (response.ok) return response;
+      } catch (e) {
+        console.log('Directe échouée, utilisation du proxy CORS');
+      }
+      // Fallback avec proxy
+      const proxyUrl = CORS_PROXY + encodeURIComponent(url);
+      return fetch(proxyUrl);
+    }
+
     // ============================================
-    // RECHERCHE EN TEMPS RÉEL (style voiranime)
+    // RECHERCHE EN TEMPS RÉEL
     // ============================================
     const searchInput = document.getElementById('searchInput');
     const searchDropdown = document.getElementById('searchDropdown');
@@ -644,7 +679,7 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=8`);
+        const response = await fetchWithProxy(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=8`);
         const data = await response.json();
         
         if (data.data && data.data.length > 0) {
@@ -661,7 +696,6 @@
           
           searchDropdown.classList.add('active');
           
-          // Ajouter les événements de clic
           document.querySelectorAll('.search-result-item').forEach(item => {
             item.addEventListener('click', () => {
               const id = item.dataset.id;
@@ -677,20 +711,18 @@
       }
     }
 
-    // Recherche en temps réel
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => performSearch(e.target.value), 300);
     });
 
-    // Fermer le dropdown en cliquant ailleurs
     document.addEventListener('click', (e) => {
+      const searchContainer = document.getElementById('searchContainer');
       if (!searchContainer.contains(e.target)) {
         searchDropdown.classList.remove('active');
       }
     });
 
-    // Recherche complète
     async function fullSearch(query) {
       if (!query.trim()) return;
       
@@ -699,7 +731,7 @@
       searchDropdown.classList.remove('active');
       
       try {
-        const response = await fetch(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=30`);
+        const response = await fetchWithProxy(`${API_BASE}/anime?q=${encodeURIComponent(query)}&limit=30`);
         const data = await response.json();
         
         if (data.data) {
@@ -720,7 +752,7 @@
     });
 
     // ============================================
-    // CHARGEMENT DES ANIMES PAR DATE (récent → ancien)
+    // CHARGEMENT DES ANIMES
     // ============================================
     async function loadAnimes(page = 1, genre = '') {
       if (isLoading) return;
@@ -730,18 +762,17 @@
       grid.innerHTML = '<div class="loading">⏳ Chargement des animes...</div>';
       
       try {
-        let url = `${API_BASE}/seasons/now?page=${page}&limit=24`;
+        let url;
         if (genre) {
           url = `${API_BASE}/anime?genres=${genre}&page=${page}&limit=24&order_by=start_date&sort=desc`;
         } else {
           url = `${API_BASE}/seasons/now?page=${page}&limit=24`;
         }
         
-        const response = await fetch(url);
+        const response = await fetchWithProxy(url);
         const data = await response.json();
         
         if (data.data) {
-          // Trier par date de début (plus récent d'abord)
           const sortedAnimes = [...data.data].sort((a, b) => {
             const dateA = a.aired?.from ? new Date(a.aired.from) : new Date(0);
             const dateB = b.aired?.from ? new Date(b.aired.from) : new Date(0);
@@ -751,11 +782,10 @@
           totalPages = data.pagination?.last_visible_page || 1;
           displayAnimes(sortedAnimes);
           displayPagination(page, totalPages);
-          document.querySelector('.section-title').innerHTML = `<span>📺</span> <span>Dernières sorties ${genre ? `- ${genre}` : ''}</span>`;
         }
       } catch (error) {
         console.error('Erreur:', error);
-        grid.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
+        grid.innerHTML = '<div class="error">❌ Erreur de chargement. Vérifie ta connexion.</div>';
       }
       
       isLoading = false;
@@ -831,7 +861,7 @@
       calendarGrid.innerHTML = '<div class="loading">⏳ Chargement...</div>';
       
       try {
-        const response = await fetch(`${API_BASE}/schedules`);
+        const response = await fetchWithProxy(`${API_BASE}/schedules`);
         const data = await response.json();
         
         const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -872,7 +902,8 @@
         });
         
       } catch (error) {
-        calendarGrid.innerHTML = '<div class="error">❌ Erreur</div>';
+        console.error('Erreur calendrier:', error);
+        calendarGrid.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
       }
     }
 
@@ -884,7 +915,7 @@
       container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
       
       try {
-        const response = await fetch(`${API_BASE}/top/anime?limit=30`);
+        const response = await fetchWithProxy(`${API_BASE}/top/anime?limit=30`);
         const data = await response.json();
         
         if (data.data) {
@@ -909,7 +940,8 @@
           });
         }
       } catch (error) {
-        container.innerHTML = '<div class="error">❌ Erreur</div>';
+        console.error('Erreur top:', error);
+        container.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
       }
     }
 
@@ -938,7 +970,8 @@
           `).join('');
         }
       } catch (error) {
-        container.innerHTML = '<div class="error">❌ Erreur</div>';
+        console.error('Erreur news:', error);
+        container.innerHTML = '<div class="error">❌ Erreur de chargement</div>';
       }
     }
 
@@ -983,45 +1016,6 @@
         });
       });
     });
-
-    // ============================================
-    // AUTHENTIFICATION
-    // ============================================
-    const firebaseConfig = {
-      apiKey: "VOTRE_API_KEY",
-      authDomain: "VOTRE_PROJECT.firebaseapp.com",
-      projectId: "VOTRE_PROJECT_ID",
-      storageBucket: "VOTRE_PROJECT.appspot.com",
-      messagingSenderId: "VOTRE_SENDER_ID",
-      appId: "VOTRE_APP_ID"
-    };
-
-    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
-
-    if (auth) {
-      auth.onAuthStateChanged((user) => {
-        const authDiv = document.getElementById('authButtons');
-        const userDiv = document.getElementById('userMenu');
-        if (authDiv && userDiv) {
-          if (user) {
-            authDiv.style.display = 'none';
-            userDiv.style.display = 'flex';
-            document.getElementById('userName').textContent = user.displayName || user.email;
-            if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
-          } else {
-            authDiv.style.display = 'flex';
-            userDiv.style.display = 'none';
-          }
-        }
-      });
-    }
-
-    window.loginWithGoogle = () => auth?.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    window.loginWithFacebook = () => auth?.signInWithPopup(new firebase.auth.FacebookAuthProvider());
-    window.logout = () => auth?.signOut();
   </script>
 </body>
 </html>
