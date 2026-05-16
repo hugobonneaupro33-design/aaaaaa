@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visionnage - Anime & Manga Info</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <a href="index.html" class="home-link">🏠 Accueil</a>
+      <h1 id="animeTitle">🎬 Lecture</h1>
+      <div id="userMenu" class="user-menu">
+        <a href="profile.html" class="profile-link">👤 Mon profil</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="watch-container">
+    <div class="video-section">
+      <!-- Lecteur vidéo -->
+      <div class="video-player">
+        <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+      </div>
+      
+      <!-- Sélecteur VF/VOSTFR -->
+      <div class="lang-selector">
+        <button class="lang-btn active" data-lang="vf">🇫🇷 VF</button>
+        <button class="lang-btn" data-lang="vostfr">🇯🇵 VOSTFR</button>
+      </div>
+      
+      <!-- Infos anime -->
+      <div class="anime-info">
+        <h2 id="currentAnimeTitle"></h2>
+        <p id="animeSynopsis"></p>
+      </div>
+    </div>
+
+    <!-- Liste des épisodes -->
+    <div class="episodes-section">
+      <h3>📺 Liste des épisodes</h3>
+      <div id="episodesList" class="episodes-grid"></div>
+    </div>
+  </main>
+
+  <script src="firebase-config.js"></script>
+  <script src="watch.js"></script>
+</body>
+</html>
