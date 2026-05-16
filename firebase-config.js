@@ -1,7 +1,7 @@
 // Firebase configuration - Remplace par tes propres infos
 // Va sur https://console.firebase.google.com/ pour créer un projet
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY",
+  apiKey: "VOTRE_API_KEY",           // À remplacer
   authDomain: "VOTRE_PROJECT.firebaseapp.com",
   projectId: "VOTRE_PROJECT_ID",
   storageBucket: "VOTRE_PROJECT.appspot.com",
