@@ -26,22 +26,23 @@ let episodesList = [];
 let contentData = null;
 let autoPlayNext = true;
 
-// Corrections des épisodes pour les animes longs
+// Corrections des épisodes pour les animes longs (version 2025)
 const episodeCorrections = {
-  21: 1122,  // One Piece
-  1: 1100,   // Detective Conan
-  2: 500,    // Naruto Shippuden
-  3: 366,    // Bleach
-  4: 291,    // Dragon Ball Z
-  5: 131,    // Dragon Ball Super
-  6: 87,     // Attack on Titan
-  7: 47,     // Jujutsu Kaisen
-  8: 55,     // Demon Slayer
-  9: 138,    // My Hero Academia
-  10: 293    // Boruto
+  21: 1162,    // One Piece (à jour - 2025)
+  1: 1124,     // Detective Conan (à jour)
+  2: 500,      // Naruto Shippuden
+  3: 366,      // Bleach
+  4: 291,      // Dragon Ball Z
+  5: 131,      // Dragon Ball Super
+  6: 87,       // Attack on Titan (Terminé)
+  7: 47,       // Jujutsu Kaisen Saison 2
+  8: 55,       // Demon Slayer
+  9: 138,      // My Hero Academia Saison 6
+  10: 293,     // Boruto
+  154587: 28   // Sousou no Frieren (28 épisodes)
 };
 
-// Sources d'embed disponibles
+// Sources d'embed disponibles (multiples pour éviter les liens morts)
 const embedSources = {
   voe: {
     name: 'Voe',
@@ -65,6 +66,12 @@ const embedSources = {
     name: 'AnimeSama',
     vf: (id, ep) => `https://animesama.cc/embed/${id}-${ep}`,
     vostfr: (id, ep) => `https://animesama.cc/embed/${id}-${ep}`,
+    isAvailable: true
+  },
+  kraken: {
+    name: 'KrakenFiles',
+    vf: (id, ep) => `https://krakenfiles.com/embed/${id}-${ep}`,
+    vostfr: (id, ep) => `https://krakenfiles.com/embed/${id}-${ep}`,
     isAvailable: true
   }
 };
@@ -122,7 +129,7 @@ async function loadContent() {
     contentData = data.Media;
     contentTitle = contentData.title?.romaji || contentData.title?.english || 'Anime';
     
-    // Déterminer le nombre d'épisodes
+    // Déterminer le nombre d'épisodes (priorité aux corrections manuelles)
     if (episodeCorrections[contentId]) {
       episodeCount = episodeCorrections[contentId];
     } else if (contentData.episodes) {
@@ -137,10 +144,16 @@ async function loadContent() {
     document.getElementById('currentAnimeTitle').textContent = contentTitle;
     
     const isAiring = contentData.status === 'RELEASING';
+    let nextEpText = '';
+    if (isAiring && contentData.nextAiringEpisode) {
+      const nextDate = new Date(contentData.nextAiringEpisode.airingAt * 1000);
+      nextEpText = ` | 📺 Prochain: Ép. ${contentData.nextAiringEpisode.episode} le ${nextDate.toLocaleDateString('fr-FR')}`;
+    }
+    
     document.getElementById('animeMeta').innerHTML = `
       <span>⭐ ${(contentData.averageScore / 10).toFixed(1) || 'N/A'}</span>
       <span>📺 ${episodeCount} épisodes</span>
-      <span>${isAiring ? '🟢 En cours' : (contentData.status === 'FINISHED' ? '✅ Terminé' : '📅 À venir')}</span>
+      <span>${isAiring ? '🟢 En cours' : (contentData.status === 'FINISHED' ? '✅ Terminé' : '📅 À venir')}${nextEpText}</span>
     `;
     
     generateEpisodesList();
@@ -157,7 +170,8 @@ async function loadContent() {
 }
 
 function generateEpisodesList() {
-  episodesList = Array.from({ length: Math.min(episodeCount, 500) }, (_, i) => {
+  const maxEpisodes = Math.min(episodeCount, 2000); // Pas de limite !
+  episodesList = Array.from({ length: maxEpisodes }, (_, i) => {
     const epNum = i + 1;
     const releaseDate = new Date();
     releaseDate.setDate(releaseDate.getDate() - (episodeCount - epNum));
@@ -450,4 +464,4 @@ window.nextEpisode = nextEpisode;
 window.prevEpisode = prevEpisode;
 window.showToast = showToast;
 
-console.log('✅ watch.js chargé (version AniList)');
+console.log('✅ watch.js chargé (version AniList 2025)');
