@@ -1,21 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Dégradés -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
     </linearGradient>
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e94560;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6b8b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffaa00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="animeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6b8b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mangaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6c5ce7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a363d9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="webtoonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00bcd4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4dd0e1;stop-opacity:1" />
+    </linearGradient>
   </defs>
   
+  <!-- ========== FAVICON PRINCIPAL ========== -->
   <!-- Fond -->
-  <rect width="100" height="100" rx="20" fill="url(#grad)"/>
+  <rect width="100" height="100" rx="20" fill="url(#bgGrad)"/>
   
   <!-- Cercle extérieur -->
-  <circle cx="50" cy="50" r="42" fill="#e94560" stroke="#ff6b8b" stroke-width="2"/>
+  <circle cx="50" cy="50" r="42" fill="url(#circleGrad)" stroke="#fff" stroke-width="2"/>
   
-  <!-- Étoile/Anime symbol -->
-  <text x="50" y="72" font-size="48" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold">🎌</text>
+  <!-- Étoile centrale -->
+  <polygon points="50,20 55,38 74,38 59,50 65,68 50,56 35,68 41,50 26,38 45,38" fill="url(#starGrad)" stroke="#fff" stroke-width="1"/>
   
-  <!-- Petits détails -->
+  <!-- Symbole anime central -->
+  <text x="50" y="72" font-size="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold">🎌</text>
+  
+  <!-- Petits détails décoratifs -->
   <circle cx="25" cy="25" r="3" fill="#ff6b8b"/>
   <circle cx="75" cy="25" r="3" fill="#ff6b8b"/>
   <circle cx="25" cy="75" r="3" fill="#ff6b8b"/>
