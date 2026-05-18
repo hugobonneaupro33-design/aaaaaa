@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Découvrez les meilleurs webtoons : tendances, top rated, nouveautés et lectures en ligne">
-  <meta name="theme-color" content="#e94560">
+  <meta name="theme-color" content="#00bcd4">
   <title>Webtoon - Anime & Manga Info</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
     /* ============================================
        STYLES SPÉCIFIQUES WEBTOON
@@ -14,7 +15,87 @@
     :root {
       --webtoon-primary: #00bcd4;
       --webtoon-primary-dark: #0097a7;
-      --webtoon-gradient: linear-gradient(135deg, #00bcd4, #4dd0e1);
+      --bg-dark: #0a0a0f;
+      --bg-card: #13131f;
+      --bg-hover: #1e1e2e;
+      --text-light: #f0f0f0;
+      --text-muted: #8888aa;
+      --border: #252540;
+    }
+
+    /* Theme clair */
+    body.light-theme {
+      --bg-dark: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-hover: #e8e8e8;
+      --text-light: #1a1a2e;
+      --text-muted: #666666;
+      --border: #dddddd;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    body.light-theme header {
+      background: linear-gradient(135deg, #e8e8e8 0%, #ffffff 100%);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .home-link {
+      color: var(--webtoon-primary);
+      text-decoration: none;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tools-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .theme-btn {
+      background: var(--bg-hover);
+      border: none;
+      border-radius: 30px;
+      padding: 0.4rem 0.8rem;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover {
+      background: var(--webtoon-primary);
     }
 
     .webtoon-hero {
@@ -61,7 +142,6 @@
       color: var(--webtoon-primary);
     }
 
-    /* Grille webtoon */
     .webtoon-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -125,7 +205,6 @@
       z-index: 5;
     }
 
-    /* Section webtoon */
     .webtoon-section {
       margin-bottom: 2rem;
     }
@@ -146,13 +225,6 @@
       gap: 0.5rem;
     }
 
-    .view-all {
-      color: var(--webtoon-primary);
-      text-decoration: none;
-      font-size: 0.8rem;
-    }
-
-    /* Filtres */
     .webtoon-filters {
       display: flex;
       flex-wrap: wrap;
@@ -175,72 +247,68 @@
       background: var(--webtoon-primary);
     }
 
-    /* Détail webtoon */
-    .webtoon-detail {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .webtoon-detail-hero {
-      display: flex;
-      gap: 2rem;
-      background: var(--bg-card);
-      border-radius: 24px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .webtoon-detail-hero img {
-      width: 250px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-
-    .webtoon-detail-info h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .webtoon-detail-info h2 {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    .webtoon-chapters {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
-
-    .chapter-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      gap: 0.8rem;
-      margin-top: 1rem;
-    }
-
-    .chapter-item {
-      background: var(--bg-hover);
-      padding: 0.6rem;
+    .loading, .error {
       text-align: center;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+    .error { color: var(--webtoon-primary); }
+
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: var(--bg-card);
+      color: var(--text-light);
+      text-align: center;
+      border-radius: 8px;
+      padding: 1rem;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-left: 4px solid var(--webtoon-primary);
     }
 
-    .chapter-item:hover {
-      background: var(--webtoon-primary);
-      transform: translateY(-2px);
+    .toast.show {
+      visibility: visible;
+      animation: fadeInOut 3s ease;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+
+    @media (max-width: 768px) {
+      .webtoon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .webtoon-card img {
+        height: 220px;
+      }
+      .header-top {
+        flex-direction: column;
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-top">
-      <a href="index.html" class="home-link">🏠 Accueil</a>
+      <a href="index.html" class="home-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/>
+        </svg>
+        Accueil
+      </a>
       <h1>🎨 Webtoon</h1>
+      <div class="tools-bar">
+        <button id="themeToggle" class="theme-btn">🌙</button>
+      </div>
       <div id="authButtons" class="auth-buttons">
         <button onclick="loginWithGoogle()" class="google-btn">🔵 Google</button>
         <button onclick="loginWithFacebook()" class="facebook-btn">📘 Facebook</button>
@@ -255,19 +323,17 @@
   </header>
 
   <main style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
-    <!-- Hero Section -->
     <div class="webtoon-hero">
       <span class="webtoon-badge">🎨 LECTURE ILLIMITÉE</span>
       <h2>Découvrez les meilleurs Webtoons</h2>
       <p>Plongez dans l'univers des webtoons coréens, chinois et japonais</p>
       <div class="webtoon-stats">
-        <div class="webtoon-stat"><div class="number">+1,000</div><div class="label">Webtoons</div></div>
-        <div class="webtoon-stat"><div class="number">+50,000</div><div class="label">Chapitres</div></div>
-        <div class="webtoon-stat"><div class="number">+100,000</div><div class="label">Lecteurs</div></div>
+        <div class="webtoon-stat"><div class="number">+10,000</div><div class="label">Webtoons</div></div>
+        <div class="webtoon-stat"><div class="number">+500,000</div><div class="label">Chapitres</div></div>
+        <div class="webtoon-stat"><div class="number">+1,000,000</div><div class="label">Lecteurs</div></div>
       </div>
     </div>
 
-    <!-- Filtres -->
     <div class="webtoon-filters">
       <button class="webtoon-filter active" data-genre="all">🌟 Tous</button>
       <button class="webtoon-filter" data-genre="action">⚔️ Action</button>
@@ -277,68 +343,101 @@
       <button class="webtoon-filter" data-genre="comedy">😄 Comédie</button>
       <button class="webtoon-filter" data-genre="horror">👻 Horreur</button>
       <button class="webtoon-filter" data-genre="sports">⚽ Sports</button>
+      <button class="webtoon-filter" data-genre="thriller">🔪 Thriller</button>
     </div>
 
-    <!-- Section Tendances -->
     <div class="webtoon-section">
       <div class="section-header">
         <h3>🔥 Tendances cette semaine</h3>
-        <a href="#" class="view-all">Voir tout →</a>
       </div>
-      <div id="trendingWebtoons" class="webtoon-grid">
-        <div class="loading">⏳ Chargement...</div>
-      </div>
+      <div id="trendingWebtoons" class="webtoon-grid"><div class="loading">⏳ Chargement...</div></div>
     </div>
 
-    <!-- Section Top Rated -->
     <div class="webtoon-section">
       <div class="section-header">
         <h3>⭐ Top Rated Webtoons</h3>
-        <a href="#" class="view-all">Voir tout →</a>
       </div>
-      <div id="topWebtoons" class="webtoon-grid">
-        <div class="loading">⏳ Chargement...</div>
-      </div>
+      <div id="topWebtoons" class="webtoon-grid"><div class="loading">⏳ Chargement...</div></div>
     </div>
 
-    <!-- Section Nouveautés -->
     <div class="webtoon-section">
       <div class="section-header">
         <h3>✨ Nouveautés de la semaine</h3>
-        <a href="#" class="view-all">Voir tout →</a>
       </div>
-      <div id="newWebtoons" class="webtoon-grid">
-        <div class="loading">⏳ Chargement...</div>
-      </div>
+      <div id="newWebtoons" class="webtoon-grid"><div class="loading">⏳ Chargement...</div></div>
     </div>
   </main>
 
   <div id="toast" class="toast hidden"></div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script>
     // ============================================
-    // DONNÉES WEBTOONS (API temporaire - À remplacer par API réelle)
+    // CONFIGURATION
     // ============================================
+    const ANILIST_API = 'https://graphql.anilist.co';
+    const PROXY = 'https://corsproxy.io/?url=';
     
-    // Webtoons populaires (données de démonstration)
-    const WEBTOONS_DB = [
-      { id: 1, title: "Solo Leveling", title_eng: "Solo Leveling", author: "Chugong", genre: "action", score: 4.8, chapters: 179, image: "https://cdn.myanimelist.net/images/manga/2/209195.jpg", status: "Terminé", description: "Sung Jin-Woo, un chasseur de niveau E, se retrouve dans une situation qui va changer sa vie à jamais..." },
-      { id: 2, title: "Tower of God", title_eng: "Tower of God", author: "SIU", genre: "action", score: 4.7, chapters: 600, image: "https://cdn.myanimelist.net/images/manga/2/165032.jpg", status: "En cours", description: "Un garçon nommé Bam entre dans une tour mystérieuse pour retrouver sa meilleure amie." },
-      { id: 3, title: "The God of High School", title_eng: "The God of High School", author: "Yongje Park", genre: "action", score: 4.5, chapters: 569, image: "https://cdn.myanimelist.net/images/manga/3/131999.jpg", status: "En cours", description: "Un tournoi martial réunissant les meilleurs combattants de Corée." },
-      { id: 4, title: "Noblesse", title_eng: "Noblesse", author: "Son Jeho", genre: "action", score: 4.6, chapters: 544, image: "https://cdn.myanimelist.net/images/manga/2/167725.jpg", status: "Terminé", description: "Un noble vampire se réveille après 820 ans et découvre le monde moderne." },
-      { id: 5, title: "True Beauty", title_eng: "True Beauty", author: "Yaongyi", genre: "romance", score: 4.4, chapters: 223, image: "https://cdn.myanimelist.net/images/manga/2/219756.jpg", status: "Terminé", description: "Une jeune fille maîtrise l'art du maquillage pour devenir belle." },
-      { id: 6, title: "Lookism", title_eng: "Lookism", author: "Taejun Pak", genre: "drama", score: 4.5, chapters: 470, image: "https://cdn.myanimelist.net/images/manga/3/115225.jpg", status: "En cours", description: "Un lycéen se réveille dans un corps parfait après avoir été victime de harcèlement." },
-      { id: 7, title: "Sweet Home", title_eng: "Sweet Home", author: "Carnby Kim", genre: "horror", score: 4.7, chapters: 141, image: "https://cdn.myanimelist.net/images/manga/1/217405.jpg", status: "Terminé", description: "Un adolescent recluse doit survivre à une apocalypse monstrueuse." },
-      { id: 8, title: "A Returner's Magic Should Be Special", title_eng: "A Returner's Magic Should Be Special", author: "Usonan", genre: "fantasy", score: 4.3, chapters: 267, image: "https://cdn.myanimelist.net/images/manga/2/215269.jpg", status: "En cours", description: "Un mage retourne dans le passé pour sauver l'humanité." },
-      { id: 9, title: "The Beginning After The End", title_eng: "The Beginning After The End", author: "TurtleMe", genre: "fantasy", score: 4.8, chapters: 178, image: "https://cdn.myanimelist.net/images/manga/2/220707.jpg", status: "En cours", description: "Un roi réincarné dans un monde fantastique." },
-      { id: 10, title: "Eleceed", title_eng: "Eleceed", author: "Jeho Son", genre: "action", score: 4.7, chapters: 280, image: "https://cdn.myanimelist.net/images/manga/1/227940.jpg", status: "En cours", description: "Un jeune garçon aux pouvoirs électriques rencontre des combattants hors normes." }
+    let currentGenre = 'all';
+    let currentUser = null;
+
+    // Webtoons populaires (fallback si API échoue)
+    const FALLBACK_WEBTOONS = [
+      { id: 101, title: "Solo Leveling", genre: "action", score: 4.8, chapters: 179, image: "https://cdn.myanimelist.net/images/manga/2/209195.jpg", status: "FINISHED" },
+      { id: 102, title: "Tower of God", genre: "action", score: 4.7, chapters: 600, image: "https://cdn.myanimelist.net/images/manga/2/165032.jpg", status: "RELEASING" },
+      { id: 103, title: "The God of High School", genre: "action", score: 4.5, chapters: 569, image: "https://cdn.myanimelist.net/images/manga/3/131999.jpg", status: "RELEASING" },
+      { id: 104, title: "Noblesse", genre: "action", score: 4.6, chapters: 544, image: "https://cdn.myanimelist.net/images/manga/2/167725.jpg", status: "FINISHED" },
+      { id: 105, title: "True Beauty", genre: "romance", score: 4.4, chapters: 223, image: "https://cdn.myanimelist.net/images/manga/2/219756.jpg", status: "FINISHED" },
+      { id: 106, title: "Lookism", genre: "drama", score: 4.5, chapters: 470, image: "https://cdn.myanimelist.net/images/manga/3/115225.jpg", status: "RELEASING" },
+      { id: 107, title: "Sweet Home", genre: "horror", score: 4.7, chapters: 141, image: "https://cdn.myanimelist.net/images/manga/1/217405.jpg", status: "FINISHED" },
+      { id: 108, title: "The Beginning After The End", genre: "fantasy", score: 4.8, chapters: 178, image: "https://cdn.myanimelist.net/images/manga/2/220707.jpg", status: "RELEASING" },
+      { id: 109, title: "Eleceed", genre: "action", score: 4.7, chapters: 280, image: "https://cdn.myanimelist.net/images/manga/1/227940.jpg", status: "RELEASING" },
+      { id: 110, title: "Wind Breaker", genre: "sports", score: 4.6, chapters: 450, image: "https://cdn.myanimelist.net/images/manga/1/228906.jpg", status: "RELEASING" }
     ];
 
-    let currentGenre = 'all';
+    // Requête AniList pour les mangas/webtoons
+    const WEBTOON_QUERY = `
+      query ($page: Int, $perPage: Int, $genre: String) {
+        Page(page: $page, perPage: $perPage) {
+          pageInfo { total lastPage }
+          media(type: MANGA, sort: POPULARITY_DESC, genre_in: $genre) {
+            id
+            title { romaji english }
+            coverImage { large medium }
+            averageScore
+            chapters
+            status
+            format
+          }
+        }
+      }
+    `;
 
-    // ============================================
-    // AFFICHAGE
-    // ============================================
+    async function fetchAnilist(query, variables) {
+      try {
+        const response = await fetch(PROXY + encodeURIComponent(ANILIST_API), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, variables })
+        });
+        const data = await response.json();
+        if (data.errors) { console.error('GraphQL Errors:', data.errors); return null; }
+        return data.data;
+      } catch (error) { console.error('Erreur:', error); return null; }
+    }
+
+    async function fetchWebtoons(genre = null) {
+      const genreVar = genre && genre !== 'all' ? [genre.toUpperCase()] : null;
+      const data = await fetchAnilist(WEBTOON_QUERY, { page: 1, perPage: 24, genre: genreVar });
+      if (data?.Page?.media && data.Page.media.length > 0) {
+        return data.Page.media;
+      }
+      return FALLBACK_WEBTOONS;
+    }
+
     function displayWebtoons(containerId, webtoons) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -348,134 +447,81 @@
         return;
       }
 
-      container.innerHTML = webtoons.map(w => `
-        <div class="webtoon-card" data-id="${w.id}">
-          <span class="webtoon-badge-type">${w.status === 'En cours' ? '🟢 En cours' : '✅ Terminé'}</span>
-          <img src="${w.image}" alt="${w.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/180x260?text=Webtoon'">
-          <div class="webtoon-info">
-            <h3>${w.title.length > 30 ? w.title.substring(0,27)+'...' : w.title}</h3>
-            <div class="webtoon-meta">
-              <span class="score">⭐ ${w.score}</span>
-              <span>📚 ${w.chapters} ch</span>
+      container.innerHTML = webtoons.map(w => {
+        const title = w.title?.romaji || w.title?.english || 'Sans titre';
+        const score = w.averageScore ? (w.averageScore / 10).toFixed(1) : (w.score || 'N/A');
+        const chapters = w.chapters || '?';
+        const image = w.coverImage?.large || w.coverImage?.medium || w.image || 'https://via.placeholder.com/180x260?text=Webtoon';
+        const status = w.status === 'RELEASING' ? '🟢 En cours' : (w.status === 'FINISHED' ? '✅ Terminé' : '📅 À venir');
+        
+        return `
+          <div class="webtoon-card" data-id="${w.id}">
+            <span class="webtoon-badge-type">${status}</span>
+            <img src="${image}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/180x260?text=Webtoon'">
+            <div class="webtoon-info">
+              <h3>${title.length > 30 ? title.substring(0,27)+'...' : title}</h3>
+              <div class="webtoon-meta">
+                <span class="score">⭐ ${score}</span>
+                <span>📚 ${chapters} ch</span>
+              </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       document.querySelectorAll(`#${containerId} .webtoon-card`).forEach(card => {
         card.addEventListener('click', () => {
-          const id = card.dataset.id;
-          showWebtoonDetail(id);
+          window.location.href = `webtoon-detail.html?id=${card.dataset.id}`;
         });
       });
     }
 
-    // ============================================
-    // CHARGEMENT DES WEBTOONS
-    // ============================================
-    function loadTrendingWebtoons() {
-      const trending = [...WEBTOONS_DB].sort((a, b) => b.score - a.score).slice(0, 8);
+    async function loadAllWebtoons() {
+      const webtoons = await fetchWebtoons(currentGenre !== 'all' ? currentGenre : null);
+      
+      // Tendances (tri par popularité)
+      const trending = [...webtoons].sort((a, b) => (b.averageScore || 0) - (a.averageScore || 0)).slice(0, 8);
       displayWebtoons('trendingWebtoons', trending);
-    }
-
-    function loadTopWebtoons() {
-      const top = [...WEBTOONS_DB].sort((a, b) => b.score - a.score).slice(0, 8);
-      displayWebtoons('topWebtoons', top);
-    }
-
-    function loadNewWebtoons() {
-      const newest = [...WEBTOONS_DB].slice(0, 8);
+      
+      // Top Rated (tri par score)
+      const topRated = [...webtoons].sort((a, b) => (b.averageScore || 0) - (a.averageScore || 0)).slice(0, 8);
+      displayWebtoons('topWebtoons', topRated);
+      
+      // Nouveautés (mélangé)
+      const newest = [...webtoons].slice(0, 8);
       displayWebtoons('newWebtoons', newest);
     }
 
-    function loadWebtoonsByGenre(genre) {
-      let filtered = WEBTOONS_DB;
-      if (genre !== 'all') {
-        filtered = WEBTOONS_DB.filter(w => w.genre === genre);
-      }
-      
-      // Mettre à jour l'affichage des sections
-      displayWebtoons('trendingWebtoons', filtered.slice(0, 8));
-      displayWebtoons('topWebtoons', [...filtered].sort((a, b) => b.score - a.score).slice(0, 8));
-      displayWebtoons('newWebtoons', filtered.slice(0, 8));
+    async function loadFilteredWebtoons() {
+      const webtoons = await fetchWebtoons(currentGenre !== 'all' ? currentGenre : null);
+      displayWebtoons('trendingWebtoons', webtoons.slice(0, 8));
+      displayWebtoons('topWebtoons', [...webtoons].sort((a, b) => (b.averageScore || 0) - (a.averageScore || 0)).slice(0, 8));
+      displayWebtoons('newWebtoons', webtoons.slice(0, 8));
     }
 
     // ============================================
-    // DÉTAIL WEBTOON (MODAL)
+    // THEME
     // ============================================
-    function showWebtoonDetail(id) {
-      const webtoon = WEBTOONS_DB.find(w => w.id == id);
-      if (!webtoon) return;
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') document.body.classList.add('light-theme');
+      const themeBtn = document.getElementById('themeToggle');
+      if (themeBtn) themeBtn.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+    }
 
-      // Créer une modale
-      const modal = document.createElement('div');
-      modal.className = 'modal';
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      `;
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      const themeBtn = document.getElementById('themeToggle');
+      if (themeBtn) themeBtn.textContent = isLight ? '☀️' : '🌙';
+    }
 
-      modal.innerHTML = `
-        <div style="background: #13131f; border-radius: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
-          <button id="closeModal" style="position: absolute; top: 10px; right: 15px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">&times;</button>
-          <div style="padding: 2rem;">
-            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-              <img src="${webtoon.image}" style="width: 150px; border-radius: 12px;">
-              <div>
-                <h2>${webtoon.title}</h2>
-                <p style="color: #888;">${webtoon.title_eng || ''}</p>
-                <p>✍️ ${webtoon.author}</p>
-                <p>⭐ ${webtoon.score} | 📚 ${webtoon.chapters} chapitres | ${webtoon.status}</p>
-              </div>
-            </div>
-            <div style="margin-top: 1rem;">
-              <h3>📖 Synopsis</h3>
-              <p style="color: #aaa; line-height: 1.6;">${webtoon.description}</p>
-            </div>
-            <div style="margin-top: 1.5rem;">
-              <h3>📚 Chapitres récents</h3>
-              <div class="chapter-list" id="chapterList"></div>
-            </div>
-            <button id="readFirstBtn" style="margin-top: 1rem; width: 100%; padding: 0.8rem; background: #00bcd4; border: none; border-radius: 30px; color: white; font-weight: bold; cursor: pointer;">📖 Lire le chapitre 1</button>
-          </div>
-        </div>
-      `;
-
-      document.body.appendChild(modal);
-
-      // Générer la liste des chapitres
-      const chapterList = document.getElementById('chapterList');
-      if (chapterList) {
-        const chapters = Array.from({ length: Math.min(webtoon.chapters, 50) }, (_, i) => i + 1);
-        chapterList.innerHTML = chapters.slice(0, 20).map(ch => `
-          <div class="chapter-item" data-ch="${ch}">
-            Ch. ${ch}
-          </div>
-        `).join('');
-        
-        document.querySelectorAll('.chapter-item').forEach(item => {
-          item.addEventListener('click', () => {
-            showToast(`🔜 Lecture du chapitre ${item.dataset.ch} bientôt disponible`);
-          });
-        });
-      }
-
-      // Fermeture
-      document.getElementById('closeModal')?.addEventListener('click', () => modal.remove());
-      document.getElementById('readFirstBtn')?.addEventListener('click', () => {
-        showToast('📖 Lecteur webtoon bientôt disponible');
-      });
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-      });
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     // ============================================
@@ -487,36 +533,46 @@
           document.querySelectorAll('.webtoon-filter').forEach(f => f.classList.remove('active'));
           filter.classList.add('active');
           currentGenre = filter.dataset.genre;
-          loadWebtoonsByGenre(currentGenre);
+          loadFilteredWebtoons();
         });
       });
     }
 
     // ============================================
+    // AUTH
+    // ============================================
+    if (typeof auth !== 'undefined') {
+      auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        const authDiv = document.getElementById('authButtons');
+        const userDiv = document.getElementById('userMenu');
+        if (authDiv && userDiv) {
+          if (user) {
+            authDiv.style.display = 'none';
+            userDiv.style.display = 'flex';
+            document.getElementById('userName').textContent = user.displayName || user.email;
+            if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
+          } else {
+            authDiv.style.display = 'flex';
+            userDiv.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    window.loginWithGoogle = () => auth?.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    window.loginWithFacebook = () => auth?.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    window.logout = () => auth?.signOut();
+
+    // ============================================
     // INITIALISATION
     // ============================================
     document.addEventListener('DOMContentLoaded', () => {
-      loadTrendingWebtoons();
-      loadTopWebtoons();
-      loadNewWebtoons();
+      initTheme();
+      document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+      loadAllWebtoons();
       setupFilters();
     });
-
-    // ============================================
-    // TOAST
-    // ============================================
-    function showToast(message) {
-      let toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // Auth simplifiée (à connecter avec Firebase)
-    window.loginWithGoogle = () => showToast('🔧 Connexion Google - Configuration Firebase requise');
-    window.loginWithFacebook = () => showToast('🔧 Connexion Facebook - Configuration Firebase requise');
-    window.logout = () => showToast('🔓 Déconnexion');
   </script>
 </body>
 </html>
