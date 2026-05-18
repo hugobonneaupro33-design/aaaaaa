@@ -25,7 +25,12 @@
       --radius-sm: 8px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: var(--bg-dark);
@@ -33,6 +38,7 @@
       min-height: 100vh;
     }
 
+    /* Header */
     header {
       background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
       padding: 1rem 2rem;
@@ -41,6 +47,7 @@
       z-index: 100;
       border-bottom: 1px solid var(--border);
     }
+
     .header-top {
       display: flex;
       justify-content: space-between;
@@ -48,6 +55,7 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
+
     .home-link {
       color: var(--primary);
       text-decoration: none;
@@ -56,13 +64,19 @@
       align-items: center;
       gap: 0.5rem;
     }
-    .home-link:hover { color: var(--primary-dark); }
 
+    .home-link:hover {
+      color: var(--primary-dark);
+    }
+
+    /* Main */
     .detail-container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
     }
+
+    /* Hero section */
     .detail-hero {
       display: flex;
       gap: 2rem;
@@ -71,21 +85,42 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
+
     .detail-hero img {
       width: 250px;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
-    .detail-hero-info { flex: 1; }
-    .detail-hero-info h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-    .detail-hero-info h2 { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem; }
-    .detail-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+
+    .detail-hero-info {
+      flex: 1;
+    }
+
+    .detail-hero-info h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-hero-info h2 {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .detail-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
     .stat {
       background: var(--bg-hover);
       padding: 0.3rem 0.8rem;
       border-radius: 20px;
       font-size: 0.85rem;
     }
+
     .next-episode {
       background: var(--primary);
       padding: 0.8rem 1rem;
@@ -93,6 +128,7 @@
       margin: 1rem 0;
       display: inline-block;
     }
+
     .watch-btn {
       display: inline-block;
       background: var(--primary);
@@ -103,42 +139,63 @@
       font-weight: bold;
       transition: all 0.2s;
     }
+
     .watch-btn:hover {
       background: var(--primary-dark);
       transform: scale(1.02);
     }
+
+    /* Info grid */
     .detail-info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1rem;
       margin-bottom: 2rem;
     }
+
     .info-card {
       background: var(--bg-card);
       padding: 1rem;
       border-radius: var(--radius);
     }
-    .info-card h3 { color: var(--primary); margin-bottom: 0.8rem; }
-    .info-card p { margin: 0.5rem 0; line-height: 1.4; }
-    .genres-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .info-card h3 {
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .info-card p {
+      margin: 0.5rem 0;
+      line-height: 1.4;
+    }
+
+    .genres-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
     .genre-tag {
       background: var(--primary);
       padding: 0.25rem 0.75rem;
       border-radius: 20px;
       font-size: 0.75rem;
     }
+
+    /* Synopsis bilingue */
     .synopsis-container {
       background: var(--bg-card);
       border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
+
     .synopsis-tabs {
       display: flex;
-      flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
+
     .synopsis-tab {
       padding: 0.5rem 1.2rem;
       background: var(--bg-hover);
@@ -148,14 +205,23 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .synopsis-tab.active { background: var(--primary); }
-    .synopsis-content { line-height: 1.6; color: var(--text-muted); }
 
+    .synopsis-tab.active {
+      background: var(--primary);
+    }
+
+    .synopsis-content {
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* Épisodes */
     .episodes-section {
       background: var(--bg-card);
       border-radius: var(--radius);
       padding: 1.5rem;
     }
+
     .episodes-header {
       display: flex;
       justify-content: space-between;
@@ -164,7 +230,11 @@
       gap: 1rem;
       margin-bottom: 1.5rem;
     }
-    .episodes-header h3 { font-size: 1.3rem; }
+
+    .episodes-header h3 {
+      font-size: 1.3rem;
+    }
+
     .episode-search {
       padding: 0.5rem 1rem;
       background: var(--bg-hover);
@@ -173,6 +243,11 @@
       color: white;
       width: 200px;
     }
+
+    .episode-search::placeholder {
+      color: var(--text-muted);
+    }
+
     .episode-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -181,6 +256,7 @@
       overflow-y: auto;
       padding: 0.5rem;
     }
+
     .episode-item {
       background: var(--bg-hover);
       padding: 0.6rem;
@@ -189,7 +265,13 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .episode-item:hover { background: var(--primary); transform: translateY(-2px); }
+
+    .episode-item:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Pagination épisodes */
     .episode-pagination {
       display: flex;
       justify-content: center;
@@ -197,6 +279,7 @@
       margin-top: 1rem;
       flex-wrap: wrap;
     }
+
     .ep-page-btn {
       padding: 0.4rem 0.9rem;
       background: var(--bg-hover);
@@ -206,8 +289,16 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .ep-page-btn:hover, .ep-page-btn.active { background: var(--primary); }
 
+    .ep-page-btn:hover {
+      background: var(--primary);
+    }
+
+    .ep-page-btn.active {
+      background: var(--primary);
+    }
+
+    /* Favoris */
     .favorite-btn {
       background: none;
       border: 2px solid var(--primary);
@@ -220,13 +311,21 @@
       margin-top: 1rem;
       margin-right: 0.5rem;
     }
+
     .favorite-btn.active {
       background: var(--primary);
       color: white;
     }
-    .loading, .error { text-align: center; padding: 2rem; color: var(--text-muted); }
+
+    /* Loading & Error */
+    .loading, .error {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
     .error { color: var(--primary); }
 
+    /* Toast */
     .toast {
       visibility: hidden;
       min-width: 250px;
@@ -242,7 +341,10 @@
       z-index: 1000;
       border-left: 4px solid var(--primary);
     }
-    .toast.show { visibility: visible; animation: fadeInOut 3s ease; }
+    .toast.show {
+      visibility: visible;
+      animation: fadeInOut 3s ease;
+    }
     @keyframes fadeInOut {
       0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
       15% { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -250,8 +352,13 @@
       100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     }
 
+    /* Responsive */
     @media (max-width: 768px) {
-      .detail-hero { flex-direction: column; align-items: center; text-align: center; }
+      .detail-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
       .detail-hero img { width: 200px; }
       .detail-stats { justify-content: center; }
       .episode-list { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
@@ -263,7 +370,9 @@
   <header>
     <div class="header-top">
       <a href="index.html" class="home-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/>
+        </svg>
         Accueil
       </a>
       <h1>🎌 Détail de l'anime</h1>
@@ -272,8 +381,11 @@
   </header>
 
   <main class="detail-container">
-    <div id="animeDetailContainer"><div class="loading">⏳ Chargement des informations...</div></div>
+    <div id="animeDetailContainer">
+      <div class="loading">⏳ Chargement des informations...</div>
+    </div>
   </main>
+
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -282,38 +394,36 @@
   <script src="firebase-config.js"></script>
   <script>
     // ============================================
-    // CONFIGURATION
+    // RÉCUPÉRATION DE L'ID
     // ============================================
     const urlParams = new URLSearchParams(window.location.search);
     const animeId = urlParams.get('id');
     const ANILIST_API = 'https://graphql.anilist.co';
-
+    
     let currentLang = 'fr';
-    let itemsPerPage = 50;
+    let itemsPerPage = 50; // 50 épisodes par page
     let totalEpisodes = 0;
     let animeData = null;
     let isFav = false;
 
     // ============================================
-    // CORRECTIONS POUR LES ANIMES TRÈS LONGS (VERSION 2025)
+    // CORRECTIONS POUR LES ANIMES TRÈS LONGS
     // ============================================
     const LONG_ANIMES = {
-      21: 1162,    // One Piece (à jour 2025)
-      1: 1124,     // Detective Conan (à jour)
-      2: 500,      // Naruto Shippuden
-      3: 366,      // Bleach
-      4: 291,      // Dragon Ball Z
-      5: 131,      // Dragon Ball Super
+      21: 1122,    // One Piece
+      1: 1100,     // Detective Conan (estimé)
+      2: 1000,     // Naruto
+      3: 500,      // Naruto Shippuden
+      4: 366,      // Bleach
       6: 87,       // Attack on Titan
       7: 47,       // Jujutsu Kaisen
       8: 55,       // Demon Slayer
       9: 138,      // My Hero Academia
-      10: 293,     // Boruto
-      154587: 28   // Sousou no Frieren
+      10: 293      // Boruto
     };
 
     // ============================================
-    // REQUÊTE GRAPHQL MULTILINGUE
+    // REQUÊTE GRAPHQL POUR LES DÉTAILS
     // ============================================
     const DETAIL_QUERY = `
       query ($id: Int) {
@@ -323,10 +433,6 @@
           coverImage { extraLarge large medium }
           bannerImage
           description
-          descriptionEn: description(asHtml: false, locale: "en")
-          descriptionEs: description(asHtml: false, locale: "es")
-          descriptionAr: description(asHtml: false, locale: "ar")
-          descriptionZh: description(asHtml: false, locale: "zh")
           averageScore
           meanScore
           popularity
@@ -349,6 +455,17 @@
       }
     `;
 
+    // Requête pour le nombre réel d'épisodes
+    const EPISODE_COUNT_QUERY = `
+      query ($id: Int) {
+        Media(id: $id, type: ANIME) {
+          episodes
+          nextAiringEpisode { episode }
+          status
+        }
+      }
+    `;
+
     async function fetchAnilist(query, variables) {
       try {
         const response = await fetch(ANILIST_API, {
@@ -357,9 +474,15 @@
           body: JSON.stringify({ query, variables })
         });
         const data = await response.json();
-        if (data.errors) { console.error('GraphQL Errors:', data.errors); return null; }
+        if (data.errors) {
+          console.error('GraphQL Errors:', data.errors);
+          return null;
+        }
         return data.data;
-      } catch (error) { console.error('Erreur:', error); return null; }
+      } catch (error) {
+        console.error('Erreur:', error);
+        return null;
+      }
     }
 
     async function fetchAnimeDetail(id) {
@@ -368,7 +491,40 @@
     }
 
     // ============================================
-    // GESTION DES FAVORIS
+    // RÉCUPÉRATION DU NOMBRE RÉEL D'ÉPISODES (SORTIS UNIQUEMENT)
+    // ============================================
+    async function getActualEpisodeCount(animeId) {
+      // Vérifier d'abord si l'anime est dans la liste des longs animes
+      if (LONG_ANIMES[animeId]) {
+        return LONG_ANIMES[animeId];
+      }
+      
+      try {
+        const data = await fetchAnilist(EPISODE_COUNT_QUERY, { id: animeId });
+        if (data?.Media) {
+          const totalEpisodes = data.Media.episodes || 0;
+          const nextEpisode = data.Media.nextAiringEpisode?.episode || 0;
+          const status = data.Media.status;
+          
+          // Si l'anime est en cours, afficher uniquement les épisodes sortis
+          if (status === 'RELEASING' && nextEpisode > 0) {
+            return nextEpisode - 1; // Retourne le dernier épisode sorti
+          }
+          
+          // Si l'anime a un nombre défini d'épisodes
+          if (totalEpisodes > 0) {
+            return totalEpisodes;
+          }
+        }
+        return 24; // Valeur par défaut
+      } catch (error) {
+        console.error('Erreur récupération épisodes:', error);
+        return LONG_ANIMES[animeId] || 24;
+      }
+    }
+
+    // ============================================
+    // GESTION DES FAVORIS (localStorage + Firebase)
     // ============================================
     function getFavoritesFromStorage() {
       const stored = localStorage.getItem('anime_favorites');
@@ -380,27 +536,62 @@
     }
 
     async function addToFavorites(type, id, title, image, score) {
-      if (!currentUser) { showToast('🔐 Connectez-vous', 'error'); return false; }
-      const favorites = getFavoritesFromStorage();
-      if (favorites.some(f => f.id === id)) { showToast('❌ Déjà dans vos favoris'); return false; }
-      favorites.push({ id, title, image, score, dateAdded: new Date().toISOString() });
-      saveFavoritesToStorage(favorites);
-      if (db && currentUser) {
-        try { await db.collection('users').doc(currentUser.uid).set({ favorites }, { merge: true }); } catch(e) {}
+      if (!currentUser) {
+        showToast('🔐 Connectez-vous pour ajouter aux favoris', 'error');
+        return false;
       }
+      
+      const favorites = getFavoritesFromStorage();
+      
+      if (favorites.some(f => f.id === id)) {
+        showToast('❌ Déjà dans vos favoris', 'warning');
+        return false;
+      }
+      
+      favorites.push({
+        id: id,
+        title: title,
+        image: image,
+        score: score,
+        dateAdded: new Date().toISOString()
+      });
+      
+      saveFavoritesToStorage(favorites);
+      
+      // Sauvegarde Firebase
+      if (db && currentUser) {
+        try {
+          await db.collection('users').doc(currentUser.uid).set({
+            favorites: favorites
+          }, { merge: true });
+        } catch (e) {
+          console.warn('Firestore save:', e);
+        }
+      }
+      
       showToast(`❤️ ${title} ajouté aux favoris`);
       return true;
     }
 
     async function removeFromFavorites(animeId) {
       if (!currentUser) return false;
+      
       let favorites = getFavoritesFromStorage();
-      const removed = favorites.find(f => f.id == animeId);
-      favorites = favorites.filter(f => f.id != animeId);
+      const removed = favorites.find(f => f.id === animeId);
+      favorites = favorites.filter(f => f.id !== animeId);
+      
       saveFavoritesToStorage(favorites);
+      
       if (db && currentUser) {
-        try { await db.collection('users').doc(currentUser.uid).set({ favorites }, { merge: true }); } catch(e) {}
+        try {
+          await db.collection('users').doc(currentUser.uid).set({
+            favorites: favorites
+          }, { merge: true });
+        } catch (e) {
+          console.warn('Firestore save:', e);
+        }
       }
+      
       if (removed) showToast(`🗑️ ${removed.title} retiré des favoris`);
       return true;
     }
@@ -411,43 +602,60 @@
     }
 
     // ============================================
-    // AFFICHAGE
+    // AFFICHAGE DU DÉTAIL
     // ============================================
     function formatDate(year, month, day) {
       if (!year) return 'Inconnue';
-      return new Date(year, month - 1, day || 1).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      return new Date(year, month - 1, day || 1).toLocaleDateString('fr-FR', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
     }
 
     function getStatusText(status) {
-      const map = { FINISHED: '✅ Terminé', RELEASING: '🟢 En cours', NOT_YET_RELEASED: '📅 À venir', CANCELLED: '❌ Annulé' };
-      return map[status] || status;
-    }
-
-    function cleanHtml(html) {
-      if (!html) return '';
-      return html.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
-    }
-
-    function getDescription(lang) {
-      if (!animeData) return '';
-      const descMap = {
-        fr: animeData.description,
-        en: animeData.descriptionEn,
-        es: animeData.descriptionEs,
-        ar: animeData.descriptionAr,
-        zh: animeData.descriptionZh
+      const statusMap = {
+        FINISHED: '✅ Terminé',
+        RELEASING: '🟢 En cours',
+        NOT_YET_RELEASED: '📅 À venir',
+        CANCELLED: '❌ Annulé'
       };
-      return cleanHtml(descMap[lang] || animeData.description);
+      return statusMap[status] || status;
+    }
+
+    function getFormatText(format) {
+      const formatMap = {
+        TV: 'Série TV',
+        TV_SHORT: 'Série TV courte',
+        MOVIE: 'Film',
+        SPECIAL: 'Spécial',
+        OVA: 'OVA',
+        ONA: 'ONA'
+      };
+      return formatMap[format] || format;
+    }
+
+    function cleanHtmlDescription(html) {
+      if (!html) return 'Synopsis non disponible.';
+      return html
+        .replace(/<br>/g, '\n')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&');
     }
 
     // ============================================
-    // AFFICHAGE DES ÉPISODES
+    // AFFICHAGE DES ÉPISODES (AVEC PAGINATION)
     // ============================================
     let currentEpisodePage = 1;
     let totalEpisodePages = 1;
 
     function renderEpisodeList(episodes, start, end) {
-      return episodes.slice(start, end).map(ep => `<div class="episode-item" data-ep="${ep}">${ep}</div>`).join('');
+      const displayEpisodes = episodes.slice(start, end);
+      return displayEpisodes.map(ep => `
+        <div class="episode-item" data-ep="${ep}">
+          ${ep}
+        </div>
+      `).join('');
     }
 
     function setupEpisodePagination(total) {
@@ -459,35 +667,66 @@
         const end = Math.min(start + itemsPerPage, total);
         const episodes = Array.from({ length: total }, (_, i) => i + 1);
         const episodeList = document.getElementById('episodeList');
+        
         if (episodeList) {
           episodeList.innerHTML = renderEpisodeList(episodes, start, end);
+          
           document.querySelectorAll('.episode-item').forEach(item => {
-            item.addEventListener('click', () => window.location.href = `watch.html?id=${animeId}&ep=${item.dataset.ep}`);
+            item.addEventListener('click', () => {
+              const epNum = item.dataset.ep;
+              window.location.href = `watch.html?id=${animeId}&ep=${epNum}`;
+            });
           });
         }
-        updatePagination(page, totalEpisodePages);
+        updatePaginationButtons(page, totalEpisodePages);
       }
 
-      function updatePagination(current, total) {
+      function updatePaginationButtons(currentPage, total) {
         const paginationDiv = document.getElementById('episodePagination');
         if (!paginationDiv) return;
+        
         let pages = [];
-        for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) pages.push(i);
-        paginationDiv.innerHTML = `<button class="ep-page-btn" data-page="${current-1}" ${current===1 ? 'disabled' : ''}>◀</button>${pages.map(p => `<button class="ep-page-btn ${p===current?'active':''}" data-page="${p}">${p}</button>`).join('')}<button class="ep-page-btn" data-page="${current+1}" ${current===total ? 'disabled' : ''}>▶</button>`;
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(total, currentPage + 2); i++) {
+          pages.push(i);
+        }
+        
+        paginationDiv.innerHTML = `
+          <button class="ep-page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>◀</button>
+          ${pages.map(p => `<button class="ep-page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`).join('')}
+          <button class="ep-page-btn" data-page="${currentPage + 1}" ${currentPage === total ? 'disabled' : ''}>▶</button>
+        `;
+        
         document.querySelectorAll('.ep-page-btn').forEach(btn => {
-          if (!btn.disabled) btn.addEventListener('click', () => { const newPage = parseInt(btn.dataset.page); if (!isNaN(newPage)) { currentEpisodePage = newPage; renderPage(currentEpisodePage); } });
+          if (!btn.disabled) {
+            btn.addEventListener('click', () => {
+              const newPage = parseInt(btn.dataset.page);
+              if (!isNaN(newPage) && newPage !== currentPage) {
+                currentEpisodePage = newPage;
+                renderPage(currentEpisodePage);
+              }
+            });
+          }
         });
       }
+
       renderPage(1);
     }
 
     function setupEpisodeSearch() {
-      document.getElementById('episodeSearch')?.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.episode-item').forEach(item => {
-          item.style.display = item.dataset.ep.includes(term) ? 'flex' : 'none';
+      const searchInput = document.getElementById('episodeSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          document.querySelectorAll('.episode-item').forEach(item => {
+            const epNum = item.dataset.ep;
+            if (epNum.includes(searchTerm)) {
+              item.style.display = 'flex';
+            } else {
+              item.style.display = 'none';
+            }
+          });
         });
-      });
+      }
     }
 
     // ============================================
@@ -496,7 +735,9 @@
     async function displayAnimeDetail(anime) {
       const container = document.getElementById('animeDetailContainer');
       
-      let episodeCount = LONG_ANIMES[animeId] || anime.episodes || 24;
+      // Récupérer le vrai nombre d'épisodes
+      let episodeCount = await getActualEpisodeCount(parseInt(animeId));
+      
       const isAiring = anime.status === 'RELEASING';
       const releaseDate = formatDate(anime.startDate?.year, anime.startDate?.month, anime.startDate?.day);
       const endDate = formatDate(anime.endDate?.year, anime.endDate?.month, anime.endDate?.day);
@@ -507,7 +748,10 @@
         nextEpisodeText = `<div class="next-episode">📺 Prochain épisode: Épisode ${anime.nextAiringEpisode.episode} - ${nextDate.toLocaleDateString('fr-FR')} à ${nextDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>`;
       }
 
+      const descriptionFr = cleanHtmlDescription(anime.description);
+      
       container.innerHTML = `
+        <!-- Hero Section -->
         <div class="detail-hero">
           <img src="${anime.coverImage?.extraLarge || anime.coverImage?.large || anime.coverImage?.medium}" alt="${anime.title?.romaji}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
           <div class="detail-hero-info">
@@ -521,44 +765,60 @@
             </div>
             ${nextEpisodeText}
             <div>
-              <button id="favoriteBtn" class="favorite-btn ${isFav ? 'active' : ''}">${isFav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}</button>
+              <button id="favoriteBtn" class="favorite-btn ${isFav ? 'active' : ''}">
+                ${isFav ? '❤️ Dans mes favoris' : '🤍 Ajouter aux favoris'}
+              </button>
               <a href="watch.html?id=${anime.id}&ep=1" class="watch-btn">▶ Regarder l'épisode 1</a>
             </div>
           </div>
         </div>
+
+        <!-- Informations détaillées -->
         <div class="detail-info-grid">
           <div class="info-card">
             <h3>📅 Informations</h3>
             <p><strong>Statut:</strong> ${getStatusText(anime.status)}</p>
             <p><strong>Épisodes:</strong> ${episodeCount}</p>
             <p><strong>Durée:</strong> ${anime.duration || '?'} min/ép</p>
-            <p><strong>Format:</strong> ${anime.format || 'TV'}</p>
+            <p><strong>Format:</strong> ${getFormatText(anime.format)}</p>
             <p><strong>Source:</strong> ${anime.source || 'N/A'}</p>
             <p><strong>Saison:</strong> ${anime.season || '?'} ${anime.seasonYear || ''}</p>
           </div>
           <div class="info-card">
             <h3>🏷️ Genres</h3>
-            <div class="genres-list">${anime.genres?.map(g => `<span class="genre-tag">${g}</span>`).join('') || 'Aucun genre'}</div>
-            ${anime.tags?.length ? `<h3 style="margin-top:1rem;">🏷️ Tags</h3><div class="genres-list">${anime.tags.slice(0,8).map(t => `<span class="genre-tag">${t.name}</span>`).join('')}</div>` : ''}
+            <div class="genres-list">
+              ${anime.genres?.map(g => `<span class="genre-tag">${g}</span>`).join('') || 'Aucun genre'}
+            </div>
+            ${anime.tags?.length > 0 ? `
+              <h3 style="margin-top: 1rem;">🏷️ Tags</h3>
+              <div class="genres-list">
+                ${anime.tags.slice(0, 8).map(t => `<span class="genre-tag">${t.name}</span>`).join('')}
+              </div>
+            ` : ''}
           </div>
           <div class="info-card">
             <h3>📺 Production</h3>
             <p><strong>Studio:</strong> ${anime.studios?.nodes?.map(s => s.name).join(', ') || 'N/A'}</p>
             <p><strong>Date début:</strong> ${releaseDate}</p>
             <p><strong>Date fin:</strong> ${endDate}</p>
-            ${anime.relations?.edges?.length ? `<p><strong>Liens:</strong> ${anime.relations.edges.slice(0,3).map(r => r.node.title?.romaji).join(', ')}</p>` : ''}
+            ${anime.relations?.edges?.length > 0 ? `
+              <p><strong>Liens:</strong> ${anime.relations.edges.slice(0, 3).map(r => r.node.title?.romaji).join(', ')}</p>
+            ` : ''}
           </div>
         </div>
+
+        <!-- Synopsis bilingue -->
         <div class="synopsis-container">
           <div class="synopsis-tabs">
             <button class="synopsis-tab ${currentLang === 'fr' ? 'active' : ''}" data-lang="fr">🇫🇷 Français</button>
             <button class="synopsis-tab ${currentLang === 'en' ? 'active' : ''}" data-lang="en">🇬🇧 English</button>
-            <button class="synopsis-tab ${currentLang === 'es' ? 'active' : ''}" data-lang="es">🇪🇸 Español</button>
-            <button class="synopsis-tab ${currentLang === 'ar' ? 'active' : ''}" data-lang="ar">🇸🇦 العربية</button>
-            <button class="synopsis-tab ${currentLang === 'zh' ? 'active' : ''}" data-lang="zh">🇨🇳 中文</button>
           </div>
-          <div id="synopsisContent" class="synopsis-content">${getDescription('fr')}</div>
+          <div id="synopsisContent" class="synopsis-content">
+            ${descriptionFr}
+          </div>
         </div>
+
+        <!-- Liste des épisodes -->
         <div class="episodes-section">
           <div class="episodes-header">
             <h3>📺 Liste des épisodes (${episodeCount})</h3>
@@ -569,17 +829,25 @@
         </div>
       `;
 
-      // Synopsis multilingue
+      // Gestion synopsis bilingue
       document.querySelectorAll('.synopsis-tab').forEach(tab => {
         tab.addEventListener('click', () => {
           currentLang = tab.dataset.lang;
           document.querySelectorAll('.synopsis-tab').forEach(t => t.classList.remove('active'));
           tab.classList.add('active');
-          document.getElementById('synopsisContent').textContent = getDescription(currentLang) || (currentLang === 'fr' ? 'Synopsis non disponible.' : 'Synopsis not available.');
+          
+          const synopsisDiv = document.getElementById('synopsisContent');
+          if (synopsisDiv) {
+            if (currentLang === 'en') {
+              synopsisDiv.textContent = cleanHtmlDescription(anime.description) || 'Synopsis not available.';
+            } else {
+              synopsisDiv.textContent = descriptionFr;
+            }
+          }
         });
       });
 
-      // Épisodes
+      // Initialiser la liste des épisodes (sans limite)
       if (episodeCount > 0) {
         setupEpisodePagination(episodeCount);
         setupEpisodeSearch();
@@ -587,11 +855,14 @@
         document.getElementById('episodeList').innerHTML = '<div class="loading">Nombre d\'épisodes non disponible</div>';
       }
 
-      // Favoris
+      // Gestion favoris
       const favBtn = document.getElementById('favoriteBtn');
       if (favBtn) {
         favBtn.addEventListener('click', async () => {
-          if (!currentUser) { showToast('🔐 Connectez-vous', 'error'); return; }
+          if (!currentUser) {
+            showToast('🔐 Connectez-vous pour ajouter aux favoris', 'error');
+            return;
+          }
           if (isFav) {
             await removeFromFavorites(anime.id);
             isFav = false;
@@ -607,26 +878,38 @@
       }
     }
 
+    // ============================================
+    // CHARGEMENT PRINCIPAL
+    // ============================================
     async function loadAnimeDetail() {
-      if (!animeId) { document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ ID manquant</div>'; return; }
+      if (!animeId) {
+        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ ID de l\'anime manquant</div>';
+        return;
+      }
+
       const anime = await fetchAnimeDetail(parseInt(animeId));
       if (anime) {
+        // Vérifier si dans les favoris
         isFav = await isInFavorites(animeId);
-        animeData = anime;
         await displayAnimeDetail(anime);
       } else {
-        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ Erreur de chargement</div>';
+        document.getElementById('animeDetailContainer').innerHTML = '<div class="error">❌ Erreur de chargement de l\'anime</div>';
       }
     }
 
-    function showToast(msg) {
+    function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
-      toast.textContent = msg;
+      toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    document.addEventListener('DOMContentLoaded', loadAnimeDetail);
+    // ============================================
+    // INITIALISATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAnimeDetail();
+    });
   </script>
 </body>
 </html>
