@@ -92,7 +92,7 @@ anime-info/
 
 📝 Licence
 Ce projet est sous licence MIT
-Hugo Bonneau - GitHub
+Iraya - GitHub
 
 <div align="center">
 ⭐ Si vous aimez ce projet, n'oubliez pas de laisser une étoile ! ⭐
