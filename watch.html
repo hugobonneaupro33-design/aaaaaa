@@ -466,9 +466,7 @@
             <button class="lang-btn active" data-lang="vf">🇫🇷 VF</button>
             <button class="lang-btn" data-lang="vostfr">🇯🇵 VOSTFR</button>
           </div>
-          <div class="source-selector" id="sourceSelector">
-            <!-- Les sources seront générées dynamiquement -->
-          </div>
+          <div class="source-selector" id="sourceSelector"></div>
           <div class="speed-selector">
             <button class="speed-btn" data-speed="0.5">0.5x</button>
             <button class="speed-btn" data-speed="0.75">0.75x</button>
@@ -530,7 +528,6 @@
     let autoPlayNext = true;
     let nextAiringEpisode = null;
     let currentZoom = 1;
-    let isFullscreen = false;
 
     const ANILIST_API = 'https://graphql.anilist.co';
     const PROXY = 'https://corsproxy.io/?url=';
@@ -745,15 +742,19 @@
     // ============================================
     function updateZoom(change) {
       currentZoom = Math.min(2, Math.max(0.5, currentZoom + change));
-      document.getElementById('videoPlayer').style.transform = `scale(${currentZoom})`;
-      document.getElementById('zoomLevel').textContent = `${Math.round(currentZoom * 100)}%`;
+      const player = document.getElementById('videoPlayer');
+      if (player) player.style.transform = `scale(${currentZoom})`;
+      const zoomSpan = document.getElementById('zoomLevel');
+      if (zoomSpan) zoomSpan.textContent = `${Math.round(currentZoom * 100)}%`;
       localStorage.setItem('zoomLevel', currentZoom);
     }
 
     function resetZoom() {
       currentZoom = 1;
-      document.getElementById('videoPlayer').style.transform = 'scale(1)';
-      document.getElementById('zoomLevel').textContent = '100%';
+      const player = document.getElementById('videoPlayer');
+      if (player) player.style.transform = 'scale(1)';
+      const zoomSpan = document.getElementById('zoomLevel');
+      if (zoomSpan) zoomSpan.textContent = '100%';
       localStorage.setItem('zoomLevel', 1);
     }
 
@@ -771,7 +772,8 @@
       document.body.classList.toggle('light-theme');
       const isLight = document.body.classList.contains('light-theme');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+      const themeBtn = document.getElementById('themeToggle');
+      if (themeBtn) themeBtn.textContent = isLight ? '☀️' : '🌙';
     }
 
     // ============================================
@@ -787,8 +789,7 @@
           case '+': updateZoom(0.1); break;
           case '-': updateZoom(-0.1); break;
           case '0': resetZoom(); break;
-          case 's': case 'S': document.getElementById('speed-btn-1')?.click(); break;
-          case 'z': case 'Z': document.getElementById('zoomResetBtn')?.click(); break;
+          case 'z': case 'Z': resetZoom(); break;
         }
       });
     }
@@ -816,6 +817,8 @@
           autoPlayNext = e.target.checked;
           localStorage.setItem('autoPlayNext', autoPlayNext);
         });
+        const savedAutoPlay = localStorage.getItem('autoPlayNext');
+        if (savedAutoPlay !== null) autoPlayNext = savedAutoPlay === 'true';
       }
       
       document.getElementById('episodeSearch')?.addEventListener('input', (e) => {
@@ -825,14 +828,12 @@
         });
       });
       
-      // Zoom buttons
       document.getElementById('zoomInBtn')?.addEventListener('click', () => updateZoom(0.1));
       document.getElementById('zoomOutBtn')?.addEventListener('click', () => updateZoom(-0.1));
       document.getElementById('zoomResetBtn')?.addEventListener('click', resetZoom);
       document.getElementById('zoomInMini')?.addEventListener('click', () => updateZoom(0.1));
       document.getElementById('zoomOutMini')?.addEventListener('click', () => updateZoom(-0.1));
       document.getElementById('zoomResetMini')?.addEventListener('click', resetZoom);
-      
       document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
     }
 
@@ -850,7 +851,13 @@
       setupEventListeners();
       setupKeyboardShortcuts();
       const savedZoom = localStorage.getItem('zoomLevel');
-      if (savedZoom) { currentZoom = parseFloat(savedZoom); document.getElementById('videoPlayer').style.transform = `scale(${currentZoom})`; document.getElementById('zoomLevel').textContent = `${Math.round(currentZoom * 100)}%`; }
+      if (savedZoom) {
+        currentZoom = parseFloat(savedZoom);
+        const player = document.getElementById('videoPlayer');
+        if (player) player.style.transform = `scale(${currentZoom})`;
+        const zoomSpan = document.getElementById('zoomLevel');
+        if (zoomSpan) zoomSpan.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
     });
   </script>
 </body>
