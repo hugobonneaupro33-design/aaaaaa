@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail - Akrya Anime</title>
+  <style>
+    :root {
+      --primary: #e94560;
+      --primary-dark: #c72e48;
+      --bg-dark: #0a0a0f;
+      --bg-card: #13131f;
+      --bg-hover: #1e1e2e;
+      --text-light: #f0f0f0;
+      --text-muted: #8888aa;
+      --border: #252540;
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .home-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .detail-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .detail-hero {
+      display: flex;
+      gap: 2rem;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-hero img {
+      width: 250px;
+      border-radius: var(--radius);
+    }
+
+    .detail-hero-info { flex: 1; }
+    .detail-hero-info h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .detail-hero-info h2 { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    .detail-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: var(--bg-hover);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    .watch-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .detail-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      padding: 1rem;
+      border-radius: var(--radius);
+    }
+    .info-card h3 { color: var(--primary); margin-bottom: 0.8rem; }
+
+    .genres-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .genre-tag {
+      background: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    .synopsis-container {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .synopsis-content { line-height: 1.6; color: var(--text-muted); }
+
+    .loading, .error { text-align: center; padding: 2rem; color: var(--text-muted); }
+    .error { color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .detail-hero { flex-direction: column; align-items: center; text-align: center; }
+      .detail-hero img { width: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="home-link">🏠 Accueil</a>
+    <h1>🎌 Détail de l'anime</h1>
+    <div></div>
+  </header>
+
+  <main class="detail-container">
+    <div id="detailContent">
+      <div class="loading">⏳ Chargement...</div>
+    </div>
+  </main>
+
+  <script>
+    const ANILIST_API = 'https://graphql.anilist.co';
+    const urlParams = new URLSearchParams(window.location.search);
+    const animeId = urlParams.get('id');
+
+    const QUERY = `
+      query ($id: Int) {
+        Media(id: $id, type: ANIME) {
+          title { romaji english }
+          coverImage { large }
+          averageScore
+          episodes
+          status
+          startDate { year month day }
+          description
+          genres
+        }
+      }
+    `;
+
+    async function fetchAnimeDetail() {
+      if (!animeId) {
+        document.getElementById('detailContent').innerHTML = '<div class="error">❌ ID manquant</div>';
+        return;
+      }
+
+      try {
+        const response = await fetch(ANILIST_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: QUERY, variables: { id: parseInt(animeId) } })
+        });
+        const data = await response.json();
+        const anime = data.data.Media;
+
+        if (!anime) throw new Error('Anime non trouvé');
+
+        const releaseDate = anime.startDate?.year || 'Inconnue';
+        const score = (anime.averageScore / 10).toFixed(1);
+        const isAiring = anime.status === 'RELEASING';
+
+        document.getElementById('detailContent').innerHTML = `
+          <div class="detail-hero">
+            <img src="${anime.coverImage?.large}" alt="${anime.title?.romaji}" onerror="this.src='https://via.placeholder.com/250x350'">
+            <div class="detail-hero-info">
+              <h1>${anime.title?.romaji}</h1>
+              <h2>${anime.title?.english || ''}</h2>
+              <div class="detail-stats">
+                <span class="stat">⭐ ${score}</span>
+                <span class="stat">📺 ${anime.episodes || '?'} épisodes</span>
+                <span class="stat">📅 ${releaseDate}</span>
+                <span class="stat">${isAiring ? '🟢 En cours' : '✅ Terminé'}</span>
+              </div>
+              <a href="watch.html?id=${animeId}&ep=1" class="watch-btn">▶ Regarder l'épisode 1</a>
+            </div>
+          </div>
+
+          <div class="detail-info-grid">
+            <div class="info-card">
+              <h3>🏷️ Genres</h3>
+              <div class="genres-list">
+                ${anime.genres?.map(g => `<span class="genre-tag">${g}</span>`).join('') || 'Aucun genre'}
+              </div>
+            </div>
+            <div class="info-card">
+              <h3>📺 Production</h3>
+              <p><strong>Épisodes:</strong> ${anime.episodes || '?'}</p>
+              <p><strong>Statut:</strong> ${isAiring ? 'En cours' : 'Terminé'}</p>
+            </div>
+          </div>
+
+          <div class="synopsis-container">
+            <h3>📖 Synopsis</h3>
+            <div class="synopsis-content">
+              ${anime.description?.replace(/<[^>]*>/g, '') || 'Synopsis non disponible.'}
+            </div>
+          </div>
+        `;
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('detailContent').innerHTML = '<div class="error">❌ Erreur de chargement</div>';
+      }
+    }
+
+    fetchAnimeDetail();
+  </script>
+</body>
+</html>
