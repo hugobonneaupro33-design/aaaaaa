@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Akrya Anime - Découvrez les animes par date de sortie, calendrier, top rated et actualités">
+  <meta name="description" content="Akrya Anime - Anime, Manga, Webtoon">
   <meta name="theme-color" content="#e94560">
-  <title>Akrya Anime - Accueil</title>
+  <title>Akrya Anime</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
-    /* ============================================
-       VARIABLES & RESET
-    ============================================ */
+    /* ========== STYLES (identiques à ton fichier, je les garde) ========== */
     :root {
       --primary: #e94560;
       --primary-dark: #c72e48;
       --primary-light: #ff6b8b;
       --secondary: #6c5ce7;
       --anime-color: #e94560;
-      --manga-color: #6c5ce7;
-      --webtoon-color: #00bcd4;
+      --manga-color: #8b5cf6;
+      --webtoon-color: #14b8a6;
       --bg-dark: #0a0a0f;
       --bg-card: rgba(19, 19, 31, 0.95);
       --bg-hover: rgba(30, 30, 46, 0.95);
@@ -56,12 +54,10 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 4px; }
     ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
 
-    /* Header */
     header {
       background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
       padding: 1rem 2rem;
@@ -102,7 +98,6 @@
     }
     .theme-btn:hover { background: var(--primary); }
 
-    /* Auth */
     .auth-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .google-btn, .facebook-btn, .logout-btn {
       padding: 0.5rem 1.2rem;
@@ -132,7 +127,6 @@
     .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
     .profile-link { color: var(--primary); text-decoration: none; font-weight: 500; }
 
-    /* Catégories */
     .category-nav {
       display: flex;
       justify-content: center;
@@ -157,10 +151,9 @@
     }
     .cat-nav-btn:hover { transform: translateY(-3px); }
     .cat-nav-btn.anime:hover, .cat-nav-btn.anime.active { background: var(--anime-color); box-shadow: 0 4px 15px rgba(233,69,96,0.3); }
-    .cat-nav-btn.manga:hover, .cat-nav-btn.manga.active { background: var(--manga-color); box-shadow: 0 4px 15px rgba(108,92,231,0.3); }
-    .cat-nav-btn.webtoon:hover, .cat-nav-btn.webtoon.active { background: var(--webtoon-color); box-shadow: 0 4px 15px rgba(0,188,212,0.3); }
+    .cat-nav-btn.manga:hover, .cat-nav-btn.manga.active { background: var(--manga-color); box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
+    .cat-nav-btn.webtoon:hover, .cat-nav-btn.webtoon.active { background: var(--webtoon-color); box-shadow: 0 4px 15px rgba(20,184,166,0.3); }
 
-    /* Recherche */
     .search-container { max-width: 600px; margin: 1rem auto 0; position: relative; }
     .search-wrapper {
       display: flex;
@@ -221,7 +214,6 @@
     .search-item-info h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
     .search-item-info p { font-size: 0.7rem; color: var(--text-muted); }
 
-    /* Navigation */
     .quick-nav {
       display: flex;
       gap: 0.5rem;
@@ -242,7 +234,6 @@
     .nav-btn.active { background: var(--primary); }
     .nav-btn:hover { background: var(--primary); transform: translateY(-2px); }
 
-    /* Hero */
     .hero-section {
       background: linear-gradient(135deg, rgba(233,69,96,0.15), rgba(108,92,231,0.05));
       border-radius: var(--radius-lg);
@@ -269,7 +260,6 @@
     .hero-stat .number { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
     .hero-stat .label { font-size: 0.7rem; color: var(--text-muted); }
 
-    /* Filtres */
     .filters-section { margin-bottom: 2rem; }
     .filter-title {
       display: flex;
@@ -291,7 +281,6 @@
     }
     .genre-filter.active, .genre-filter:hover { background: var(--primary); }
 
-    /* Grille */
     .section-title {
       font-size: 1.5rem;
       margin-bottom: 1.5rem;
@@ -359,7 +348,6 @@
       cursor: pointer;
     }
 
-    /* Pagination */
     .pagination {
       display: flex;
       justify-content: center;
@@ -378,7 +366,6 @@
     }
     .page-btn.active, .page-btn:hover { background: var(--primary); }
 
-    /* Calendrier */
     .calendar-container {
       background: var(--bg-card);
       border-radius: var(--radius);
@@ -442,7 +429,6 @@
     }
     .calendar-episode:hover { background: var(--primary); transform: translateX(2px); }
 
-    /* Actualités */
     .news-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -468,7 +454,6 @@
     }
     .news-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; }
 
-    /* Utilitaires */
     .page { display: block; }
     .page.hidden { display: none !important; }
     .hidden { display: none !important; }
@@ -522,7 +507,7 @@
     <div class="header-top">
       <div class="logo">
         <h1>🎌 Akrya Anime</h1>
-        <p>Votre source d'actualités manga & anime</p>
+        <p>Anime · Manga · Webtoon</p>
       </div>
       <div class="tools-bar">
         <button id="themeToggle" class="theme-btn">🌙</button>
@@ -540,8 +525,8 @@
     </div>
     <div class="search-container">
       <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Rechercher un anime..." autocomplete="off">
-        <button id="searchBtn">🔍 Rechercher</button>
+        <input type="text" id="searchInput" placeholder="Rechercher...">
+        <button id="searchBtn">🔍</button>
       </div>
       <div id="searchDropdown" class="search-dropdown"></div>
     </div>
@@ -549,9 +534,9 @@
 
   <main style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
     <div class="category-nav">
-      <a href="#" class="cat-nav-btn anime active" data-cat="anime">📺 Anime</a>
-      <a href="#" class="cat-nav-btn manga" data-cat="manga">📖 Manga</a>
-      <a href="webtoon.html" class="cat-nav-btn webtoon">🎨 Webtoon</a>
+      <button class="cat-nav-btn anime active" data-cat="anime">📺 Anime</button>
+      <button class="cat-nav-btn manga" data-cat="manga">📖 Manga</button>
+      <button class="cat-nav-btn webtoon" data-cat="webtoon">🎨 Webtoon</button>
     </div>
 
     <div class="quick-nav">
@@ -562,36 +547,25 @@
     </div>
 
     <div class="hero-section">
-      <h2>📺 Bienvenue sur Akrya Anime</h2>
-      <p>Découvrez les animes tendances, consultez le calendrier des sorties et restez informé</p>
+      <h2 id="heroTitle">📺 Bienvenue sur Akrya Anime</h2>
+      <p id="heroDesc">Découvrez les animes, mangas et webtoons tendances</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="number" id="animeCount">+10,000</div><div class="label">Animes</div></div>
-        <div class="hero-stat"><div class="number" id="episodeCount">+100,000</div><div class="label">Épisodes</div></div>
-        <div class="hero-stat"><div class="number" id="userCount">+5,000</div><div class="label">Utilisateurs</div></div>
+        <div class="hero-stat"><div class="number">+10,000</div><div class="label">Œuvres</div></div>
+        <div class="hero-stat"><div class="number">+100,000</div><div class="label">Chapitres/Épisodes</div></div>
+        <div class="hero-stat"><div class="number">+5,000</div><div class="label">Utilisateurs</div></div>
       </div>
     </div>
 
     <div id="homePage" class="page">
       <div class="filters-section">
         <div class="filter-title">🎯 Filtrer par genre</div>
-        <div class="genre-filters" id="genreFilters">
-          <button class="genre-filter active" data-genre="">🌟 Tous</button>
-          <button class="genre-filter" data-genre="action">⚔️ Action</button>
-          <button class="genre-filter" data-genre="adventure">🗺️ Aventure</button>
-          <button class="genre-filter" data-genre="comedy">😄 Comédie</button>
-          <button class="genre-filter" data-genre="drama">🎭 Drame</button>
-          <button class="genre-filter" data-genre="fantasy">✨ Fantasy</button>
-          <button class="genre-filter" data-genre="romance">💕 Romance</button>
-          <button class="genre-filter" data-genre="sci-fi">🤖 Sci-Fi</button>
-          <button class="genre-filter" data-genre="horror">👻 Horreur</button>
-          <button class="genre-filter" data-genre="sports">⚽ Sports</button>
-        </div>
+        <div class="genre-filters" id="genreFilters"></div>
       </div>
       <div class="section-title">
-        <span>📺</span> Sorties récentes
+        <span>📖</span> <span id="homeTitle">Sorties récentes</span>
         <span style="font-size:0.8rem;">(du plus récent au plus ancien)</span>
       </div>
-      <div id="animeGrid" class="anime-grid"><div class="loading">⏳ Chargement des animes...</div></div>
+      <div id="animeGrid" class="anime-grid"><div class="loading">⏳ Chargement...</div></div>
       <div id="pagination" class="pagination"></div>
     </div>
 
@@ -601,9 +575,9 @@
         <div class="calendar-header">
           <div class="calendar-title" id="calendarTitle">📅 Semaine du ...</div>
           <div class="calendar-nav">
-            <button id="prevWeekBtn">◀ Semaine précédente</button>
+            <button id="prevWeekBtn">◀</button>
             <button id="currentWeekBtn">📍 Cette semaine</button>
-            <button id="nextWeekBtn">Semaine suivante ▶</button>
+            <button id="nextWeekBtn">▶</button>
           </div>
         </div>
         <div class="calendar-week-days" id="weekDays"></div>
@@ -612,13 +586,13 @@
     </div>
 
     <div id="topPage" class="page hidden">
-      <div class="section-title">⭐ Top Rated Anime</div>
-      <div id="topGrid" class="anime-grid"><div class="loading">⏳ Chargement...</div></div>
+      <div class="section-title">⭐ Top Rated</div>
+      <div id="topGrid" class="anime-grid"></div>
     </div>
 
     <div id="newsPage" class="page hidden">
-      <div class="section-title">📰 Actualités Anime & Manga</div>
-      <div id="newsGrid" class="news-grid"><div class="loading">⏳ Chargement...</div></div>
+      <div class="section-title">📰 Actualités</div>
+      <div id="newsGrid" class="news-grid"></div>
     </div>
   </main>
 
@@ -628,231 +602,273 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script>
-    // ============================================
-    // BASE DE DONNÉES AVEC DATES (triées du plus récent au plus ancien)
-    // ============================================
-    const ANIMES_DB = [
-      { id: 15, title: "Dragon Ball Daima", score: 8.0, episodes: 12, image: "https://cdn.myanimelist.net/images/anime/1947/144122.jpg", status: "RELEASING", year: 2024, genre: "fantasy" },
-      { id: 12, title: "Spy x Family", score: 8.4, episodes: 25, image: "https://cdn.myanimelist.net/images/anime/1441/122092.jpg", status: "RELEASING", year: 2022, genre: "comedy" },
-      { id: 11, title: "Tokyo Revengers", score: 7.9, episodes: 25, image: "https://cdn.myanimelist.net/images/anime/1375/115449.jpg", status: "RELEASING", year: 2021, genre: "drama" },
-      { id: 7, title: "Jujutsu Kaisen", score: 8.7, episodes: 47, image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg", status: "RELEASING", year: 2020, genre: "action" },
-      { id: 8, title: "Demon Slayer", score: 8.6, episodes: 55, image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg", status: "FINISHED", year: 2019, genre: "fantasy" },
-      { id: 10, title: "Boruto", score: 7.5, episodes: 293, image: "https://cdn.myanimelist.net/images/anime/9/78917.jpg", status: "RELEASING", year: 2017, genre: "action" },
-      { id: 9, title: "My Hero Academia", score: 8.2, episodes: 138, image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg", status: "RELEASING", year: 2016, genre: "action" },
-      { id: 5, title: "Dragon Ball Super", score: 7.8, episodes: 131, image: "https://cdn.myanimelist.net/images/anime/5/77498.jpg", status: "FINISHED", year: 2015, genre: "action" },
-      { id: 6, title: "Attack on Titan", score: 9.0, episodes: 87, image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg", status: "FINISHED", year: 2013, genre: "action" },
-      { id: 3, title: "Bleach", score: 8.2, episodes: 366, image: "https://cdn.myanimelist.net/images/anime/3/40451.jpg", status: "FINISHED", year: 2004, genre: "action" },
-      { id: 2, title: "Naruto", score: 8.3, episodes: 220, image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg", status: "FINISHED", year: 2002, genre: "action" },
-      { id: 21, title: "One Piece", score: 8.8, episodes: 1122, image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg", status: "RELEASING", year: 1999, genre: "action" }
-    ];
+    // ======================== BASES DE DONNÉES (ANIME / MANGA / WEBTOON) ========================
+    const DB = {
+      anime: [
+        { id: 21, title: "One Piece", score: 8.8, episodes: 1122, year: 1999, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg", genre: "action", synopsis: "L'aventure de Luffy." },
+        { id: 2, title: "Naruto", score: 8.3, episodes: 220, year: 2002, status: "FINISHED", image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg", genre: "action" },
+        { id: 6, title: "Attack on Titan", score: 9.0, episodes: 87, year: 2013, status: "FINISHED", image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg", genre: "action" },
+        { id: 8, title: "Demon Slayer", score: 8.6, episodes: 55, year: 2019, status: "FINISHED", image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg", genre: "fantasy" },
+        { id: 7, title: "Jujutsu Kaisen", score: 8.7, episodes: 47, year: 2020, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/1171/109222.jpg", genre: "action" },
+        { id: 12, title: "Spy x Family", score: 8.4, episodes: 25, year: 2022, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/1441/122092.jpg", genre: "comedy" },
+        { id: 15, title: "Dragon Ball Daima", score: 8.0, episodes: 12, year: 2024, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/1947/144122.jpg", genre: "fantasy" },
+        { id: 10, title: "Boruto", score: 7.5, episodes: 293, year: 2017, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/9/78917.jpg", genre: "action" },
+        { id: 9, title: "My Hero Academia", score: 8.2, episodes: 138, year: 2016, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg", genre: "action" },
+        { id: 5, title: "Dragon Ball Super", score: 7.8, episodes: 131, year: 2015, status: "FINISHED", image: "https://cdn.myanimelist.net/images/anime/5/77498.jpg", genre: "action" },
+        { id: 3, title: "Bleach", score: 8.2, episodes: 366, year: 2004, status: "FINISHED", image: "https://cdn.myanimelist.net/images/anime/3/40451.jpg", genre: "action" },
+        { id: 11, title: "Tokyo Revengers", score: 7.9, episodes: 25, year: 2021, status: "RELEASING", image: "https://cdn.myanimelist.net/images/anime/1375/115449.jpg", genre: "drama" }
+      ],
+      manga: [
+        { id: 101, title: "One Piece (Manga)", score: 9.0, chapters: 1125, year: 1997, status: "RELEASING", image: "https://cdn.myanimelist.net/images/manga/1/10.jpg", genre: "action" },
+        { id: 102, title: "Jujutsu Kaisen (Manga)", score: 8.6, chapters: 255, year: 2018, status: "RELEASING", image: "https://cdn.myanimelist.net/images/manga/3/196750.jpg", genre: "action" },
+        { id: 103, title: "Demon Slayer (Manga)", score: 8.5, chapters: 205, year: 2016, status: "FINISHED", image: "https://cdn.myanimelist.net/images/manga/1/197476.jpg", genre: "fantasy" },
+        { id: 104, title: "Attack on Titan (Manga)", score: 8.9, chapters: 139, year: 2009, status: "FINISHED", image: "https://cdn.myanimelist.net/images/manga/3/75731.jpg", genre: "action" },
+        { id: 105, title: "My Hero Academia (Manga)", score: 8.1, chapters: 398, year: 2014, status: "RELEASING", image: "https://cdn.myanimelist.net/images/manga/3/205975.jpg", genre: "action" },
+        { id: 106, title: "Spy x Family (Manga)", score: 8.4, chapters: 87, year: 2019, status: "RELEASING", image: "https://cdn.myanimelist.net/images/manga/3/219900.jpg", genre: "comedy" }
+      ],
+      webtoon: [
+        { id: 201, title: "Solo Leveling", score: 8.9, chapters: 179, year: 2018, status: "FINISHED", image: "https://cdn.myanimelist.net/images/manga/2/209195.jpg", genre: "action" },
+        { id: 202, title: "Tower of God", score: 8.7, chapters: 600, year: 2010, status: "RELEASING", image: "https://cdn.myanimelist.net/images/manga/2/165032.jpg", genre: "fantasy" },
+        { id: 203, title: "The God of High School", score: 7.9, chapters: 569, year: 2011, status: "FINISHED", image: "https://cdn.myanimelist.net/images/manga/3/131999.jpg", genre: "action" },
+        { id: 204, title: "Noblesse", score: 8.3, chapters: 544, year: 2007, status: "FINISHED", image: "https://cdn.myanimelist.net/images/manga/2/167725.jpg", genre: "action" }
+      ]
+    };
 
+    // Trie par année décroissante
+    for(let cat in DB) DB[cat].sort((a,b) => b.year - a.year);
+
+    let currentCategory = "anime";
+    let currentTab = "home";
+    let currentGenre = "";
     let currentPage = 1;
-    let currentGenre = '';
-    let currentTab = 'home';
-    let itemsPerPage = 12;
-    let favorites = JSON.parse(localStorage.getItem('akrya_favorites') || '[]');
+    const itemsPerPage = 12;
+    let favorites = JSON.parse(localStorage.getItem("akrya_favorites") || "[]");
 
-    // ============================================
-    // GESTION DES FAVORIS
-    // ============================================
     function saveFavorites() {
-      localStorage.setItem('akrya_favorites', JSON.stringify(favorites));
-      if (currentUser && db) {
-        db.collection('users').doc(currentUser.uid).set({ favorites: favorites }, { merge: true });
-      }
+      localStorage.setItem("akrya_favorites", JSON.stringify(favorites));
+      if (currentUser && db) db.collection("users").doc(currentUser.uid).set({ favorites }, { merge: true });
     }
 
-    function toggleFavorite(animeId, animeTitle, animeImage, animeScore) {
-      const index = favorites.findIndex(f => f.id === animeId);
-      if (index === -1) {
-        favorites.push({ id: animeId, title: animeTitle, image: animeImage, score: animeScore, date: new Date().toISOString() });
-        showToast(`❤️ ${animeTitle} ajouté aux favoris`);
+    function toggleFavorite(item) {
+      let idx = favorites.findIndex(f => f.id === item.id && f.type === currentCategory);
+      if(idx === -1) {
+        favorites.push({ id: item.id, type: currentCategory, title: item.title, image: item.image, score: item.score });
+        showToast(`❤️ ${item.title} ajouté aux favoris`);
       } else {
-        favorites.splice(index, 1);
-        showToast(`💔 ${animeTitle} retiré des favoris`);
+        favorites.splice(idx,1);
+        showToast(`💔 ${item.title} retiré des favoris`);
       }
       saveFavorites();
-      loadAnimes(currentPage, currentGenre); // Rafraîchir l'affichage
+      renderCurrentPage();
     }
 
-    function isFavorite(animeId) {
-      return favorites.some(f => f.id === animeId);
+    function isFavorite(item) {
+      return favorites.some(f => f.id === item.id && f.type === currentCategory);
     }
 
-    // ============================================
-    // AFFICHAGE
-    // ============================================
-    function displayAnimes(animes, containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!animes || animes.length === 0) {
-        container.innerHTML = '<div class="error">❌ Aucun résultat</div>';
-        return;
-      }
-      container.innerHTML = animes.map(anime => `
-        <div class="anime-card" data-id="${anime.id}">
-          <span class="badge">${anime.status === 'RELEASING' ? '🟢 En cours' : '✅ Terminé'}</span>
-          <div class="fav-badge" data-fav="${anime.id}">${isFavorite(anime.id) ? '❤️' : '🤍'}</div>
-          <img src="${anime.image}" alt="${anime.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x280?text=No+Image'">
+    function getCurrentData() {
+      let data = DB[currentCategory].filter(i => currentGenre === "" || i.genre === currentGenre);
+      return data;
+    }
+
+    function renderCard(item) {
+      const count = item.episodes ? `${item.episodes} ép` : `${item.chapters} ch`;
+      return `
+        <div class="anime-card" data-id="${item.id}">
+          <span class="badge">${item.status === "RELEASING" ? "🟢 En cours" : "✅ Terminé"}</span>
+          <div class="fav-badge" data-id="${item.id}">${isFavorite(item) ? "❤️" : "🤍"}</div>
+          <img src="${item.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x280'">
           <div class="anime-info">
-            <h3>${anime.title.length > 35 ? anime.title.substring(0,32)+'...' : anime.title}</h3>
-            <div class="anime-meta">
-              <span class="score">⭐ ${anime.score}</span>
-              <span>📺 ${anime.episodes} ép</span>
-            </div>
-            <div class="anime-meta">
-              <span>📅 ${anime.year}</span>
-            </div>
+            <h3>${item.title.length > 35 ? item.title.substring(0,32)+'...' : item.title}</h3>
+            <div class="anime-meta"><span class="score">⭐ ${item.score}</span><span>${count}</span></div>
+            <div class="anime-meta">📅 ${item.year}</div>
           </div>
         </div>
-      `).join('');
+      `;
+    }
 
-      document.querySelectorAll(`#${containerId} .anime-card`).forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (e.target.classList.contains('fav-badge')) return;
-          window.location.href = `anime-detail.html?id=${card.dataset.id}`;
+    function renderHome() {
+      let data = getCurrentData();
+      const totalPages = Math.ceil(data.length / itemsPerPage);
+      const start = (currentPage-1)*itemsPerPage;
+      const pageData = data.slice(start, start+itemsPerPage);
+      document.getElementById("animeGrid").innerHTML = pageData.map(renderCard).join("");
+      document.querySelectorAll(".anime-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          if(e.target.classList.contains("fav-badge")) return;
+          let id = parseInt(card.dataset.id);
+          window.location.href = `detail.html?type=${currentCategory}&id=${id}`;
         });
       });
-
-      document.querySelectorAll(`#${containerId} .fav-badge`).forEach(badge => {
-        badge.addEventListener('click', (e) => {
+      document.querySelectorAll(".fav-badge").forEach(badge => {
+        badge.addEventListener("click", (e) => {
           e.stopPropagation();
-          const id = parseInt(badge.dataset.fav);
-          const anime = ANIMES_DB.find(a => a.id === id);
-          if (anime) toggleFavorite(id, anime.title, anime.image, anime.score);
-          loadAnimes(currentPage, currentGenre);
+          let id = parseInt(badge.dataset.id);
+          let item = DB[currentCategory].find(i => i.id === id);
+          if(item) toggleFavorite(item);
+          renderHome();
+          renderTopRated();
         });
       });
-    }
-
-    function loadAnimes(page = 1, genre = '') {
-      let filtered = [...ANIMES_DB];
-      if (genre) filtered = filtered.filter(anime => anime.genre === genre);
-      filtered.sort((a, b) => b.year - a.year);
-      const start = (page - 1) * itemsPerPage;
-      const paginated = filtered.slice(start, start + itemsPerPage);
-      const totalPages = Math.ceil(filtered.length / itemsPerPage);
-      displayAnimes(paginated, 'animeGrid');
-      displayPagination(page, totalPages);
-    }
-
-    function displayPagination(current, total) {
-      const div = document.getElementById('pagination');
-      if (!div || total <= 1) { div.innerHTML = ''; return; }
-      let pages = [];
-      for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) pages.push(i);
-      div.innerHTML = `<button class="page-btn" data-page="${current-1}" ${current===1 ? 'disabled' : ''}>◀</button>${pages.map(p => `<button class="page-btn ${p===current?'active':''}" data-page="${p}">${p}</button>`).join('')}<button class="page-btn" data-page="${current+1}" ${current===total ? 'disabled' : ''}>▶</button>`;
-      document.querySelectorAll('.page-btn').forEach(btn => {
-        if (!btn.disabled) btn.addEventListener('click', () => {
-          const newPage = parseInt(btn.dataset.page);
-          if (!isNaN(newPage)) { loadAnimes(newPage, currentGenre); window.scrollTo({ top: 0 }); }
-        });
-      });
-    }
-
-    // ============================================
-    // TOP RATED
-    // ============================================
-    function loadTopRated() {
-      const top = [...ANIMES_DB].sort((a, b) => b.score - a.score);
-      displayAnimes(top, 'topGrid');
-    }
-
-    // ============================================
-    // ACTUALITÉS
-    // ============================================
-    function loadNews() {
-      const container = document.getElementById('newsGrid');
-      const news = [
-        { title: "One Piece: Nouvel arc annoncé", image: ANIMES_DB.find(a=>a.id===21).image, date: new Date().toLocaleDateString('fr-FR') },
-        { title: "Jujutsu Kaisen Saison 2 terminée", image: ANIMES_DB.find(a=>a.id===7).image, date: new Date().toLocaleDateString('fr-FR') },
-        { title: "Demon Slayer: Nouveau film", image: ANIMES_DB.find(a=>a.id===8).image, date: new Date().toLocaleDateString('fr-FR') },
-        { title: "Attack on Titan: Le final", image: ANIMES_DB.find(a=>a.id===6).image, date: new Date().toLocaleDateString('fr-FR') }
-      ];
-      container.innerHTML = news.map(item => `<div class="news-card"><img src="${item.image}"><div class="news-content"><span class="news-source">📰 Actualité</span><h3>${item.title}</h3><div class="news-meta">📅 ${item.date}</div></div></div>`).join('');
-    }
-
-    // ============================================
-    // CALENDRIER
-    // ============================================
-    function loadCalendar() {
-      const container = document.getElementById('calendarGrid');
-      const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-      const schedule = {
-        'Lundi': [{ title: "One Piece", ep: 1122 }], 'Mardi': [{ title: "Jujutsu Kaisen", ep: 47 }],
-        'Mercredi': [{ title: "Demon Slayer", ep: 55 }], 'Jeudi': [{ title: "My Hero Academia", ep: 138 }],
-        'Vendredi': [{ title: "Attack on Titan", ep: 87 }], 'Samedi': [{ title: "Spy x Family", ep: 25 }],
-        'Dimanche': [{ title: "Dragon Ball Daima", ep: 12 }]
-      };
-      container.innerHTML = days.map(day => `<div class="calendar-day"><div class="calendar-day-header">${day}</div>${(schedule[day] || []).map(a => `<div class="calendar-episode"><strong>${a.title}</strong><small>Ép. ${a.ep}</small></div>`).join('')}</div>`).join('');
-      document.querySelectorAll('.calendar-episode').forEach(ep => {
-        ep.addEventListener('click', () => { const anime = ANIMES_DB.find(a => a.title === ep.querySelector('strong')?.innerText); if(anime) window.location.href = `anime-detail.html?id=${anime.id}`; });
-      });
-    }
-
-    // ============================================
-    // RECHERCHE
-    // ============================================
-    function performSearch(query) {
-      const dropdown = document.getElementById('searchDropdown');
-      if (!query.trim()) { dropdown.classList.remove('active'); return; }
-      const results = ANIMES_DB.filter(a => a.title.toLowerCase().includes(query.toLowerCase())).slice(0, 8);
-      if (results.length) {
-        dropdown.innerHTML = results.map(a => `<div class="search-item" data-id="${a.id}"><img src="${a.image}"><div><h4>${a.title}</h4><p>⭐ ${a.score} | ${a.episodes} ép</p></div></div>`).join('');
-        dropdown.classList.add('active');
-        document.querySelectorAll('.search-item').forEach(item => {
-          item.addEventListener('click', () => window.location.href = `anime-detail.html?id=${item.dataset.id}`);
-        });
-      } else {
-        dropdown.innerHTML = '<div class="search-item">Aucun résultat</div>';
-        dropdown.classList.add('active');
+      let pag = "";
+      for(let i=1; i<=totalPages; i++) {
+        pag += `<button class="page-btn ${i===currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
       }
+      document.getElementById("pagination").innerHTML = pag;
+      document.querySelectorAll(".page-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentPage = parseInt(btn.dataset.page);
+          renderHome();
+          window.scrollTo({top:0});
+        });
+      });
+      document.getElementById("homeTitle").innerText = currentCategory === "anime" ? "Animes récents" : (currentCategory === "manga" ? "Mangas récents" : "Webtoons récents");
     }
 
-    // ============================================
-    // NAVIGATION
-    // ============================================
+    function renderTopRated() {
+      let top = [...DB[currentCategory]].sort((a,b) => b.score - a.score).slice(0,12);
+      document.getElementById("topGrid").innerHTML = top.map(renderCard).join("");
+      document.querySelectorAll(".anime-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          if(e.target.classList.contains("fav-badge")) return;
+          let id = parseInt(card.dataset.id);
+          window.location.href = `detail.html?type=${currentCategory}&id=${id}`;
+        });
+      });
+      document.querySelectorAll(".fav-badge").forEach(badge => {
+        badge.addEventListener("click", (e) => {
+          e.stopPropagation();
+          let id = parseInt(badge.dataset.id);
+          let item = DB[currentCategory].find(i => i.id === id);
+          if(item) toggleFavorite(item);
+          renderTopRated();
+        });
+      });
+    }
+
+    function renderCalendar() {
+      const days = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+      let schedule = {
+        "Lundi": [{ title: "One Piece", ep: 1122 }],
+        "Mardi": [{ title: "Jujutsu Kaisen", ep: 47 }],
+        "Mercredi": [{ title: "Demon Slayer", ep: 55 }],
+        "Jeudi": [{ title: "My Hero Academia", ep: 138 }],
+        "Vendredi": [{ title: "Attack on Titan", ep: 87 }],
+        "Samedi": [{ title: "Spy x Family", ep: 25 }],
+        "Dimanche": [{ title: "Dragon Ball Daima", ep: 12 }]
+      };
+      let html = `<div class="calendar-grid">`;
+      days.forEach(day => {
+        html += `<div class="calendar-day"><div class="calendar-day-header">${day}</div>`;
+        (schedule[day] || []).forEach(ep => {
+          html += `<div class="calendar-episode"><strong>${ep.title}</strong><small>Ép. ${ep.ep}</small></div>`;
+        });
+        html += `</div>`;
+      });
+      html += `</div>`;
+      document.getElementById("calendarGrid").innerHTML = html;
+    }
+
+    function renderNews() {
+      const news = [
+        { title: "One Piece : Nouvel arc annoncé", image: DB.anime[0].image, date: new Date().toLocaleDateString() },
+        { title: "Jujutsu Kaisen Saison 2 terminée", image: DB.anime.find(a=>a.id===7).image, date: new Date().toLocaleDateString() },
+        { title: "Demon Slayer : nouveau film", image: DB.anime.find(a=>a.id===8).image, date: new Date().toLocaleDateString() }
+      ];
+      document.getElementById("newsGrid").innerHTML = news.map(n => `
+        <div class="news-card">
+          <img src="${n.image}">
+          <div class="news-content"><span class="news-source">📰 Actualité</span><h3>${n.title}</h3><div class="news-meta">📅 ${n.date}</div></div>
+        </div>
+      `).join("");
+    }
+
+    function renderCurrentPage() {
+      if(currentTab === "home") renderHome();
+      else if(currentTab === "top") renderTopRated();
+      else if(currentTab === "calendar") renderCalendar();
+      else if(currentTab === "news") renderNews();
+    }
+
     function switchTab(tab) {
       currentTab = tab;
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.getElementById(tab + 'Page').classList.remove('hidden');
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-      if (tab === 'calendar') loadCalendar();
-      else if (tab === 'top') loadTopRated();
-      else if (tab === 'news') loadNews();
+      document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+      document.getElementById(tab+"Page").classList.remove("hidden");
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+      renderCurrentPage();
     }
 
     function setCategory(cat) {
-      document.querySelectorAll('.cat-nav-btn').forEach(b => b.classList.remove('active'));
-      if (cat === 'anime') { document.querySelector('.cat-nav-btn.anime').classList.add('active'); loadAnimes(1, ''); }
-      else if (cat === 'manga') showToast('📖 Page Manga en construction');
-      else if (cat === 'webtoon') window.location.href = 'webtoon.html';
+      currentCategory = cat;
+      currentPage = 1;
+      currentGenre = "";
+      document.body.classList.remove("anime-mode", "manga-mode", "webtoon-mode");
+      if(cat === "anime") document.body.classList.add("anime-mode");
+      else if(cat === "manga") document.body.classList.add("manga-mode");
+      else if(cat === "webtoon") document.body.classList.add("webtoon-mode");
+      document.querySelectorAll(".cat-nav-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(`.cat-nav-btn[data-cat="${cat}"]`).classList.add("active");
+      // Met à jour le hero
+      const heroTitle = document.getElementById("heroTitle");
+      const heroDesc = document.getElementById("heroDesc");
+      if(cat === "anime") { heroTitle.innerText = "📺 Bienvenue sur Akrya Anime"; heroDesc.innerText = "Découvrez les animes tendances"; }
+      else if(cat === "manga") { heroTitle.innerText = "📖 Bienvenue sur Akrya Manga"; heroDesc.innerText = "Découvrez les mangas populaires"; }
+      else { heroTitle.innerText = "🎨 Bienvenue sur Akrya Webtoon"; heroDesc.innerText = "Découvrez les webtoons coréens"; }
+      // Recharge les filtres genres (uniquement ceux présents dans la catégorie)
+      const genresSet = new Set();
+      DB[cat].forEach(item => { if(item.genre) genresSet.add(item.genre); });
+      const genres = Array.from(genresSet);
+      const filtersDiv = document.getElementById("genreFilters");
+      filtersDiv.innerHTML = `<button class="genre-filter active" data-genre="">🌟 Tous</button>` + genres.map(g => `<button class="genre-filter" data-genre="${g}">${g === "action" ? "⚔️ Action" : g === "fantasy" ? "✨ Fantasy" : g === "drama" ? "🎭 Drame" : g === "comedy" ? "😄 Comédie" : g}</button>`).join("");
+      document.querySelectorAll(".genre-filter").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".genre-filter").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentGenre = btn.dataset.genre;
+          currentPage = 1;
+          renderHome();
+        });
+      });
+      renderHome();
+      if(currentTab === "top") renderTopRated();
+      showToast(`Mode ${cat.toUpperCase()} activé`);
+    }
+
+    function performSearch(query) {
+      const dropdown = document.getElementById("searchDropdown");
+      if (!query.trim()) { dropdown.classList.remove("active"); return; }
+      const results = DB[currentCategory].filter(i => i.title.toLowerCase().includes(query.toLowerCase())).slice(0,8);
+      if(results.length) {
+        dropdown.innerHTML = results.map(i => `<div class="search-item" data-id="${i.id}"><img src="${i.image}"><div><h4>${i.title}</h4><p>⭐ ${i.score}</p></div></div>`).join("");
+        dropdown.classList.add("active");
+        document.querySelectorAll(".search-item").forEach(item => {
+          item.addEventListener("click", () => window.location.href = `detail.html?type=${currentCategory}&id=${item.dataset.id}`);
+        });
+      } else {
+        dropdown.innerHTML = "<div class='search-item'>Aucun résultat</div>";
+        dropdown.classList.add("active");
+      }
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
+      const toast = document.getElementById("toast");
       toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
     }
 
-    // ============================================
-    // THEME
-    // ============================================
     function initTheme() {
-      if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
-      document.getElementById('themeToggle').textContent = localStorage.getItem('theme') === 'light' ? '☀️' : '🌙';
+      if (localStorage.getItem("theme") === "light") document.body.classList.add("light-theme");
+      document.getElementById("themeToggle").textContent = localStorage.getItem("theme") === "light" ? "☀️" : "🌙";
     }
     function toggleTheme() {
-      document.body.classList.toggle('light-theme');
-      const isLight = document.body.classList.contains('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+      document.body.classList.toggle("light-theme");
+      const isLight = document.body.classList.contains("light-theme");
+      localStorage.setItem("theme", isLight ? "light" : "dark");
+      document.getElementById("themeToggle").textContent = isLight ? "☀️" : "🌙";
     }
 
-    // ============================================
-    // FIREBASE
-    // ============================================
+    // Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCwDOGPUWQ08WGuAAZ9p6hS6SZytmRoKig",
       authDomain: "arkya-animemanga.firebaseapp.com",
@@ -868,53 +884,46 @@
 
     auth.onAuthStateChanged(async (user) => {
       currentUser = user;
-      const authDiv = document.getElementById('authButtons');
-      const userDiv = document.getElementById('userMenu');
+      const authDiv = document.getElementById("authButtons");
+      const userDiv = document.getElementById("userMenu");
       if (authDiv && userDiv) {
         if (user) {
-          authDiv.style.display = 'none';
-          userDiv.style.display = 'flex';
-          document.getElementById('userName').textContent = user.displayName || user.email;
-          if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
-          const doc = await db.collection('users').doc(user.uid).get();
+          authDiv.style.display = "none";
+          userDiv.style.display = "flex";
+          document.getElementById("userName").textContent = user.displayName || user.email;
+          if (user.photoURL) document.getElementById("userAvatar").src = user.photoURL;
+          const doc = await db.collection("users").doc(user.uid).get();
           if (doc.exists && doc.data().favorites) favorites = doc.data().favorites;
           saveFavorites();
-          loadAnimes(currentPage, currentGenre);
+          renderHome();
+          renderTopRated();
         } else {
-          authDiv.style.display = 'flex';
-          userDiv.style.display = 'none';
+          authDiv.style.display = "flex";
+          userDiv.style.display = "none";
         }
       }
     });
 
-    window.loginWithGoogle = async () => { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); showToast('Connexion réussie'); } catch(e) { showToast('Erreur: ' + e.message); } };
-    window.loginWithFacebook = async () => { try { await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); showToast('Connexion réussie'); } catch(e) { showToast('Erreur: ' + e.message); } };
-    window.logout = async () => { await auth.signOut(); showToast('Déconnecté'); };
+    window.loginWithGoogle = async () => { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); showToast("Connexion réussie"); } catch(e) { showToast("Erreur: "+e.message); } };
+    window.loginWithFacebook = async () => { try { await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); showToast("Connexion réussie"); } catch(e) { showToast("Erreur: "+e.message); } };
+    window.logout = async () => { await auth.signOut(); showToast("Déconnecté"); };
 
-    // ============================================
-    // INITIALISATION
-    // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
       initTheme();
-      loadAnimes(1, '');
-      document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
-      document.querySelectorAll('.cat-nav-btn').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); setCategory(btn.dataset.cat); }));
-      document.querySelectorAll('.genre-filter').forEach(btn => btn.addEventListener('click', () => {
-        document.querySelectorAll('.genre-filter').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentGenre = btn.dataset.genre;
-        loadAnimes(1, currentGenre);
-      }));
-      document.getElementById('prevWeekBtn')?.addEventListener('click', loadCalendar);
-      document.getElementById('nextWeekBtn')?.addEventListener('click', loadCalendar);
-      document.getElementById('currentWeekBtn')?.addEventListener('click', loadCalendar);
-      const searchInput = document.getElementById('searchInput');
-      const searchBtn = document.getElementById('searchBtn');
+      document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+      document.querySelectorAll(".cat-nav-btn").forEach(btn => btn.addEventListener("click", () => { setCategory(btn.dataset.cat); }));
+      setCategory("anime");
+      switchTab("home");
+      document.getElementById("prevWeekBtn")?.addEventListener("click", () => renderCalendar());
+      document.getElementById("nextWeekBtn")?.addEventListener("click", () => renderCalendar());
+      document.getElementById("currentWeekBtn")?.addEventListener("click", () => renderCalendar());
+      const searchInput = document.getElementById("searchInput");
+      const searchBtn = document.getElementById("searchBtn");
       let timeout;
-      searchInput.addEventListener('input', (e) => { clearTimeout(timeout); timeout = setTimeout(() => performSearch(e.target.value), 300); });
-      searchBtn.addEventListener('click', () => performSearch(searchInput.value));
-      document.addEventListener('click', (e) => { if (!e.target.closest('.search-container')) document.getElementById('searchDropdown')?.classList.remove('active'); });
+      searchInput.addEventListener("input", (e) => { clearTimeout(timeout); timeout = setTimeout(() => performSearch(e.target.value), 300); });
+      searchBtn.addEventListener("click", () => performSearch(searchInput.value));
+      document.addEventListener("click", (e) => { if (!e.target.closest(".search-container")) document.getElementById("searchDropdown")?.classList.remove("active"); });
     });
   </script>
 </body>
