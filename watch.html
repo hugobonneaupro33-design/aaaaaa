@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Regardez vos animes en VF et VOSTFR avec lecteur intégré - Anime & Manga Info">
+  <meta name="description" content="Regardez vos animes en VF et VOSTFR avec lecteur intégré - Akrya Anime">
   <meta name="theme-color" content="#e94560">
-  <title>Visionnage - Anime & Manga Info</title>
+  <title>Visionnage - Akrya Anime</title>
   <link rel="stylesheet" href="style.css">
   <style>
     /* ============================================
@@ -533,19 +533,24 @@
     const PROXY = 'https://corsproxy.io/?url=';
 
     // ============================================
-    // 10 SOURCES DE LECTEUR
+    // 15 SOURCES DE LECTEUR
     // ============================================
     const embedSources = {
-      voe: { name: 'Voe', vf: (id,ep) => `https://voe.sx/e/${id}-${ep}`, vostfr: (id,ep) => `https://voe.sx/e/${id}-${ep}`, isAvailable: true },
-      send: { name: 'Send.cm', vf: (id,ep) => `https://send.cm/embed/${id}-${ep}`, vostfr: (id,ep) => `https://send.cm/embed/${id}-${ep}`, isAvailable: true },
-      kraken: { name: 'Kraken', vf: (id,ep) => `https://krakenfiles.com/embed/${id}-${ep}`, vostfr: (id,ep) => `https://krakenfiles.com/embed/${id}-${ep}`, isAvailable: true },
-      animesama: { name: 'AnimeSama', vf: (id,ep) => `https://animesama.cc/embed/${id}-${ep}`, vostfr: (id,ep) => `https://animesama.cc/embed/${id}-${ep}`, isAvailable: true },
-      gdrive: { name: 'GDrive', vf: (id,ep) => `https://drive.google.com/file/d/preview`, vostfr: (id,ep) => `https://drive.google.com/file/d/preview`, isAvailable: true },
-      uqload: { name: 'Uqload', vf: (id,ep) => `https://uqload.com/embed-${id}-${ep}.html`, vostfr: (id,ep) => `https://uqload.com/embed-${id}-${ep}.html`, isAvailable: true },
-      streamsb: { name: 'StreamSB', vf: (id,ep) => `https://streamsb.net/embed-${id}-${ep}`, vostfr: (id,ep) => `https://streamsb.net/embed-${id}-${ep}`, isAvailable: true },
-      mp4upload: { name: 'Mp4Upload', vf: (id,ep) => `https://www.mp4upload.com/embed-${id}-${ep}.html`, vostfr: (id,ep) => `https://www.mp4upload.com/embed-${id}-${ep}.html`, isAvailable: true },
-      doodstream: { name: 'Doodstream', vf: (id,ep) => `https://doodstream.com/e/${id}-${ep}`, vostfr: (id,ep) => `https://doodstream.com/e/${id}-${ep}`, isAvailable: true },
-      mixdrop: { name: 'Mixdrop', vf: (id,ep) => `https://mixdrop.co/e/${id}-${ep}`, vostfr: (id,ep) => `https://mixdrop.co/e/${id}-${ep}`, isAvailable: true }
+      voe: { name: '🎬 Voe', vf: (id,ep) => `https://voe.sx/e/${id}-${ep}`, vostfr: (id,ep) => `https://voe.sx/e/${id}-${ep}`, isAvailable: true },
+      send: { name: '📡 Send', vf: (id,ep) => `https://send.cm/embed/${id}-${ep}`, vostfr: (id,ep) => `https://send.cm/embed/${id}-${ep}`, isAvailable: true },
+      kraken: { name: '🐙 Kraken', vf: (id,ep) => `https://krakenfiles.com/embed/${id}-${ep}`, vostfr: (id,ep) => `https://krakenfiles.com/embed/${id}-${ep}`, isAvailable: true },
+      animesama: { name: '🍥 AnimeSama', vf: (id,ep) => `https://animesama.cc/embed/${id}-${ep}`, vostfr: (id,ep) => `https://animesama.cc/embed/${id}-${ep}`, isAvailable: true },
+      gdrive: { name: '☁️ GDrive', vf: (id,ep) => `https://drive.google.com/file/d/preview`, vostfr: (id,ep) => `https://drive.google.com/file/d/preview`, isAvailable: true },
+      uqload: { name: '📤 Uqload', vf: (id,ep) => `https://uqload.com/embed-${id}-${ep}.html`, vostfr: (id,ep) => `https://uqload.com/embed-${id}-${ep}.html`, isAvailable: true },
+      streamsb: { name: '🎥 StreamSB', vf: (id,ep) => `https://streamsb.net/embed-${id}-${ep}`, vostfr: (id,ep) => `https://streamsb.net/embed-${id}-${ep}`, isAvailable: true },
+      mp4upload: { name: '📀 Mp4Upload', vf: (id,ep) => `https://www.mp4upload.com/embed-${id}-${ep}.html`, vostfr: (id,ep) => `https://www.mp4upload.com/embed-${id}-${ep}.html`, isAvailable: true },
+      doodstream: { name: '🎞️ Doodstream', vf: (id,ep) => `https://doodstream.com/e/${id}-${ep}`, vostfr: (id,ep) => `https://doodstream.com/e/${id}-${ep}`, isAvailable: true },
+      mixdrop: { name: '🎬 Mixdrop', vf: (id,ep) => `https://mixdrop.co/e/${id}-${ep}`, vostfr: (id,ep) => `https://mixdrop.co/e/${id}-${ep}`, isAvailable: true },
+      wolfstream: { name: '🐺 WolfStream', vf: (id,ep) => `https://wolfstream.tv/embed-${id}-${ep}`, vostfr: (id,ep) => `https://wolfstream.tv/embed-${id}-${ep}`, isAvailable: true },
+      vidcloud: { name: '☁️ VidCloud', vf: (id,ep) => `https://vidcloud.icu/embed-${id}-${ep}`, vostfr: (id,ep) => `https://vidcloud.icu/embed-${id}-${ep}`, isAvailable: true },
+      gogoplay: { name: '🎮 GogoPlay', vf: (id,ep) => `https://gogoplay.io/embed/${id}-${ep}`, vostfr: (id,ep) => `https://gogoplay.io/embed/${id}-${ep}`, isAvailable: true },
+      animevibe: { name: '✨ AnimeVibe', vf: (id,ep) => `https://animevibe.tv/embed/${id}-${ep}`, vostfr: (id,ep) => `https://animevibe.tv/embed/${id}-${ep}`, isAvailable: true },
+      zoro: { name: '⚔️ Zoro', vf: (id,ep) => `https://zoro.to/embed/${id}-${ep}`, vostfr: (id,ep) => `https://zoro.to/embed/${id}-${ep}`, isAvailable: true }
     };
 
     // Générer les boutons sources dynamiquement
